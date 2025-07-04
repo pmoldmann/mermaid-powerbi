@@ -170,8 +170,7 @@ const devServer = {
     hot: false,
     liveReload: false,
     webSocketServer: false,
-    https: {
-    },
+    server: 'https',
     headers: {
         "access-control-allow-origin": "*",
         "cache-control": "public, max-age=0"
