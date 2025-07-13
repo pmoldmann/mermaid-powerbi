@@ -55,6 +55,7 @@
 }
 
 .about {
+    height: calc(100% - 25px);
     overflow-y: scroll;
     font-family: Arial, sans-serif;
     line-height: 1.6;
@@ -86,5 +87,40 @@
     }
     .section {
         margin-bottom: 20px;
+    }
+}
+
+.editor {
+    .w-md-editor-toolbar, .w-md-editor-toolbar > ul {
+        min-height: 35px;
+    }
+
+    .about-tab,#rc-tabs-0-tab-donate {
+        color: red;
+        font-weight: 400;
+    }
+
+    .ant-tabs-nav {
+        margin-left: 10px;
+    }
+
+    .ant-tabs {
+        height: 100%;
+    }
+
+    .ant-tabs-tabpane {
+        height: 100%;
+    }
+
+    .ant-tabs-content {
+        height: 100%;
+    }
+
+    .container {
+        height: 100%;
+    }
+
+    .wmde-markdown-var {
+        height: 100% !important;
     }
 }
