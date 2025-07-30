@@ -9,7 +9,7 @@ import { select } from "d3-selection";
 
 import { axisBottom, axisLeft, axisRight, axisTop, Axis } from "d3-axis";
 
-import { 
+import {
     scaleLinear,
     scaleBand,
     scaleLog,
@@ -181,7 +181,7 @@ Handlebars.registerHelper('filter', (array, v, eq: string = '==') => {
         case '<':
             return filter(array, (a) => a < v)
         case '<=':
-            return filter(array, (a) => a <= v)       
+            return filter(array, (a) => a <= v)
         default:
             return filter(array, (a) => a === v)
     }
@@ -193,7 +193,7 @@ for (const axisFunc in axisFunctions) {
             const scale = scales.get(scaleID)
             const axis = axisFunctions[axisFunc](scale)
             axes.set(id, axis)
-        }  else {
+        } else {
             return `Scale ${scaleID} not found`
         }
     })
@@ -201,13 +201,13 @@ for (const axisFunc in axisFunctions) {
 
 for (const scaleFunc in scaleFunctions) {
     Handlebars.registerHelper(scaleFunc, (id: string, ...args: unknown[]) => {
-        if (!scales.has(id)) {
-            args.pop();
-            const scale = scaleFunctions[scaleFunc].call(axisFunctions[scaleFunc], ...args)
-            scales.set(id, scale)
-        } else {
-            return 'Scale redeclared'
+        if (scales.has(id)) {
+            scales.delete(id);
         }
+
+        args.pop();
+        const scale = scaleFunctions[scaleFunc].call(axisFunctions[scaleFunc], ...args)
+        scales.set(id, scale)
     })
 }
 
