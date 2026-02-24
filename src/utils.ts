@@ -1,11 +1,5 @@
 import powerbiVisualsApi from "powerbi-visuals-api";
-import PrimitiveValue = powerbiVisualsApi.PrimitiveValue;
 import DataView = powerbiVisualsApi.DataView;
-import ISelectionId = powerbiVisualsApi.visuals.ISelectionId;
-import DataViewMetadataColumn = powerbiVisualsApi.DataViewMetadataColumn;
-import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
-
-import { utcParse } from "d3-time-format";
 
 import dompurify from "dompurify";
 
@@ -18,7 +12,6 @@ export const defaultDompurifyConfig = <dompurify.Config>{
     ],
     ALLOW_UNKNOWN_PROTOCOLS: false,
     USE_PROFILES: {svg: true, svgFilters: true, html: true, mathMl: false},
-    // ALLOWED_TAGS: [],
     FORBID_ATTR: [
         'href',
         'url',
@@ -88,121 +81,27 @@ export const defaultDompurifyConfig = <dompurify.Config>{
     FORBID_TAGS: ['script', 'iframe', 'object', 'param', 'source', 'video'],
 };
 
-export type Column = Pick<DataViewMetadataColumn, "displayName" | "index">;
-
-export interface Row {
-    [key: string]: PrimitiveValue | ISelectionId
-    selection?: ISelectionId
-}
-
-export interface Table {
-    rows: Row[];
-    columns: Column[];
-}
-
 export function sanitizeHTML(dirty: string) {
     return dompurify.sanitize(dirty, defaultDompurifyConfig) as string;
 }
 
-export function safeParse(echartJson: string): any {
-    let chart: any = {};
-
-    try {
-        chart = echartJson ? JSON.parse(echartJson) : {};
-    } catch (e) {
-        console.log(e.message);
+/**
+ * Extracts markdown content from the dataView's single value mapping.
+ * @param dataView The Power BI dataView
+ * @returns The markdown string or empty string if not available
+ */
+export function extractMarkdownContent(dataView: DataView): string {
+    if (!dataView || !dataView.single) {
+        return '';
     }
-
-    return chart;
-}
-
-export function getChartColumns(echartJson: string): string[] {
-    if (!echartJson) {
-        return [];
+    
+    const value = dataView.single.value;
+    
+    if (value === null || value === undefined) {
+        return '';
     }
-    const chart = safeParse(echartJson);
-
-    if (chart.dataset) {
-        if (chart.dataset.dimensions && chart.dataset.dimensions instanceof Array) {
-            const columns = [];
-            chart.dataset.dimensions.forEach((dimension: string | Record<string, string>) => {
-                if (typeof dimension === 'string') {
-                    columns.push(dimension);
-                } else {
-                    columns.push(dimension.name);
-                }
-            });
-
-            return columns;
-        }
-        if (chart.dataset.source[0]) {
-            return chart.dataset.source[0];
-        }
-    }
-
-    return [];
-}
-
-export function walk(key: string, tree: Record<string, unknown | unknown[]> | unknown, apply: (key: string, value: any) => void) {
-    if (typeof tree !== 'object') {
-        apply(key, tree);
-        return;
-    }
-    for (const key in tree) {
-        if (tree[key] instanceof Array) {
-            const array = tree[key] as Array<unknown>;
-            array.forEach((el, index) => {
-                apply(index.toString(), el);
-                walk(index.toString(), el, apply);
-            });
-        } else {
-            apply(key, tree[key]);
-            if (tree[key] instanceof Object) {
-                walk(key, tree[key], apply);
-            }
-        }
-
-    }
-}
-
-
-export function convertData(dataView: DataView, host?: IVisualHost): Table {
-    const table: Table = {
-        rows: [],
-        columns: []
-    };
-
-    if (!dataView || !dataView.table) {
-        return table
-    }
-
-    const dateParse = utcParse('%Y-%m-%dT%H:%M:%S.%LZ');
-    dataView.table.rows.forEach((data, rowIndex) => {
-        const selection = host
-            ?.createSelectionIdBuilder()
-            .withTable(dataView.table, rowIndex)
-            .createSelectionId();
-        
-        const row = {
-            selection
-        };
-        dataView.table.columns.forEach((col, index) => {
-            if (col.type.dateTime || col.type.temporal) {
-                row[col.displayName] = dateParse(data[index] as string);
-            } else {
-                row[col.displayName] = data[index];
-            }
-        })
-
-        table.rows.push(row)
-    })
-
-    table.columns = dataView.table.columns.map(c => ({
-        displayName: c.displayName,
-        index: c.index
-    }))
-
-    return table;
+    
+    return String(value);
 }
 
 export function deepClone(object: unknown) {

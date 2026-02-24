@@ -19,7 +19,7 @@ import { VisualSettings } from "./settings";
 
 import { Provider } from 'react-redux';
 import { store } from "./redux/store";
-import { setDataView, setHost, setMode, setSettings, setViewport } from './redux/slice';
+import { setDataView, setHost, setSettings, setViewport } from './redux/slice';
 import { deepClone } from './utils';
 
 
@@ -61,9 +61,10 @@ export class Visual implements IVisual {
     public update(options: VisualUpdateOptions) {
         const dataView = options && options.dataViews && options.dataViews[0];
         this.settings = Visual.parseSettings(dataView);
-        store.dispatch(setMode(options.editMode));
         store.dispatch(setSettings(this.settings));
-        store.dispatch(setDataView(deepClone(options.dataViews[0])));
+        if (dataView) {
+            store.dispatch(setDataView(deepClone(dataView)));
+        }
         store.dispatch(setViewport(deepClone(options.viewport)));
     }
 
@@ -72,19 +73,7 @@ export class Visual implements IVisual {
     }
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
-        if (options.objectName === 'template') {
-            return <VisualObjectInstance[]>[
-                {
-                    objectName: options.objectName,
-                    properties: {}
-                }
-            ];
-        }
-        if (options.objectName === 'resources') {
-            return <VisualObjectInstance[]>[
-                
-            ];
-        }
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
     }
 }
+

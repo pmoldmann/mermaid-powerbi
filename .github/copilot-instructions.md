@@ -2,16 +2,14 @@
 
 ## Project Overview
 
-This is a **Power BI Custom Visual** that integrates Markdown and Mermaid diagram rendering into Power BI reports. Users can write Markdown content with embedded Mermaid diagrams using Handlebars templating to dynamically bind Power BI data.
+This is a **Power BI Custom Visual** that renders Markdown content with embedded Mermaid diagrams. Users provide a column or measure containing Markdown text, which is then visualized in the report. No editor functionality - content is driven entirely by data.
 
 ## Tech Stack
 
 - **TypeScript 5.3** with React 18 (JSX)
 - **Redux Toolkit** for global state management
 - **Mermaid 11.x** for diagram rendering
-- **Handlebars** for templating with data binding
-- **D3.js** for data formatting, scales, and axes
-- **Ant Design (antd)** for UI components
+- **@uiw/react-md-editor** for Markdown rendering
 - **DOMPurify** for HTML sanitization
 - **SCSS** for styling
 - **Webpack** with `powerbi-visuals-webpack-plugin` for bundling
@@ -21,14 +19,11 @@ This is a **Power BI Custom Visual** that integrates Markdown and Mermaid diagra
 ```
 src/
 ├── visual.ts          # Main Power BI visual entry point (implements IVisual interface)
-├── Application.tsx    # Root React application component
-├── Editor.tsx         # Template editor with Markdown/Mermaid preview
+├── Application.tsx    # Root React component - renders Markdown content
+├── Code.tsx           # Code block handler for Mermaid diagrams and inline styles
 ├── Error.tsx          # Error boundary component
-├── helpers.ts         # Handlebars helpers for D3 formatting/scales
 ├── settings.ts        # Visual settings definitions using DataViewObjectsParser
-├── utils.ts           # Data conversion and sanitization utilities
-├── Sponsor.tsx        # Sponsorship component
-├── Resources.tsx      # Resource management (images)
+├── utils.ts           # Markdown extraction and sanitization utilities
 └── redux/
     ├── store.ts       # Redux store configuration
     ├── slice.ts       # Redux slice with visual state actions/reducers
@@ -52,35 +47,31 @@ export class Visual implements IVisual {
 }
 ```
 
+### Data Flow
+
+1. User adds a column/measure containing Markdown text to the "Markdown Content" field
+2. Power BI calls `visual.update()` with new data
+3. Visual extracts markdown from `dataView.single.value` using `extractMarkdownContent()`
+4. Redux state is updated with the markdown content
+5. React renders the markdown with Mermaid diagram support
+
 ### State Management
 
 Use typed Redux hooks instead of plain `useDispatch`/`useSelector`:
 ```typescript
 import { useAppSelector, useAppDispatch } from './redux/hooks';
 
+const markdownContent = useAppSelector((state) => state.options.markdownContent);
 const settings = useAppSelector((state) => state.options.settings);
-const dispatch = useAppDispatch();
 ```
 
-### Data Flow
+### Markdown & Mermaid Rendering
 
-1. Power BI calls `visual.update()` with new data
-2. Visual dispatches actions: `setDataView`, `setSettings`, `setViewport`, `setMode`
-3. Always use `deepClone()` before dispatching dataViews (they're mutable)
-4. React components consume state via `useAppSelector`
+Markdown is rendered using `@uiw/react-md-editor`. The `Code` component handles:
+- **Mermaid diagrams**: Code blocks with `language-mermaid` are rendered as SVG diagrams
+- **Inline styles**: Code blocks with `language-style` inject CSS into the document
+- **Regular code**: Rendered as standard `<code>` elements
 
-### Handlebars Templating
-
-Custom helpers are registered in `helpers.ts` for D3 integration:
-- `{{format value ",.2f"}}` - D3 number formatting
-- `{{utcFormat date "%Y-%m-%d"}}` - UTC date formatting
-- `{{timeFormat date "%H:%M"}}` - Local time formatting
-- Scale helpers: `createScale`, `bandScale`, `linearScale`
-- `{{#each table.rows}}` - Iterate over data rows
-
-### Mermaid Rendering
-
-Mermaid code blocks in Markdown are rendered in `Editor.tsx`:
 ```tsx
 // Detect mermaid code blocks via className
 const isMermaid = className && /^language-mermaid/.test(className.toLocaleLowerCase());
@@ -117,10 +108,6 @@ Use DOMPurify for HTML sanitization. Default config in `utils.ts`:
 - Never mutate state directly
 - Keep actions in `slice.ts`, use `PayloadAction<T>` typing
 
-### Settings
-- Define settings classes extending `DataViewObjectsParser`
-- Template content is chunked across `chunk0`-`chunk10` due to Power BI property size limits
-
 ## Build Commands
 
 ```bash
@@ -135,18 +122,41 @@ yarn lintfix        # Auto-fix lint issues
 1. Run `yarn start` to start dev server
 2. Enable Developer Mode in Power BI Desktop
 3. Add "Developer Visual" to your report
-4. Changes hot-reload automatically
+4. Add a column or measure with Markdown text to the visual
+5. Changes hot-reload automatically
 
 ## Key Files for Common Tasks
 
 | Task | Files |
 |------|-------|
 | Add new setting | `settings.ts`, `capabilities.json` |
-| Add Handlebars helper | `helpers.ts` |
-| Modify editor UI | `Editor.tsx` |
-| Change data processing | `utils.ts`, `slice.ts` |
+| Modify Markdown rendering | `Application.tsx`, `Code.tsx` |
+| Change data extraction | `utils.ts`, `slice.ts` |
 | Update styling | `style/visual.scss` |
 | Modify visual metadata | `pbiviz.json`, `capabilities.json` |
+
+## Data Binding
+
+The visual uses a "single" dataViewMapping - it expects one value (column or measure) containing Markdown text:
+
+```json
+{
+    "dataRoles": [
+        {
+            "displayName": "Markdown Content",
+            "name": "markdown",
+            "kind": "Measure"
+        }
+    ],
+    "dataViewMappings": [
+        {
+            "single": {
+                "role": "markdown"
+            }
+        }
+    ]
+}
+```
 
 ## Dependencies Notes
 
