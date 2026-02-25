@@ -37,9 +37,10 @@ export const slice = createSlice({
         setViewport: (state, action: PayloadAction<IViewport>) => {
             state.viewport = action.payload
         },
-        setDataView: (state, action: PayloadAction<DataView>) => {
-            state.dataView = action.payload
-            state.markdownContent = extractMarkdownContent(action.payload)
+        setDataView: (state, action: PayloadAction<DataView | null>) => {
+            state.dataView = action.payload;
+            // Extract content or clear if dataView is null/undefined
+            state.markdownContent = action.payload ? extractMarkdownContent(action.payload) : '';
         },
         setSettings: (state, action: PayloadAction<IVisualSettings>) => {
             state.settings = action.payload;

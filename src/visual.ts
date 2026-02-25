@@ -62,9 +62,8 @@ export class Visual implements IVisual {
         const dataView = options && options.dataViews && options.dataViews[0];
         this.settings = Visual.parseSettings(dataView);
         store.dispatch(setSettings(this.settings));
-        if (dataView) {
-            store.dispatch(setDataView(deepClone(dataView)));
-        }
+        // Always dispatch dataView - null/undefined will clear the content and show welcome page
+        store.dispatch(setDataView(dataView ? deepClone(dataView) : null));
         store.dispatch(setViewport(deepClone(options.viewport)));
     }
 
