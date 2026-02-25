@@ -1,7 +1,7 @@
 {
   "name": "mermaid-visual",
-  "version": "1.5.1.0",
-  "author": "Ilfat Galiev",
+  "version": "1.0.0",
+  "author": "Paul Moldmann",
   "scripts": {
     "package": "webpack --config view-webpack.config",
     "sass": "npx rebuild node-sass",

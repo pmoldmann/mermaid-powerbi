@@ -1,18 +1,18 @@
    
 {
     "author": {
-      "name": "Ilfat Galiev",
-      "email": "powerbi@ilfat-galiev.com"
+      "name": "Paul Moldmann",
+      "email": "mail@paulmoldmann.de"
     },
     "visual": {
-      "name": "MarkdownMermaidVisual",
-      "displayName": "Markdown & Mermaid Visual",
-      "guid": "markdownMermaidVisual",
+      "name": "MarkdownMermaidRenderer",
+      "displayName": "Markdown / Mermaid Renderer",
+      "guid": "markdownMermaidRenderer",
       "visualClassName": "Visual",
-      "version": "1.5.1.0",
-      "description": "Integrate Markdown and Mermaid render into Power BI",
-      "supportUrl": "https://github.com/zBritva/mermaid-powerbi/issues",
-      "gitHubUrl": "https://github.com/zBritva/mermaid-powerbi"
+      "version": "1.0.0",
+      "description": "Render Markdown content with embedded Mermaid diagrams in Power BI. Perfect for documentation, flowcharts, and process diagrams.",
+      "supportUrl": "https://github.com/pmoldmann/mermaid-powerbi",
+      "gitHubUrl": "https://github.com/pmoldmann/mermaid-powerbi"
     },
     "apiVersion": "5.4.0",
     "assets": {
