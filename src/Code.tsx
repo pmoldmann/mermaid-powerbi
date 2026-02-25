@@ -2,6 +2,7 @@ import React from "react";
 import { getCodeString } from 'rehype-rewrite';
 import mermaid from "mermaid";
 import { ErrorBoundary } from "./Error";
+import { debugLog } from "./DebugPanel";
 
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
@@ -33,6 +34,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 },
                 flowchart: {
                     useMaxWidth: false,  // Don't stretch flowcharts to full width
+                    htmlLabels: true,    // Enable HTML in labels (needed for <br/>)
                 },
                 sequence: {
                     useMaxWidth: false,  // Don't stretch sequence diagrams to full width
@@ -177,9 +179,22 @@ export const Code = (props: any) => {
     const isStyling =
         className && /^language-style/.test(className.toLocaleLowerCase());
 
-    const code = children
+    let code = children
         ? getCodeString(props.node.children)
         : children[0] || "";
+
+    // Debug: Log the code before and after decoding
+    if (isMermaid) {
+        debugLog('code', 'Mermaid code (raw)', code);
+    }
+
+    // Decode HTML entities for Mermaid code (e.g., &lt;br/&gt; -> <br/>)
+    if (isMermaid && code) {
+        const textarea = document.createElement('textarea');
+        textarea.innerHTML = code;
+        code = textarea.value;
+        debugLog('code', 'Mermaid code (decoded)', code);
+    }
 
     if (isMermaid) {
         return (

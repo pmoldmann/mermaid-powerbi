@@ -2,15 +2,27 @@ import React from 'react';
 
 import { useAppSelector } from './redux/hooks';
 import MDEditor from '@uiw/react-md-editor';
-import rehypeSanitize from "rehype-sanitize";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
 import { Code } from './Code';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar, SearchToggle } from './SearchBar';
+import { DebugPanel, useDebugLogs, clearDebugLogs, setDebugEnabled } from './DebugPanel';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import "mermaid";
+
+// Custom schema that preserves br tags (needed for Mermaid diagrams with line breaks)
+// Also allow br inside code elements
+const sanitizeSchema = {
+    ...defaultSchema,
+    tagNames: [...(defaultSchema.tagNames || []), 'br'],
+    ancestors: {
+        ...defaultSchema.ancestors,
+        br: ['code', 'pre', 'span', 'div', 'p', 'li', 'td', 'th'],
+    },
+};
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ApplicationProps {
@@ -90,6 +102,15 @@ export const Application: React.FC<ApplicationProps> = () => {
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [highlights, setHighlights] = React.useState<HTMLElement[]>([]);
     const [currentMatchIndex, setCurrentMatchIndex] = React.useState(0);
+    const [isDebugOpen, setIsDebugOpen] = React.useState(false);
+    const debugLogs = useDebugLogs();
+
+    const showDebugPanel = settings?.view?.showDebugPanel === true;
+
+    // Enable/disable debug logging based on settings
+    React.useEffect(() => {
+        setDebugEnabled(showDebugPanel);
+    }, [showDebugPanel]);
 
     const onLinkClick = React.useCallback((e: React.MouseEvent<HTMLElement>) => {
         const target = e.target as HTMLElement;
@@ -175,6 +196,26 @@ export const Application: React.FC<ApplicationProps> = () => {
                 </div>
             ) : (
                 <div className="markdown-container" style={{ width: viewport.width, height: viewport.height }}>
+                    {/* Debug toggle button */}
+                    {showDebugPanel && !isDebugOpen && (
+                        <button 
+                            className="debug-toggle-btn"
+                            onClick={() => { clearDebugLogs(); setIsDebugOpen(true); }}
+                            title="Open Debug Panel"
+                        >
+                            🔧
+                        </button>
+                    )}
+
+                    {/* Debug panel */}
+                    {showDebugPanel && isDebugOpen && (
+                        <DebugPanel 
+                            logs={debugLogs} 
+                            onClose={() => setIsDebugOpen(false)}
+                            markdownContent={markdownContent}
+                        />
+                    )}
+
                     {/* Search toggle button */}
                     {!isSearchOpen && (
                         <SearchToggle onClick={() => setIsSearchOpen(true)} />
@@ -205,7 +246,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                             components={{
                                 code: Code
                             }}
-                            rehypePlugins={[[rehypeSanitize]]}
+                            rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
                             source={markdownContent}
                         />
                     </div>

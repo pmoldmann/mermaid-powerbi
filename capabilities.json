@@ -18,6 +18,13 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "showDebugPanel": {
+                    "displayName": "Show debug panel",
+                    "description": "Shows debug information including raw Mermaid code",
+                    "type": {
+                        "bool": true
+                    }
                 }
             }
         }

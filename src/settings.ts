@@ -14,4 +14,5 @@ export class VisualSettings extends DataViewObjectsParser implements IVisualSett
 
 export class ViewSettings {
     public showEmptyMessage: boolean = true;
+    public showDebugPanel: boolean = false;
 }

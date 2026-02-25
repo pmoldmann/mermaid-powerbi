@@ -5,9 +5,9 @@ import VisualConstructorOptions = powerbiVisualsApi.extensibility.visual.VisualC
 import DialogConstructorOptions = powerbiVisualsApi.extensibility.visual.DialogConstructorOptions;
 var powerbiKey: any = "powerbi";
 var powerbi: any = window[powerbiKey];
-var markdownMermaidVisual: IVisualPlugin = {
-    name: 'markdownMermaidVisual',
-    displayName: 'Markdown & Mermaid Visual',
+var markdownMermaidRenderer: IVisualPlugin = {
+    name: 'markdownMermaidRenderer',
+    displayName: 'Markdown / Mermaid Renderer',
     class: 'Visual',
     apiVersion: '5.11.0',
     create: (options?: VisualConstructorOptions) => {
@@ -27,6 +27,6 @@ var markdownMermaidVisual: IVisualPlugin = {
 if (typeof powerbi !== "undefined") {
     powerbi.visuals = powerbi.visuals || {};
     powerbi.visuals.plugins = powerbi.visuals.plugins || {};
-    powerbi.visuals.plugins["markdownMermaidVisual"] = markdownMermaidVisual;
+    powerbi.visuals.plugins["markdownMermaidRenderer"] = markdownMermaidRenderer;
 }
-export default markdownMermaidVisual;
+export default markdownMermaidRenderer;
