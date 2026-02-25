@@ -128,6 +128,8 @@
 // Mermaid Zoom Styles
 .mermaid-zoom-wrapper {
     position: relative;
+    display: inline-block;  // Don't stretch to full width
+    max-width: 100%;        // But allow shrinking if content is larger
     margin: 8px 0;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
@@ -183,12 +185,14 @@
     padding: 8px;
 
     code.mermaid {
-        display: block;
+        display: inline-block;  // Don't stretch to full width
         transition: transform 0.1s ease-out;
     }
 
     svg {
-        max-width: none !important;
+        // Don't override JS-set dimensions, just ensure max-width for responsiveness
+        max-width: 100%;
+        height: auto;
     }
 }
 

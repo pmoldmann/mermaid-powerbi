@@ -28,12 +28,44 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 securityLevel: "loose",
                 maxEdges: 30000,
                 secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'suppressErrorRendering'],
+                pie: {
+                    useMaxWidth: false,  // Don't stretch pie charts to full width
+                },
+                flowchart: {
+                    useMaxWidth: false,  // Don't stretch flowcharts to full width
+                },
+                sequence: {
+                    useMaxWidth: false,  // Don't stretch sequence diagrams to full width
+                },
+                gantt: {
+                    useMaxWidth: false,  // Don't stretch gantt charts to full width
+                },
+                journey: {
+                    useMaxWidth: false,  // Don't stretch journey diagrams to full width
+                },
+                class: {
+                    useMaxWidth: false,  // Don't stretch class diagrams to full width
+                },
+                state: {
+                    useMaxWidth: false,  // Don't stretch state diagrams to full width
+                },
+                er: {
+                    useMaxWidth: false,  // Don't stretch ER diagrams to full width
+                },
             });
             mermaid
                 .render(demoid.current, code)
                 .then(({ svg, bindFunctions }) => {
                     // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
                     container.innerHTML = svg;
+                    
+                    // Ensure SVG has max-width constraint for responsiveness
+                    const svgElement = container.querySelector('svg');
+                    if (svgElement) {
+                        svgElement.style.maxWidth = '100%';
+                        svgElement.style.height = 'auto';
+                    }
+                    
                     if (bindFunctions) {
                         bindFunctions(container);
                     }
@@ -121,7 +153,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     ref={refElement}
                     data-name="mermaid"
                     style={{
-                        display: 'block',
+                        display: 'inline-block',
                         transform: `scale(${zoom}) translate(${panOffset.x / zoom}px, ${panOffset.y / zoom}px)`,
                         transformOrigin: 'top left',
                     }}
