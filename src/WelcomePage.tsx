@@ -77,7 +77,11 @@ export const WelcomePage: React.FC = () => {
                         <li>Write standard Markdown syntax in your data source</li>
                         <li>For diagrams, use Mermaid code blocks: <code>```mermaid</code></li>
                         <li>Use the <strong>zoom controls</strong> (+/−) for detailed diagram viewing</li>
+                        <li>Use <strong>Ctrl+F</strong> to search within the document</li>
                     </ol>
+                    <p style={{ marginTop: '8px', fontSize: '13px', color: '#718096' }}>
+                        <em>💡 Tip: When using a column, multiple rows are automatically concatenated and displayed together.</em>
+                    </p>
                 </section>
 
                 <section className="welcome-section">

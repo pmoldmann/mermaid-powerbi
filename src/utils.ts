@@ -86,22 +86,51 @@ export function sanitizeHTML(dirty: string) {
 }
 
 /**
- * Extracts markdown content from the dataView's single value mapping.
+ * Extracts markdown content from the dataView.
+ * Supports both single value (measure) and categorical (column) data.
+ * When a column is provided, all values are concatenated with separators.
  * @param dataView The Power BI dataView
  * @returns The markdown string or empty string if not available
  */
 export function extractMarkdownContent(dataView: DataView): string {
-    if (!dataView || !dataView.single) {
+    if (!dataView) {
         return '';
     }
-    
-    const value = dataView.single.value;
-    
-    if (value === null || value === undefined) {
-        return '';
+
+    // Try single value first (measure) - via single mapping
+    if (dataView.single && dataView.single.value != null) {
+        return String(dataView.single.value);
     }
-    
-    return String(value);
+
+    // Try categorical mapping
+    if (dataView.categorical) {
+        // Check for column data in categories
+        if (dataView.categorical.categories && dataView.categorical.categories.length > 0) {
+            const category = dataView.categorical.categories[0];
+            if (category && category.values && category.values.length > 0) {
+                // Concatenate all values with a horizontal rule separator
+                const markdownParts = category.values
+                    .filter(value => value != null && String(value).trim() !== '')
+                    .map(value => String(value));
+                
+                return markdownParts.join('\n\n---\n\n');
+            }
+        }
+        
+        // Check for measure data in values (measure appears in categorical.values)
+        if (dataView.categorical.values && dataView.categorical.values.length > 0) {
+            const valueColumn = dataView.categorical.values[0];
+            if (valueColumn && valueColumn.values && valueColumn.values.length > 0) {
+                // For measures, typically just one value
+                const value = valueColumn.values[0];
+                if (value != null) {
+                    return String(value);
+                }
+            }
+        }
+    }
+
+    return '';
 }
 
 export function deepClone(object: unknown) {
