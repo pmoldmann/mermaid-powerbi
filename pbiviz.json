@@ -9,7 +9,7 @@
       "displayName": "Markdown / Mermaid Renderer",
       "guid": "markdownMermaidRenderer",
       "visualClassName": "Visual",
-      "version": "1.0.0",
+      "version": "1.0.0.0",
       "description": "Render Markdown content with embedded Mermaid diagrams in Power BI. Perfect for documentation, flowcharts, and process diagrams.",
       "supportUrl": "https://github.com/pmoldmann/mermaid-powerbi",
       "gitHubUrl": "https://github.com/pmoldmann/mermaid-powerbi"

@@ -219,6 +219,7 @@ Handlebars.registerHelper('useAxis', function (
         // eslint-disable-next-line powerbi-visuals/no-http-string
         const group: SVGGElement = document.createElementNS('http://www.w3.org/2000/svg', 'g')
         axis(select(group));
+        // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
         return decodeURI(group.innerHTML)
     }
 })
@@ -327,12 +328,10 @@ Handlebars.registerHelper({
     gt: (v1, v2) => v1 > v2,
     lte: (v1, v2) => v1 <= v2,
     gte: (v1, v2) => v1 >= v2,
-    and() {
-        // eslint-disable-next-line powerbi-visuals/no-banned-terms, prefer-rest-params
-        return Array.prototype.every.call(arguments, Boolean);
+    and(...args: boolean[]) {
+        return args.every(Boolean);
     },
-    or() {
-        // eslint-disable-next-line powerbi-visuals/no-banned-terms, prefer-rest-params
-        return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
+    or(...args: boolean[]) {
+        return args.slice(0, -1).some(Boolean);
     }
 });

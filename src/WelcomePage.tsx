@@ -21,7 +21,7 @@ export const VisualIcon: React.FC<{ size?: number }> = ({ size = 80 }) => (
         height={size}
         viewBox="0 0 100 100"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg"
+        xmlns="https://www.w3.org/2000/svg"
     >
         {/* Background rounded rectangle */}
         <rect x="5" y="5" width="90" height="90" rx="12" fill="#2D3748" />

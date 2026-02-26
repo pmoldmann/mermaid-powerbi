@@ -11,10 +11,13 @@ A Power BI custom visual that renders **Markdown** content with embedded **Merma
 This visual allows you to embed rich documentation and diagrams in your Power BI reports using standard Markdown syntax and Mermaid diagram notation. It's perfect for:
 
 - Embedding **documentation** directly in Power BI reports
-- Creating **flowcharts** and **process diagrams**
+- Visualising **flowcharts** and **process diagrams**
 - Visualizing **data relationships** with ER diagrams
 - Documenting **architecture** and system designs
 - Adding **dynamic content** using Handlebars templates
+
+## Prerequisites
+- You need a column in your data model that contains markdown text.
 
 ## 🚀 How to Use
 
@@ -349,7 +352,74 @@ yarn lintfix
 
 ---
 
-## 👤 Author
+## � Security & Certification Compliance
+
+This visual is designed to meet **Microsoft Power BI certification requirements**. It operates entirely offline with no external communication.
+
+### No External Communication
+
+**This visual does not communicate with any external services or resources.**
+
+The following measures ensure complete isolation:
+
+| Measure | Implementation |
+|---------|----------------|
+| **No network requests** | No `fetch()`, `XMLHttpRequest`, or `WebSocket` calls in the codebase |
+| **Empty privileges** | `capabilities.json` contains `"privileges": []` - no web access requested |
+| **No external URLs** | All resources are bundled; no CDN or external script loading |
+| **Offline rendering** | Mermaid diagrams are rendered entirely client-side |
+
+### DOM Security
+
+User-provided content is sanitized to prevent XSS attacks:
+
+| Component | Sanitization Method |
+|-----------|---------------------|
+| **Markdown content** | Sanitized via `rehype-sanitize` with strict schema |
+| **HTML content** | Sanitized via `DOMPurify` with comprehensive config |
+| **Mermaid SVG output** | Rendered by Mermaid library, inserted as SVG elements |
+
+### DOMPurify Configuration
+
+The visual uses a strict DOMPurify configuration that:
+
+- **Forbids** all event handler attributes (`onclick`, `onerror`, `onload`, etc.)
+- **Forbids** dangerous tags (`script`, `iframe`, `object`, `embed`, etc.)
+- **Forbids** external URL protocols
+- **Allows** SVG and HTML profiles for diagram rendering
+- **Sanitizes** all user input before DOM insertion
+
+### innerHTML Usage
+
+Where `innerHTML` is used, it is explicitly marked with ESLint disable comments and justified:
+
+1. **Mermaid SVG rendering** - Required to insert Mermaid's generated SVG output
+2. **HTML entity decoding** - Uses a detached textarea element (safe pattern)
+3. **Style injection** - User-defined styles with React's `dangerouslySetInnerHTML`
+4. **Handlebars axis rendering** - SVG generation for D3 axes
+
+All `innerHTML` usage involves either:
+- Library-generated content (Mermaid SVG)
+- Controlled non-executable content (textarea for entity decoding)
+- User-acknowledged custom styling (Style code blocks)
+
+### Certification Checklist
+
+| Requirement | Status |
+|-------------|--------|
+| No external HTTP/HTTPS requests | ✅ |
+| No WebSocket connections | ✅ |
+| No `fetch()` or `XMLHttpRequest` | ✅ |
+| No `eval()` or `new Function()` | ✅ |
+| Privileges array is empty | ✅ |
+| DOM manipulation is sanitized | ✅ |
+| Only public OSS dependencies | ✅ |
+| TypeScript source code | ✅ |
+| ESLint with powerbi-visuals plugin | ✅ |
+
+---
+
+## �👤 Author
 
 **Paul Moldmann**
 

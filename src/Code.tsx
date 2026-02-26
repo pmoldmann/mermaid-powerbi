@@ -117,12 +117,10 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 })
                 .catch((error) => {
                     debugLog('error', 'Mermaid rendering error', String(error));
-                    // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
                     container.textContent = code;
                 });
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [container, code, mermaidSettings]);
+    }, [container, code, mermaidSettings, settingsKey]);
 
     const refElement = React.useCallback((node: HTMLElement | null) => {
         if (node !== null) {
@@ -236,7 +234,9 @@ export const Code = (props: any) => {
         debugLog('code', 'Mermaid code (raw)', code);
         
         // Decode HTML entities (e.g., &lt;br/&gt; -> <br/>)
+        // Using textarea to safely decode HTML entities - no user input is executed
         const textarea = document.createElement('textarea');
+        // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
         textarea.innerHTML = code;
         code = textarea.value;
         

@@ -113,7 +113,7 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({ logs, onClose, markdownC
 let globalDebugLogs: DebugLog[] = [];
 let globalDebugListeners: Array<(logs: DebugLog[]) => void> = [];
 let isDebugEnabled = false;
-let recentLogKeys: Set<string> = new Set();
+const recentLogKeys: Set<string> = new Set();
 let clearRecentTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export const setDebugEnabled = (enabled: boolean) => {
