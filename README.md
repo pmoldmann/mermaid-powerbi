@@ -14,7 +14,6 @@ This visual allows you to embed rich documentation and diagrams in your Power BI
 - Visualising **flowcharts** and **process diagrams**
 - Visualizing **data relationships** with ER diagrams
 - Documenting **architecture** and system designs
-- Adding **dynamic content** using Handlebars templates
 
 ## Prerequisites
 - You need a column in your data model that contains markdown text.
