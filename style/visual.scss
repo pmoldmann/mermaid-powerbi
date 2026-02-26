@@ -194,9 +194,9 @@
         max-width: 100%;
         height: auto;
         
-        // Ensure Mermaid label text preserves line breaks
+        // Ensure Mermaid label text preserves line breaks (only when class is present)
         // Mermaid renders multiline labels in foreignObject > div > span > p
-        foreignObject {
+        &.mermaid-preserve-linebreaks foreignObject {
             div, span, p {
                 white-space: pre-wrap !important;
             }
@@ -211,7 +211,8 @@
         }
         
         // Also target the nodeLabel and label classes used by Mermaid
-        .nodeLabel, .label {
+        &.mermaid-preserve-linebreaks .nodeLabel,
+        &.mermaid-preserve-linebreaks .label {
             white-space: pre-wrap !important;
             
             br {

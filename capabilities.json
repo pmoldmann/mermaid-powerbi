@@ -27,6 +27,65 @@
                     }
                 }
             }
+        },
+        "mermaid": {
+            "displayName": "Mermaid settings",
+            "description": "Settings for Mermaid diagram rendering",
+            "properties": {
+                "htmlLabels": {
+                    "displayName": "HTML labels",
+                    "description": "Enable HTML rendering in node labels (needed for line breaks)",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "markdownAutoWrap": {
+                    "displayName": "Markdown auto wrap",
+                    "description": "Enable automatic line wrapping in markdown labels",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "securityLevel": {
+                    "displayName": "Security level",
+                    "description": "Security level for Mermaid rendering (loose, strict, sandbox)",
+                    "type": {
+                        "enumeration": [
+                            { "value": "loose", "displayName": "Loose" },
+                            { "value": "strict", "displayName": "Strict" },
+                            { "value": "sandbox", "displayName": "Sandbox" }
+                        ]
+                    }
+                },
+                "maxEdges": {
+                    "displayName": "Max edges",
+                    "description": "Maximum number of edges allowed in a diagram",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "convertBrToNewline": {
+                    "displayName": "Convert <br> to newline",
+                    "description": "Converts <br/> tags to newlines. Mermaid escapes <br> as text, this fixes line breaks.",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "autoBacktickLabels": {
+                    "displayName": "Auto backtick labels",
+                    "description": "Automatically wraps labels containing newlines in backticks. Mermaid only renders newlines in backtick-wrapped labels.",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "preserveLineBreaksCSS": {
+                    "displayName": "Preserve line breaks CSS",
+                    "description": "Applies CSS to preserve line breaks in Mermaid labels (white-space: pre-wrap, br display: block)",
+                    "type": {
+                        "bool": true
+                    }
+                }
+            }
         }
     },
     "dataViewMappings": [

@@ -4,7 +4,7 @@ import { useAppSelector } from './redux/hooks';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
-import { Code } from './Code';
+import { Code, MermaidSettingsContext } from './Code';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar, SearchToggle } from './SearchBar';
@@ -242,13 +242,23 @@ export const Application: React.FC<ApplicationProps> = () => {
                             overflowY: 'auto'
                         }}
                     >
-                        <MDEditor.Markdown
-                            components={{
-                                code: Code
-                            }}
-                            rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                            source={markdownContent}
-                        />
+                        <MermaidSettingsContext.Provider value={settings?.mermaid || {
+                            htmlLabels: true,
+                            markdownAutoWrap: true,
+                            securityLevel: "loose",
+                            maxEdges: 30000,
+                            convertBrToNewline: true,
+                            autoBacktickLabels: true,
+                            preserveLineBreaksCSS: true
+                        }}>
+                            <MDEditor.Markdown
+                                components={{
+                                    code: Code
+                                }}
+                                rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+                                source={markdownContent}
+                            />
+                        </MermaidSettingsContext.Provider>
                     </div>
                 </div>
             )}

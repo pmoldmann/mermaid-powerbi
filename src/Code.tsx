@@ -3,6 +3,7 @@ import { getCodeString } from 'rehype-rewrite';
 import mermaid from "mermaid";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
+import { MermaidSettings } from "./settings";
 
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
@@ -11,10 +12,25 @@ const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
 const ZOOM_STEP = 0.25;
 
+// Default Mermaid settings
+const defaultMermaidSettings: MermaidSettings = {
+    htmlLabels: true,
+    markdownAutoWrap: true,
+    securityLevel: "loose",
+    maxEdges: 30000,
+    convertBrToNewline: true,
+    autoBacktickLabels: true,
+    preserveLineBreaksCSS: true
+};
+
+// Context for Mermaid settings
+export const MermaidSettingsContext = React.createContext<MermaidSettings>(defaultMermaidSettings);
+
 /**
  * MermaidDiagram component with zoom and pan functionality.
  */
 const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, className }) => {
+    const mermaidSettings = React.useContext(MermaidSettingsContext);
     const demoid = React.useRef(`dome${randomid()}`);
     const [container, setContainer] = React.useState<HTMLElement | null>(null);
     const [zoom, setZoom] = React.useState(1);
@@ -24,70 +40,60 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const wrapperRef = React.useRef<HTMLDivElement>(null);
     const previousCodeRef = React.useRef<string | null>(null);
 
+    // Create a settings key to detect settings changes
+    const settingsKey = JSON.stringify(mermaidSettings);
+    const previousSettingsRef = React.useRef<string | null>(null);
+
     React.useEffect(() => {
-        // Skip re-render if code hasn't actually changed
-        if (code === previousCodeRef.current) {
+        // Skip re-render if neither code nor settings have changed
+        const settingsChanged = settingsKey !== previousSettingsRef.current;
+        const codeChanged = code !== previousCodeRef.current;
+        
+        if (!settingsChanged && !codeChanged) {
             return;
         }
         
         if (container && demoid.current && code) {
-            // Mark as rendered only when actually rendering
+            // Mark as rendered
             previousCodeRef.current = code;
+            previousSettingsRef.current = settingsKey;
             
             mermaid.initialize({
-                securityLevel: "loose",
-                maxEdges: 30000,
-                htmlLabels: true,        // Global: Enable HTML in labels (needed for <br/>)
-                markdownAutoWrap: true,  // Enable markdown line wrapping in backtick labels
+                securityLevel: mermaidSettings.securityLevel as "loose" | "strict" | "sandbox",
+                maxEdges: mermaidSettings.maxEdges,
+                htmlLabels: mermaidSettings.htmlLabels,
+                markdownAutoWrap: mermaidSettings.markdownAutoWrap,
                 secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'suppressErrorRendering'],
                 pie: {
-                    useMaxWidth: false,  // Don't stretch pie charts to full width
+                    useMaxWidth: false,
                 },
                 flowchart: {
-                    useMaxWidth: false,  // Don't stretch flowcharts to full width
-                    htmlLabels: true,    // Enable HTML in labels (needed for <br/>)
+                    useMaxWidth: false,
+                    htmlLabels: mermaidSettings.htmlLabels,
                 },
                 sequence: {
-                    useMaxWidth: false,  // Don't stretch sequence diagrams to full width
+                    useMaxWidth: false,
                 },
                 gantt: {
-                    useMaxWidth: false,  // Don't stretch gantt charts to full width
+                    useMaxWidth: false,
                 },
                 journey: {
-                    useMaxWidth: false,  // Don't stretch journey diagrams to full width
+                    useMaxWidth: false,
                 },
                 class: {
-                    useMaxWidth: false,  // Don't stretch class diagrams to full width
+                    useMaxWidth: false,
                 },
                 state: {
-                    useMaxWidth: false,  // Don't stretch state diagrams to full width
+                    useMaxWidth: false,
                 },
                 er: {
-                    useMaxWidth: false,  // Don't stretch ER diagrams to full width
+                    useMaxWidth: false,
                 },
             });
-            
-            // Debug: Log what's being passed to mermaid.render
-            debugLog('info', 'Code passed to mermaid.render()', code);
             
             mermaid
                 .render(demoid.current, code)
                 .then(({ svg, bindFunctions }) => {
-                    // Debug: Log a snippet of the generated SVG to see how labels are rendered
-                    const labelSnippet = svg.substring(0, 2000);
-                    debugLog('info', 'SVG output (first 2000 chars)', labelSnippet);
-                    
-                    // Check if foreignObject is used (indicates HTML rendering)
-                    const hasForeignObject = svg.includes('foreignObject');
-                    const hasTspan = svg.includes('tspan');
-                    debugLog('info', 'SVG rendering mode', `foreignObject: ${hasForeignObject}, tspan: ${hasTspan}`);
-                    
-                    // Check how "Source" label is rendered (should contain line break)
-                    const sourceMatch = svg.match(/Source.{0,200}/);
-                    if (sourceMatch) {
-                        debugLog('info', 'How "Source" is rendered', sourceMatch[0]);
-                    }
-                    
                     // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
                     container.innerHTML = svg;
                     
@@ -96,6 +102,13 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     if (svgElement) {
                         svgElement.style.maxWidth = '100%';
                         svgElement.style.height = 'auto';
+                        
+                        // Add class for CSS line break preservation if enabled
+                        if (mermaidSettings.preserveLineBreaksCSS !== false) {
+                            svgElement.classList.add('mermaid-preserve-linebreaks');
+                        } else {
+                            svgElement.classList.remove('mermaid-preserve-linebreaks');
+                        }
                     }
                     
                     if (bindFunctions) {
@@ -103,14 +116,13 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     }
                 })
                 .catch((error) => {
-                    console.log("Mermaid rendering error:", error);
+                    debugLog('error', 'Mermaid rendering error', String(error));
                     // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
                     container.textContent = code;
                 });
         }
-    // Note: demoid is a ref (stable), only re-render when container or code changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [container, code]);
+    }, [container, code, mermaidSettings]);
 
     const refElement = React.useCallback((node: HTMLElement | null) => {
         if (node !== null) {
@@ -202,6 +214,9 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
  * Supports special handling for Mermaid diagrams and inline styles.
  */
 export const Code = (props: any) => {
+    // Get settings from context (must be at top level)
+    const mermaidSettings = React.useContext(MermaidSettingsContext);
+    
     const children = props?.children || [];
     const className = props?.className;
 
@@ -215,63 +230,40 @@ export const Code = (props: any) => {
         ? getCodeString(props.node.children)
         : children[0] || "";
 
-    // Debug: Log the code before and after decoding
-    if (isMermaid) {
+    // Process Mermaid code
+    if (isMermaid && code) {
+        // Log raw code for debugging
         debugLog('code', 'Mermaid code (raw)', code);
         
-        // Debug: Check for br tags and show hex codes of first few chars
-        const brMatch = code.match(/<br\s*\/?>/gi);
-        debugLog('info', 'BR tags found', brMatch ? `Count: ${brMatch.length}, Matches: ${JSON.stringify(brMatch)}` : 'NONE FOUND');
-        
-        // Show hex codes around potential br tags
-        const brIndex = code.indexOf('<br');
-        if (brIndex >= 0) {
-            const snippet = code.substring(Math.max(0, brIndex - 5), brIndex + 10);
-            const hexCodes = snippet.split('').map((c: string) => c.charCodeAt(0).toString(16).padStart(4, '0')).join(' ');
-            debugLog('info', 'Hex codes around <br', `Chars: "${snippet}"\nHex: ${hexCodes}`);
-        }
-    }
-
-    // Decode HTML entities for Mermaid code (e.g., &lt;br/&gt; -> <br/>)
-    if (isMermaid && code) {
+        // Decode HTML entities (e.g., &lt;br/&gt; -> <br/>)
         const textarea = document.createElement('textarea');
         textarea.innerHTML = code;
         code = textarea.value;
         
-        // Convert <br/> and <br> tags to actual newlines
-        // Mermaid doesn't render <br/> as HTML even with htmlLabels: true,
-        // it escapes them as text. Using \n works with both regular and backtick syntax.
-        const beforeReplace = code;
-        code = code.replace(/<br\s*\/?>/gi, '\n');
+        // Convert <br/> tags to newlines (Mermaid escapes <br/> as text)
+        if (mermaidSettings.convertBrToNewline !== false) {
+            code = code.replace(/<br\s*\/?>/gi, '\n');
+        }
         
-        const replacedCount = (beforeReplace.match(/<br\s*\/?>/gi) || []).length;
-        debugLog('info', 'BR to newline conversion', `Replaced ${replacedCount} <br/> tags`);
-        
-        // Convert standard node labels with newlines to backtick syntax
+        // Convert node labels with newlines to backtick syntax
         // Mermaid only renders newlines in backtick-wrapped labels: ["`text`"]
-        // This regex finds ["..."] labels containing newlines and adds backticks
-        const beforeBacktick = code;
-        code = code.replace(/\["([^"]*\n[^"]*)"\]/g, (match, content) => {
-            // Skip if already has backticks
-            if (content.startsWith('`') && content.endsWith('`')) {
-                return match;
-            }
-            return '["`' + content + '`"]';
-        });
+        if (mermaidSettings.autoBacktickLabels !== false) {
+            code = code.replace(/\["([^"]*\n[^"]*)"\]/g, (match, content) => {
+                if (content.startsWith('`') && content.endsWith('`')) return match;
+                return '["`' + content + '`"]';
+            });
+            code = code.replace(/\("([^"]*\n[^"]*)"\)/g, (match, content) => {
+                if (content.startsWith('`') && content.endsWith('`')) return match;
+                return '("`' + content + '`")';
+            });
+            code = code.replace(/\{"([^"]*\n[^"]*)"\}/g, (match, content) => {
+                if (content.startsWith('`') && content.endsWith('`')) return match;
+                return '{"`' + content + '`"}';
+            });
+        }
         
-        // Also handle round brackets (...) and curly brackets {...}
-        code = code.replace(/\("([^"]*\n[^"]*)"\)/g, (match, content) => {
-            if (content.startsWith('`') && content.endsWith('`')) return match;
-            return '("`' + content + '`")';
-        });
-        code = code.replace(/\{"([^"]*\n[^"]*)"\}/g, (match, content) => {
-            if (content.startsWith('`') && content.endsWith('`')) return match;
-            return '{"`' + content + '`"}';
-        });
-        
-        const backtickConversions = (beforeBacktick !== code);
-        debugLog('info', 'Backtick syntax conversion', backtickConversions ? 'Labels converted to backtick syntax' : 'No conversion needed');
-        debugLog('code', 'Mermaid code (after processing)', code);
+        // Log processed code for debugging
+        debugLog('code', 'Mermaid code (processed)', code);
     }
 
     if (isMermaid) {
