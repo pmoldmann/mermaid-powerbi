@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Visual version - update this for App Store releases
-export const VISUAL_VERSION = '1.0.0';
+export const VISUAL_VERSION = '1.0.0.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {
@@ -63,36 +63,35 @@ export const WelcomePage: React.FC = () => {
                 <section className="welcome-section">
                     <h2>📄 What is this Visual?</h2>
                     <p>
-                        This Power BI custom visual renders <strong>Markdown</strong> content 
-                        with embedded <strong>Mermaid diagrams</strong>. It transforms your 
-                        text-based content into beautifully formatted documentation, flowcharts, 
-                        sequence diagrams, and more — directly within your Power BI reports.
+                        This visual allows you to embed rich documentation and diagrams in your 
+                        Power BI reports using standard Markdown syntax and Mermaid diagram notation. 
+                        It's perfect for:
                     </p>
+                    <ul>
+                        <li>Embedding <strong>documentation</strong> directly in Power BI reports</li>
+                        <li>Visualising <strong>flowcharts</strong> and <strong>process diagrams</strong></li>
+                        <li>Visualizing <strong>data relationships</strong> with ER diagrams</li>
+                        <li>Documenting <strong>architecture</strong> and system designs</li>
+                    </ul>
+                </section>
+
+                <section className="welcome-section">
+                    <h2>📋 Prerequisites</h2>
+                    <ul>
+                        <li>You need a column in your data model that contains markdown text.</li>
+                    </ul>
                 </section>
 
                 <section className="welcome-section">
                     <h2>🚀 How to Use</h2>
                     <ol>
                         <li>Add a <strong>column or measure</strong> containing Markdown text to the <em>"Markdown Content"</em> field</li>
-                        <li>Write standard Markdown syntax in your data source</li>
-                        <li>For diagrams, use Mermaid code blocks: <code>```mermaid</code></li>
                         <li>Use the <strong>zoom controls</strong> (+/−) for detailed diagram viewing</li>
                         <li>Use <strong>Ctrl+F</strong> to search within the document</li>
                     </ol>
                     <p style={{ marginTop: '8px', fontSize: '13px', color: '#718096' }}>
                         <em>💡 Tip: When using a column, multiple rows are automatically concatenated and displayed together.</em>
                     </p>
-                </section>
-
-                <section className="welcome-section">
-                    <h2>💡 Use Cases</h2>
-                    <ul>
-                        <li>Embed <strong>documentation</strong> directly in Power BI reports</li>
-                        <li>Create <strong>flowcharts</strong> and <strong>process diagrams</strong></li>
-                        <li>Visualize <strong>data relationships</strong> with ER diagrams</li>
-                        <li>Document <strong>architecture</strong> and system designs</li>
-                        <li>Add <strong>dynamic content</strong> using Handlebars templates</li>
-                    </ul>
                 </section>
 
                 <section className="welcome-section libraries">

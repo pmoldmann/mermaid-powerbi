@@ -1,6 +1,6 @@
 # Markdown / Mermaid Renderer for Power BI
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.0.0.0-blue)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Custom%20Visual-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -22,8 +22,6 @@ This visual allows you to embed rich documentation and diagrams in your Power BI
 ## 🚀 How to Use
 
 1. Add a **column or measure** containing Markdown text to the *"Markdown Content"* field
-2. Write standard Markdown syntax in your data source
-3. For diagrams, use Mermaid code blocks: ` ```mermaid `
 4. Use the **zoom controls** (+/−) for detailed diagram viewing
 5. Use **Ctrl+F** to search within the document
 
