@@ -12,3 +12,4 @@ node_modules
 *webpack.statistics.html
 visuals-license-engine
 licenseGenerator.exe
+.specstory/
