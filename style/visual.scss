@@ -193,6 +193,31 @@
         // Don't override JS-set dimensions, just ensure max-width for responsiveness
         max-width: 100%;
         height: auto;
+        
+        // Ensure Mermaid label text preserves line breaks
+        // Mermaid renders multiline labels in foreignObject > div > span > p
+        foreignObject {
+            div, span, p {
+                white-space: pre-wrap !important;
+            }
+            
+            // Ensure br tags work properly (Power BI may reset them)
+            br {
+                display: block !important;
+                content: "" !important;
+                margin: 0 !important;
+                line-height: inherit !important;
+            }
+        }
+        
+        // Also target the nodeLabel and label classes used by Mermaid
+        .nodeLabel, .label {
+            white-space: pre-wrap !important;
+            
+            br {
+                display: block !important;
+            }
+        }
     }
 }
 

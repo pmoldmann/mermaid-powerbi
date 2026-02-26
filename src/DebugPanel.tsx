@@ -37,6 +37,10 @@ const copyToClipboard = async (text: string) => {
 export const DebugPanel: React.FC<DebugPanelProps> = ({ logs, onClose, markdownContent }) => {
     const [activeTab, setActiveTab] = React.useState<'logs' | 'raw'>('logs');
 
+    const handleClearLogs = () => {
+        clearDebugLogs();
+    };
+
     return (
         <div className="debug-panel">
             <div className="debug-panel-header">
@@ -53,6 +57,13 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({ logs, onClose, markdownC
                         onClick={() => setActiveTab('raw')}
                     >
                         Raw Markdown
+                    </button>
+                    <button 
+                        className="debug-clear-btn"
+                        onClick={handleClearLogs}
+                        title="Clear all logs"
+                    >
+                        🗑️ Clear
                     </button>
                 </div>
                 <button className="debug-panel-close" onClick={onClose}>✕</button>
@@ -102,14 +113,15 @@ export const DebugPanel: React.FC<DebugPanelProps> = ({ logs, onClose, markdownC
 let globalDebugLogs: DebugLog[] = [];
 let globalDebugListeners: Array<(logs: DebugLog[]) => void> = [];
 let isDebugEnabled = false;
-let lastLogContent: string | null = null;
+let recentLogKeys: Set<string> = new Set();
+let clearRecentTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export const setDebugEnabled = (enabled: boolean) => {
     isDebugEnabled = enabled;
     if (enabled) {
         // Clear logs when enabling debug
         globalDebugLogs = [];
-        lastLogContent = null;
+        recentLogKeys.clear();
     }
 };
 
@@ -117,18 +129,24 @@ export const debugLog = (type: DebugLog['type'], label: string, content: string)
     // Only log when debug is enabled to prevent performance issues
     if (!isDebugEnabled) return;
     
-    // Deduplicate: skip if same content as last log
+    // Deduplicate: skip if same content was logged recently (within 2 seconds)
     const contentKey = `${label}:${content}`;
-    if (contentKey === lastLogContent) return;
-    lastLogContent = contentKey;
+    if (recentLogKeys.has(contentKey)) return;
+    
+    // Add to recent keys and auto-clear after 2 seconds
+    recentLogKeys.add(contentKey);
+    if (clearRecentTimeout) clearTimeout(clearRecentTimeout);
+    clearRecentTimeout = setTimeout(() => {
+        recentLogKeys.clear();
+    }, 2000);
     
     const log: DebugLog = {
         timestamp: new Date().toLocaleTimeString(),
         type,
         label,
-        content: content.length > 2000 ? content.substring(0, 2000) + '\n... (truncated)' : content
+        content: content.length > 5000 ? content.substring(0, 5000) + '\n... (truncated)' : content
     };
-    globalDebugLogs = [...globalDebugLogs, log].slice(-50); // Keep last 50 logs
+    globalDebugLogs = [...globalDebugLogs, log].slice(-100); // Keep last 100 logs
     // Use setTimeout to avoid state updates during render
     setTimeout(() => {
         globalDebugListeners.forEach(listener => listener([...globalDebugLogs]));
