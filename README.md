@@ -46,7 +46,46 @@ flowchart LR
 - Step 3: Deliver
 ```
 
-## 📦 Libraries & Versions
+## � Examples
+
+The folder [`pbi_example/`](pbi_example/) contains a sample Power BI report (`.pbix`) and screenshots that demonstrate the visual in action.
+
+### Landing Page
+
+When no data is connected, the visual displays a landing page with usage instructions and a built-in demo:
+
+![Landing Page](pbi_example/markdown_mermaid_renderer_landing_page.png)
+
+### Rendered Markdown with Mermaid Diagrams
+
+Once a Markdown column or measure is added, the visual renders the content with full Mermaid diagram support:
+
+![Demo Report](pbi_example/markdown_mermaid_renderer_demo.png)
+
+## 🎯 Built-in Demo
+
+The visual includes a **Markdown / Mermaid Demo** section on the landing page. When no data is connected, you can:
+
+1. View the **raw Markdown source** to see the syntax for headings, lists, tables, and Mermaid code blocks
+2. Click **"Render"** to see how the Markdown is rendered with live diagrams
+3. Click **"Copy Markdown"** to copy the demo text to your clipboard
+
+This lets you quickly try out the visual by pasting the demo content into a column in your data model.
+
+## 💡 Tip: Use AI to Generate Documentation
+
+You can use AI tools (e.g. ChatGPT, GitHub Copilot, Claude) to automatically document your project as **Markdown with embedded Mermaid diagrams**. For example, ask the AI to:
+
+- Generate a **flowchart** of your ETL process
+- Create an **ER diagram** of your data model
+- Document your **architecture** as a sequence diagram
+- Summarize **business logic** with structured Markdown
+
+Copy the generated Markdown into a **separate table** in your Power BI data model (e.g. a `Documentation` table with a single text column) and connect it to this visual. This way, your technical documentation lives directly inside your Power BI report — always up to date and easy to maintain.
+
+Uh - And now guess only once how this file has been generated...
+
+## �📦 Libraries & Versions
 
 | Library | Version |
 |---------|---------|
