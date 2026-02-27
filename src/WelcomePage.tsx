@@ -1,4 +1,5 @@
 import React from 'react';
+import { DemoSection } from './DemoSection';
 
 // Visual version - update this for App Store releases
 export const VISUAL_VERSION = '1.0.0.0';
@@ -93,6 +94,8 @@ export const WelcomePage: React.FC = () => {
                         <em>💡 Tip: When using a column, multiple rows are automatically concatenated and displayed together.</em>
                     </p>
                 </section>
+
+                <DemoSection />
 
                 <section className="welcome-section libraries">
                     <h2>📦 Libraries & Versions</h2>
