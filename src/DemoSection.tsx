@@ -1,8 +1,9 @@
 import React from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
-import { Code, MermaidSettingsContext } from './Code';
+import { Code, MermaidSettingsContext, ColorModeContext } from './Code';
 import { ErrorBoundary } from './Error';
+import { useAppSelector } from './redux/hooks';
 
 // Demo markdown content showcasing Markdown + Mermaid capabilities
 const DEMO_MARKDOWN = `# Creating Beautiful Documentation with Markdown & Mermaid
@@ -122,13 +123,18 @@ erDiagram
 *Start documenting better today. Your future self will thank you.*
 `;
 
-// Sanitize schema that preserves br tags
+// Sanitize schema that preserves br tags and allows className on spans for syntax highlighting
 const sanitizeSchema = {
     ...defaultSchema,
     tagNames: [...(defaultSchema.tagNames || []), 'br'],
     ancestors: {
         ...defaultSchema.ancestors,
         br: ['code', 'pre', 'span', 'div', 'p', 'li', 'td', 'th'],
+    },
+    attributes: {
+        ...defaultSchema.attributes,
+        span: [...(defaultSchema.attributes?.span || []), 'className', 'class'],
+        code: [...(defaultSchema.attributes?.code || []), 'className', 'class'],
     },
 };
 
@@ -147,6 +153,8 @@ const defaultMermaidSettings = {
  * Demo section component that shows raw markdown and renders it on button click
  */
 export const DemoSection: React.FC = () => {
+    const settings = useAppSelector((state) => state.options.settings);
+    const colorMode = settings?.view?.colorMode === 'dark' ? 'dark' : 'light';
     const [isRendered, setIsRendered] = React.useState(false);
     const [copyLabel, setCopyLabel] = React.useState('📋 Copy Markdown');
 
@@ -222,17 +230,19 @@ export const DemoSection: React.FC = () => {
                             <span className="demo-rendered-label">✅ Rendered Output</span>
                             <span className="demo-rendered-hint">This is what your reports will look like!</span>
                         </div>
-                        <div className="demo-rendered-content" data-color-mode="light">
+                        <div className="demo-rendered-content" data-color-mode={colorMode}>
                             <ErrorBoundary>
-                                <MermaidSettingsContext.Provider value={defaultMermaidSettings}>
-                                    <MDEditor.Markdown
-                                        source={DEMO_MARKDOWN}
-                                        rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                        components={{
-                                            code: Code,
-                                        }}
-                                    />
-                                </MermaidSettingsContext.Provider>
+                                <ColorModeContext.Provider value={colorMode}>
+                                    <MermaidSettingsContext.Provider value={defaultMermaidSettings}>
+                                        <MDEditor.Markdown
+                                            source={DEMO_MARKDOWN}
+                                            rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+                                            components={{
+                                                code: Code,
+                                            }}
+                                        />
+                                    </MermaidSettingsContext.Provider>
+                                </ColorModeContext.Provider>
                             </ErrorBoundary>
                         </div>
                     </div>

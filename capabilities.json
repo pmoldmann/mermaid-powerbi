@@ -25,6 +25,16 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "colorMode": {
+                    "displayName": "Color mode",
+                    "description": "Switch between light and dark theme for the visual",
+                    "type": {
+                        "enumeration": [
+                            { "value": "light", "displayName": "Light" },
+                            { "value": "dark", "displayName": "Dark" }
+                        ]
+                    }
                 }
             }
         },

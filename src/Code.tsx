@@ -23,6 +23,9 @@ const defaultMermaidSettings: MermaidSettings = {
     preserveLineBreaksCSS: true
 };
 
+// Context for color mode (light/dark)
+export const ColorModeContext = React.createContext<string>('light');
+
 // Context for Mermaid settings
 export const MermaidSettingsContext = React.createContext<MermaidSettings>(defaultMermaidSettings);
 
@@ -31,6 +34,7 @@ export const MermaidSettingsContext = React.createContext<MermaidSettings>(defau
  */
 const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, className }) => {
     const mermaidSettings = React.useContext(MermaidSettingsContext);
+    const colorMode = React.useContext(ColorModeContext);
     const demoid = React.useRef(`dome${randomid()}`);
     const [container, setContainer] = React.useState<HTMLElement | null>(null);
     const [zoom, setZoom] = React.useState(1);
@@ -41,7 +45,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const previousCodeRef = React.useRef<string | null>(null);
 
     // Create a settings key to detect settings changes
-    const settingsKey = JSON.stringify(mermaidSettings);
+    const settingsKey = JSON.stringify(mermaidSettings) + colorMode;
     const previousSettingsRef = React.useRef<string | null>(null);
 
     React.useEffect(() => {
@@ -63,6 +67,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 maxEdges: mermaidSettings.maxEdges,
                 htmlLabels: mermaidSettings.htmlLabels,
                 markdownAutoWrap: mermaidSettings.markdownAutoWrap,
+                theme: colorMode === 'dark' ? 'dark' : 'default',
                 secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'suppressErrorRendering'],
                 pie: {
                     useMaxWidth: false,
@@ -120,7 +125,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     container.textContent = code;
                 });
         }
-    }, [container, code, mermaidSettings, settingsKey]);
+    }, [container, code, mermaidSettings, settingsKey, colorMode]);
 
     const refElement = React.useCallback((node: HTMLElement | null) => {
         if (node !== null) {

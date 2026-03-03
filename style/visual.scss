@@ -932,3 +932,102 @@ mark.search-highlight {
         border-bottom-color: #B2F5EA;
     }
 }
+
+// ============================
+// Dark Mode Styles
+// ============================
+// Applied when data-color-mode="dark" is set on a parent element.
+
+[data-color-mode="dark"] {
+    // Mermaid zoom wrapper
+    .mermaid-zoom-wrapper {
+        background: #2D3748;
+        border-color: #4A5568;
+    }
+
+    .mermaid-zoom-controls {
+        background: #2D3748;
+        border-bottom-color: #4A5568;
+
+        button {
+            background: #4A5568;
+            border-color: #718096;
+            color: #E2E8F0;
+
+            &:hover:not(:disabled) {
+                background: #718096;
+            }
+        }
+    }
+
+    .mermaid-zoom-level {
+        color: #A0AEC0;
+    }
+}
+
+// Search components in dark mode
+.markdown-container:has([data-color-mode="dark"]) {
+    .search-toggle {
+        background: rgba(45, 55, 72, 0.95);
+        border-color: #4A5568;
+        color: #A0AEC0;
+
+        &:hover {
+            background: #4A5568;
+            color: #E2E8F0;
+            border-color: #718096;
+        }
+    }
+
+    .search-bar {
+        background: #2D3748;
+        border-bottom-color: #4A5568;
+
+        .search-bar-icon {
+            color: #A0AEC0;
+        }
+
+        .search-bar-input {
+            background: #1A202C;
+            border-color: #4A5568;
+            color: #E2E8F0;
+
+            &:focus {
+                border-color: #4FD1C5;
+                box-shadow: 0 0 0 2px rgba(79, 209, 197, 0.3);
+            }
+        }
+
+        .search-bar-count {
+            color: #A0AEC0;
+        }
+
+        .search-bar-nav,
+        .search-bar-close {
+            background: #4A5568;
+            border-color: #718096;
+            color: #E2E8F0;
+
+            &:hover:not(:disabled) {
+                background: #718096;
+                border-color: #A0AEC0;
+            }
+        }
+
+        .search-bar-close:hover {
+            color: #FC8181;
+            border-color: #FC8181;
+        }
+    }
+
+    // Debug toggle
+    .debug-toggle-btn {
+        background: #2D3748;
+        border-color: #4A5568;
+        color: #E2E8F0;
+
+        &:hover {
+            background: #4A5568;
+        }
+    }
+}

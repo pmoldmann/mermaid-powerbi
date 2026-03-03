@@ -4,7 +4,7 @@ import { useAppSelector } from './redux/hooks';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
-import { Code, MermaidSettingsContext } from './Code';
+import { Code, MermaidSettingsContext, ColorModeContext } from './Code';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar, SearchToggle } from './SearchBar';
@@ -13,14 +13,23 @@ import { DebugPanel, useDebugLogs, clearDebugLogs, setDebugEnabled } from './Deb
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import "mermaid";
 
+// Register DAX as a custom language for syntax highlighting in code blocks
+import './dax-language';
+
 // Custom schema that preserves br tags (needed for Mermaid diagrams with line breaks)
-// Also allow br inside code elements
+// Also allow br inside code elements and className on spans (needed for syntax highlighting tokens)
 const sanitizeSchema = {
     ...defaultSchema,
     tagNames: [...(defaultSchema.tagNames || []), 'br'],
     ancestors: {
         ...defaultSchema.ancestors,
         br: ['code', 'pre', 'span', 'div', 'p', 'li', 'td', 'th'],
+    },
+    attributes: {
+        ...defaultSchema.attributes,
+        // Allow className on span elements for Prism syntax highlighting tokens
+        span: [...(defaultSchema.attributes?.span || []), 'className', 'class'],
+        code: [...(defaultSchema.attributes?.code || []), 'className', 'class'],
     },
 };
 
@@ -235,30 +244,32 @@ export const Application: React.FC<ApplicationProps> = () => {
                     <div
                         ref={container}
                         className="markdown-content"
-                        data-color-mode="light"
+                        data-color-mode={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}
                         onClick={onLinkClick}
                         style={{
                             height: isSearchOpen ? 'calc(100% - 44px)' : '100%',
                             overflowY: 'auto'
                         }}
                     >
-                        <MermaidSettingsContext.Provider value={settings?.mermaid || {
-                            htmlLabels: true,
-                            markdownAutoWrap: true,
-                            securityLevel: "loose",
-                            maxEdges: 30000,
-                            convertBrToNewline: true,
-                            autoBacktickLabels: true,
-                            preserveLineBreaksCSS: true
-                        }}>
-                            <MDEditor.Markdown
-                                components={{
-                                    code: Code
-                                }}
-                                rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                source={markdownContent}
-                            />
-                        </MermaidSettingsContext.Provider>
+                        <ColorModeContext.Provider value={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}>
+                            <MermaidSettingsContext.Provider value={settings?.mermaid || {
+                                htmlLabels: true,
+                                markdownAutoWrap: true,
+                                securityLevel: "loose",
+                                maxEdges: 30000,
+                                convertBrToNewline: true,
+                                autoBacktickLabels: true,
+                                preserveLineBreaksCSS: true
+                            }}>
+                                <MDEditor.Markdown
+                                    components={{
+                                        code: Code
+                                    }}
+                                    rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+                                    source={markdownContent}
+                                />
+                            </MermaidSettingsContext.Provider>
+                        </ColorModeContext.Provider>
                     </div>
                 </div>
             )}
