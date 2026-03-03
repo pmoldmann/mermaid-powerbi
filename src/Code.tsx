@@ -3,7 +3,7 @@ import { getCodeString } from 'rehype-rewrite';
 import mermaid from "mermaid";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
-import { MermaidSettings } from "./settings";
+import { MermaidSettings, FontSettings } from "./settings";
 
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
@@ -23,17 +23,29 @@ const defaultMermaidSettings: MermaidSettings = {
     preserveLineBreaksCSS: true
 };
 
+// Default Font settings
+const defaultFontSettings: FontSettings = {
+    fontFamily: "Segoe UI",
+    headingFontSize: 20,
+    bodyFontSize: 11,
+    mermaidFontSize: 14
+};
+
 // Context for color mode (light/dark)
 export const ColorModeContext = React.createContext<string>('light');
 
 // Context for Mermaid settings
 export const MermaidSettingsContext = React.createContext<MermaidSettings>(defaultMermaidSettings);
 
+// Context for Font settings
+export const FontSettingsContext = React.createContext<FontSettings>(defaultFontSettings);
+
 /**
  * MermaidDiagram component with zoom and pan functionality.
  */
 const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, className }) => {
     const mermaidSettings = React.useContext(MermaidSettingsContext);
+    const fontSettings = React.useContext(FontSettingsContext);
     const colorMode = React.useContext(ColorModeContext);
     const demoid = React.useRef(`dome${randomid()}`);
     const [container, setContainer] = React.useState<HTMLElement | null>(null);
@@ -45,7 +57,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const previousCodeRef = React.useRef<string | null>(null);
 
     // Create a settings key to detect settings changes
-    const settingsKey = JSON.stringify(mermaidSettings) + colorMode;
+    const settingsKey = JSON.stringify(mermaidSettings) + JSON.stringify(fontSettings) + colorMode;
     const previousSettingsRef = React.useRef<string | null>(null);
 
     React.useEffect(() => {
@@ -68,6 +80,8 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 htmlLabels: mermaidSettings.htmlLabels,
                 markdownAutoWrap: mermaidSettings.markdownAutoWrap,
                 theme: colorMode === 'dark' ? 'dark' : 'default',
+                fontFamily: fontSettings.fontFamily || 'Segoe UI',
+                fontSize: fontSettings.mermaidFontSize || 14,
                 secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'suppressErrorRendering'],
                 pie: {
                     useMaxWidth: false,
@@ -125,7 +139,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     container.textContent = code;
                 });
         }
-    }, [container, code, mermaidSettings, settingsKey, colorMode]);
+    }, [container, code, mermaidSettings, fontSettings, settingsKey, colorMode]);
 
     const refElement = React.useCallback((node: HTMLElement | null) => {
         if (node !== null) {

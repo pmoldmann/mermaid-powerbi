@@ -89,6 +89,48 @@
                     }
                 }
             }
+        },
+        "font": {
+            "displayName": "Font settings",
+            "description": "Font family and size settings for Markdown content and Mermaid diagrams",
+            "properties": {
+                "fontFamily": {
+                    "displayName": "Font family",
+                    "description": "Font family for Markdown content and Mermaid diagrams",
+                    "type": {
+                        "formatting": {
+                            "fontFamily": true
+                        }
+                    }
+                },
+                "headingFontSize": {
+                    "displayName": "Heading font size",
+                    "description": "Base font size for headings (h1). Lower heading levels scale down proportionally.",
+                    "type": {
+                        "formatting": {
+                            "fontSize": true
+                        }
+                    }
+                },
+                "bodyFontSize": {
+                    "displayName": "Body font size",
+                    "description": "Font size for paragraphs, tables, lists, and other body text",
+                    "type": {
+                        "formatting": {
+                            "fontSize": true
+                        }
+                    }
+                },
+                "mermaidFontSize": {
+                    "displayName": "Mermaid font size",
+                    "description": "Font size for text in Mermaid diagrams",
+                    "type": {
+                        "formatting": {
+                            "fontSize": true
+                        }
+                    }
+                }
+            }
         }
     },
     "dataViewMappings": [

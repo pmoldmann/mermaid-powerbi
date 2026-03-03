@@ -4,7 +4,7 @@ import { useAppSelector } from './redux/hooks';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
-import { Code, MermaidSettingsContext, ColorModeContext } from './Code';
+import { Code, MermaidSettingsContext, ColorModeContext, FontSettingsContext } from './Code';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar, SearchToggle } from './SearchBar';
@@ -248,27 +248,38 @@ export const Application: React.FC<ApplicationProps> = () => {
                         onClick={onLinkClick}
                         style={{
                             height: isSearchOpen ? 'calc(100% - 44px)' : '100%',
-                            overflowY: 'auto'
-                        }}
+                            overflowY: 'auto',
+                            '--md-font-family': settings?.font?.fontFamily || 'Segoe UI',
+                            '--md-heading-base-size': `${settings?.font?.headingFontSize || 20}pt`,
+                            '--md-body-font-size': `${settings?.font?.bodyFontSize || 11}pt`,
+                            fontFamily: `"${settings?.font?.fontFamily || 'Segoe UI'}", sans-serif`,
+                        } as React.CSSProperties}
                     >
                         <ColorModeContext.Provider value={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}>
-                            <MermaidSettingsContext.Provider value={settings?.mermaid || {
-                                htmlLabels: true,
-                                markdownAutoWrap: true,
-                                securityLevel: "loose",
-                                maxEdges: 30000,
-                                convertBrToNewline: true,
-                                autoBacktickLabels: true,
-                                preserveLineBreaksCSS: true
+                            <FontSettingsContext.Provider value={settings?.font || {
+                                fontFamily: 'Segoe UI',
+                                headingFontSize: 20,
+                                bodyFontSize: 11,
+                                mermaidFontSize: 14
                             }}>
-                                <MDEditor.Markdown
-                                    components={{
-                                        code: Code
-                                    }}
-                                    rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                    source={markdownContent}
-                                />
-                            </MermaidSettingsContext.Provider>
+                                <MermaidSettingsContext.Provider value={settings?.mermaid || {
+                                    htmlLabels: true,
+                                    markdownAutoWrap: true,
+                                    securityLevel: "loose",
+                                    maxEdges: 30000,
+                                    convertBrToNewline: true,
+                                    autoBacktickLabels: true,
+                                    preserveLineBreaksCSS: true
+                                }}>
+                                    <MDEditor.Markdown
+                                        components={{
+                                            code: Code
+                                        }}
+                                        rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+                                        source={markdownContent}
+                                    />
+                                </MermaidSettingsContext.Provider>
+                            </FontSettingsContext.Provider>
                         </ColorModeContext.Provider>
                     </div>
                 </div>

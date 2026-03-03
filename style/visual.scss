@@ -2,6 +2,55 @@
     margin: 0px;
 }
 
+// ============================================
+// Font Settings - CSS Custom Properties
+// Applied via inline style on .markdown-content:
+//   --md-font-family, --md-heading-base-size, --md-body-font-size
+// ============================================
+.markdown-content .wmde-markdown {
+    // Headings - scale proportionally from base heading size
+    h1 {
+        font-size: var(--md-heading-base-size, 20pt) !important;
+        font-family: var(--md-font-family, 'Segoe UI'), sans-serif !important;
+    }
+    h2 {
+        font-size: calc(var(--md-heading-base-size, 20pt) * 0.85) !important;
+        font-family: var(--md-font-family, 'Segoe UI'), sans-serif !important;
+    }
+    h3 {
+        font-size: calc(var(--md-heading-base-size, 20pt) * 0.7) !important;
+        font-family: var(--md-font-family, 'Segoe UI'), sans-serif !important;
+    }
+    h4 {
+        font-size: calc(var(--md-heading-base-size, 20pt) * 0.6) !important;
+        font-family: var(--md-font-family, 'Segoe UI'), sans-serif !important;
+    }
+    h5 {
+        font-size: calc(var(--md-heading-base-size, 20pt) * 0.5) !important;
+        font-family: var(--md-font-family, 'Segoe UI'), sans-serif !important;
+    }
+    h6 {
+        font-size: calc(var(--md-heading-base-size, 20pt) * 0.45) !important;
+        font-family: var(--md-font-family, 'Segoe UI'), sans-serif !important;
+    }
+
+    // Body text - paragraphs, tables, lists, blockquotes
+    p, li, td, th, dd, dt, blockquote, summary, figcaption {
+        font-size: var(--md-body-font-size, 11pt) !important;
+        font-family: var(--md-font-family, 'Segoe UI'), sans-serif !important;
+    }
+
+    // Inline code - slightly smaller than body text, keeps monospace
+    code:not(pre code) {
+        font-size: calc(var(--md-body-font-size, 11pt) * 0.9) !important;
+    }
+
+    // Code blocks - same size as body text, keeps monospace
+    pre code {
+        font-size: var(--md-body-font-size, 11pt) !important;
+    }
+}
+
 .import {
     height: 100%;
     display: flex;
