@@ -13,7 +13,7 @@ import { DebugPanel, useDebugLogs, clearDebugLogs, setDebugEnabled } from './Deb
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import "mermaid";
 
-// Register DAX as a custom language for syntax highlighting in code blocks
+// Register DAX and Power Query (M) as custom languages for syntax highlighting in code blocks
 import './dax-language';
 
 // Custom schema that preserves br tags (needed for Mermaid diagrams with line breaks)
