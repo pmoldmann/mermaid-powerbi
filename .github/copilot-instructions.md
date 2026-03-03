@@ -116,6 +116,7 @@ yarn package        # Build production .pbiviz package
 yarn lint           # Run ESLint
 yarn lintfix        # Auto-fix lint issues
 ```
+After implementing changes, run `yarn start` to test in Power BI Desktop.
 
 ## Testing Locally
 

@@ -139,10 +139,6 @@ Uh - And now guess only once how this file has been generated...
 | **Show empty message** | Boolean | `true` | Shows a welcome page when no markdown content is provided |
 | **Show debug panel** | Boolean | `false` | Shows debug information including raw and processed Mermaid code |
 | **Color mode** | Enum | `Light` | Switch between light and dark theme for the visual. Affects Markdown rendering, Mermaid diagrams, and all UI components. |
-| **Padding top** | Number | `8` | Top padding in pixels for the rendered content area |
-| **Padding right** | Number | `8` | Right padding in pixels for the rendered content area |
-| **Padding bottom** | Number | `8` | Bottom padding in pixels for the rendered content area |
-| **Padding left** | Number | `8` | Left padding in pixels for the rendered content area |
 
 ### Mermaid Settings
 

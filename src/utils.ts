@@ -87,7 +87,7 @@ export function sanitizeHTML(dirty: string) {
 
 /**
  * Extracts markdown content from the dataView.
- * Supports both single value (measure) and categorical (column) data.
+ * Supports table mapping (primary), single value (measure), and categorical (legacy) data.
  * When a column is provided, all values are concatenated with separators.
  * @param dataView The Power BI dataView
  * @returns The markdown string or empty string if not available
@@ -102,7 +102,19 @@ export function extractMarkdownContent(dataView: DataView): string {
         return String(dataView.single.value);
     }
 
-    // Try categorical mapping
+    // Try table mapping (primary mapping)
+    if (dataView.table && dataView.table.rows && dataView.table.rows.length > 0) {
+        const markdownParts = dataView.table.rows
+            .map(row => row[0])
+            .filter(value => value != null && String(value).trim() !== '')
+            .map(value => String(value));
+
+        if (markdownParts.length > 0) {
+            return markdownParts.join('\n\n---\n\n');
+        }
+    }
+
+    // Try categorical mapping (backwards compatibility)
     if (dataView.categorical) {
         // Check for column data in categories
         if (dataView.categorical.categories && dataView.categorical.categories.length > 0) {

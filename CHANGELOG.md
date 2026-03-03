@@ -11,14 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dark / Light theme support**: New "Color mode" setting to switch between light and dark theme for the visual, Mermaid diagrams, and all UI components
 - **DAX syntax highlighting**: Code blocks with ` ```dax ` are now syntax-highlighted with support for functions, keywords (VAR, RETURN, DEFINE, EVALUATE), table/column references, strings, comments, and operators
 - **Power Query (M) syntax highlighting**: Code blocks with ` ```powerquery `, ` ```pq `, or ` ```mscript ` are now syntax-highlighted with support for keywords, data types, quoted identifiers, constants, and functions
-- **Padding settings**: Configurable padding (top, right, bottom, left) in pixels for the rendered content area, preventing content from touching the visual edges
 
 ### Changed
 - Mermaid diagrams automatically use the dark theme when color mode is set to dark
 - Search bar and debug panel adapt to the selected color mode
+- Switched internal data mapping from `categorical` to `table` for improved settings persistence
 
 ### Fixed
-- Settings toggles (Color mode, Debug panel) now persist correctly even when no data field is connected. Previously they would snap back to their default values immediately.
+- Settings toggles (Color mode, Show debug panel) now work correctly even when no data field is connected. Added `supportsEmptyDataView` capability so Power BI delivers a DataView with settings metadata even without bound data.
 
 ---
 

@@ -61,9 +61,8 @@ export class Visual implements IVisual {
 
     public update(options: VisualUpdateOptions) {
         const dataView = options && options.dataViews && options.dataViews[0];
-        // Only parse settings from dataView when it exists.
-        // Without data roles filled, Power BI may not provide a dataView,
-        // which would reset settings to defaults and cause toggles to bounce back.
+        // supportsEmptyDataView ensures Power BI always provides a dataView
+        // (with metadata.objects) even when no data roles are filled.
         if (dataView) {
             this.settings = Visual.parseSettings(dataView);
         }
