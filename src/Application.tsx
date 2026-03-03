@@ -248,7 +248,11 @@ export const Application: React.FC<ApplicationProps> = () => {
                         onClick={onLinkClick}
                         style={{
                             height: isSearchOpen ? 'calc(100% - 44px)' : '100%',
-                            overflowY: 'auto'
+                            overflowY: 'auto',
+                            paddingTop: settings?.view?.paddingTop ?? 8,
+                            paddingRight: settings?.view?.paddingRight ?? 8,
+                            paddingBottom: settings?.view?.paddingBottom ?? 8,
+                            paddingLeft: settings?.view?.paddingLeft ?? 8,
                         }}
                     >
                         <ColorModeContext.Provider value={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}>

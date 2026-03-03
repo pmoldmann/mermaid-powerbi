@@ -35,6 +35,34 @@
                             { "value": "dark", "displayName": "Dark" }
                         ]
                     }
+                },
+                "paddingTop": {
+                    "displayName": "Padding top",
+                    "description": "Top padding in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "paddingRight": {
+                    "displayName": "Padding right",
+                    "description": "Right padding in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "paddingBottom": {
+                    "displayName": "Padding bottom",
+                    "description": "Bottom padding in pixels",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "paddingLeft": {
+                    "displayName": "Padding left",
+                    "description": "Left padding in pixels",
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },

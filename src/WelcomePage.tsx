@@ -2,7 +2,7 @@ import React from 'react';
 import { DemoSection } from './DemoSection';
 
 // Visual version - update this for App Store releases
-export const VISUAL_VERSION = '1.0.0.0';
+export const VISUAL_VERSION = '1.1.0.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {

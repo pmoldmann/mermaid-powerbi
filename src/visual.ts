@@ -32,6 +32,7 @@ export class Visual implements IVisual {
     constructor(options: VisualConstructorOptions) {
         this.target = options.element;
         this.host = options.host;
+        this.settings = VisualSettings.getDefault() as VisualSettings;
 
         window.open = (url?: string | URL) => {
             if (typeof url === "string") {
@@ -60,7 +61,12 @@ export class Visual implements IVisual {
 
     public update(options: VisualUpdateOptions) {
         const dataView = options && options.dataViews && options.dataViews[0];
-        this.settings = Visual.parseSettings(dataView);
+        // Only parse settings from dataView when it exists.
+        // Without data roles filled, Power BI may not provide a dataView,
+        // which would reset settings to defaults and cause toggles to bounce back.
+        if (dataView) {
+            this.settings = Visual.parseSettings(dataView);
+        }
         store.dispatch(setSettings(this.settings));
         // Always dispatch dataView - null/undefined will clear the content and show welcome page
         store.dispatch(setDataView(dataView ? deepClone(dataView) : null));

@@ -18,6 +18,10 @@ export class ViewSettings {
     public showEmptyMessage: boolean = true;
     public showDebugPanel: boolean = false;
     public colorMode: string = "light";
+    public paddingTop: number = 8;
+    public paddingRight: number = 8;
+    public paddingBottom: number = 8;
+    public paddingLeft: number = 8;
 }
 
 export class MermaidSettings {
