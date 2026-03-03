@@ -1,6 +1,6 @@
 # Markdown / Mermaid Renderer for Power BI
 
-![Version](https://img.shields.io/badge/version-1.0.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.0.0-blue)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Custom%20Visual-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -14,6 +14,8 @@ This visual allows you to embed rich documentation and diagrams in your Power BI
 - Visualising **flowcharts** and **process diagrams**
 - Visualizing **data relationships** with ER diagrams
 - Documenting **architecture** and system designs
+- Presenting **DAX** and **Power Query (M)** code with syntax highlighting
+- Supporting **dark and light themes** to match your report design
 
 ## Prerequisites
 - You need a column in your data model that contains markdown text.
@@ -45,7 +47,38 @@ flowchart LR
 - Step 2: Process
 - Step 3: Deliver
 ```
+### DAX & Power Query Syntax Highlighting
 
+The visual supports syntax highlighting for **DAX** and **Power Query (M)** code blocks — ideal for documenting measures, calculated columns, or ETL logic directly in your reports.
+
+**DAX** — use ` ```dax `:
+
+```dax
+Total Sales =
+VAR _sales = SUMX(Sales, Sales[Quantity] * Sales[UnitPrice])
+RETURN
+    IF(_sales > 0, _sales, BLANK())
+```
+
+**Power Query (M)** — use ` ```powerquery `, ` ```pq `, or ` ```mscript `:
+
+```powerquery
+let
+    Source = Sql.Database("server", "db"),
+    Filtered = Table.SelectRows(Source, each [Status] = "Active")
+in
+    Filtered
+```
+
+## 🎨 Dark / Light Theme
+
+The visual supports **dark and light themes** via the "Color mode" setting in the Power BI property pane. When set to dark mode:
+
+- Markdown content renders with light text on a dark background
+- Mermaid diagrams automatically use the Mermaid dark theme
+- Search bar, debug panel, and all UI components adapt accordingly
+
+> 💡 **Tip:** Match the color mode to your Power BI report background for a seamless look.
 ## � Examples
 
 The folder [`pbi_example/`](pbi_example/) contains a sample Power BI report (`.pbix`) and screenshots that demonstrate the visual in action.
@@ -105,6 +138,7 @@ Uh - And now guess only once how this file has been generated...
 |---------|------|---------|-------------|
 | **Show empty message** | Boolean | `true` | Shows a welcome page when no markdown content is provided |
 | **Show debug panel** | Boolean | `false` | Shows debug information including raw and processed Mermaid code |
+| **Color mode** | Enum | `Light` | Switch between light and dark theme for the visual. Affects Markdown rendering, Mermaid diagrams, and all UI components. |
 
 ### Mermaid Settings
 
@@ -262,6 +296,7 @@ src/
 ├── visual.ts              # Power BI IVisual implementation
 ├── Application.tsx        # Root React component
 ├── Code.tsx               # Code block handler (Mermaid, styles)
+├── dax-language.ts        # DAX & Power Query syntax registration
 ├── WelcomePage.tsx        # Landing page when no content
 ├── SearchBar.tsx          # Ctrl+F search functionality
 ├── DebugPanel.tsx         # Development debugging panel

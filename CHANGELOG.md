@@ -5,6 +5,19 @@ All notable changes to the Markdown / Mermaid Renderer for Power BI will be docu
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0.0] - 2026-03-03
+
+### Added
+- **Dark / Light theme support**: New "Color mode" setting to switch between light and dark theme for the visual, Mermaid diagrams, and all UI components
+- **DAX syntax highlighting**: Code blocks with ` ```dax ` are now syntax-highlighted with support for functions, keywords (VAR, RETURN, DEFINE, EVALUATE), table/column references, strings, comments, and operators
+- **Power Query (M) syntax highlighting**: Code blocks with ` ```powerquery `, ` ```pq `, or ` ```mscript ` are now syntax-highlighted with support for keywords, data types, quoted identifiers, constants, and functions
+
+### Changed
+- Mermaid diagrams automatically use the dark theme when color mode is set to dark
+- Search bar and debug panel adapt to the selected color mode
+
+---
+
 ## [1.0.0.0] - 2026-02-26
 
 ### Added
