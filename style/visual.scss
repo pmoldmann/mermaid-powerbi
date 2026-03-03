@@ -1031,3 +1031,143 @@ mark.search-highlight {
         }
     }
 }
+
+// ============================
+// Welcome Page Dark Mode
+// ============================
+[data-color-mode="dark"] {
+    background-color: #1A202C;
+
+    .welcome-page {
+        color: #E2E8F0;
+    }
+
+    .welcome-header {
+        border-bottom-color: #4A5568;
+
+        h1 {
+            color: #E2E8F0;
+        }
+    }
+
+    .welcome-section {
+        background: #2D3748;
+
+        h2 {
+            color: #E2E8F0;
+        }
+
+        p, ol, ul {
+            color: #CBD5E0;
+        }
+
+        code {
+            background: #4A5568;
+            color: #D6BCFA;
+        }
+    }
+
+    .library-item {
+        background: #1A202C;
+        border-color: #4A5568;
+
+        .library-name {
+            color: #E2E8F0;
+        }
+
+        .library-version {
+            background: #4A5568;
+            color: #A0AEC0;
+        }
+    }
+
+    .welcome-footer {
+        border-top-color: #4A5568;
+
+        p {
+            color: #A0AEC0;
+        }
+
+        .author-credit {
+            color: #CBD5E0;
+        }
+    }
+
+    // Demo section dark mode
+    .demo-section {
+        background: #2D3748;
+        border-color: #4FD1C5;
+    }
+
+    .demo-rendered {
+        background: #1A202C;
+    }
+
+    .demo-rendered-header {
+        background: #2D3748;
+        border-bottom-color: #4A5568;
+    }
+
+    .demo-rendered-label {
+        color: #68D391;
+    }
+
+    .demo-rendered-hint {
+        color: #9AE6B4;
+    }
+
+    .demo-rendered-content {
+        .wmde-markdown {
+            color: #E2E8F0;
+
+            h1 {
+                color: #E2E8F0;
+                border-bottom-color: #4A5568;
+            }
+
+            h2 {
+                color: #CBD5E0;
+            }
+
+            h3 {
+                color: #A0AEC0;
+            }
+
+            table {
+                th, td {
+                    border-color: #4A5568;
+                }
+
+                th {
+                    background: #2D3748;
+                }
+
+                tr:nth-child(even) {
+                    background: #2D3748;
+                }
+            }
+
+            blockquote {
+                background: #2D3748;
+                border-left-color: #4FD1C5;
+
+                p {
+                    color: #CBD5E0;
+                }
+            }
+
+            code:not(.mermaid) {
+                background: #4A5568;
+                color: #D6BCFA;
+            }
+
+            pre:not(:has(.mermaid)) {
+                background: #1A202C;
+
+                code {
+                    color: #E2E8F0;
+                }
+            }
+        }
+    }
+}

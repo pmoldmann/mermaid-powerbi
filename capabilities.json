@@ -12,13 +12,6 @@
             "displayName": "View settings",
             "descriptionKey": "Visual_View",
             "properties": {
-                "showEmptyMessage": {
-                    "displayName": "Show empty message",
-                    "description": "Shows a message when no markdown content is provided",
-                    "type": {
-                        "bool": true
-                    }
-                },
                 "showDebugPanel": {
                     "displayName": "Show debug panel",
                     "description": "Shows debug information including raw Mermaid code",

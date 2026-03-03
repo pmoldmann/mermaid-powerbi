@@ -189,12 +189,12 @@ export const Application: React.FC<ApplicationProps> = () => {
     }, []);
 
     const isEmpty = !markdownContent || markdownContent.trim() === '';
-    const showWelcome = isEmpty && (settings?.view?.showEmptyMessage !== false);
 
     return (
         <ErrorBoundary>
-            {showWelcome ? (
+            {isEmpty ? (
                 <div
+                    data-color-mode={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}
                     style={{
                         width: viewport.width,
                         height: viewport.height,
