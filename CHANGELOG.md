@@ -5,21 +5,20 @@ All notable changes to the Markdown / Mermaid Renderer for Power BI will be docu
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0.0] - 2026-03-04
+
+---
+
+## [1.1.0.0] - 2026-03-04
 
 ### Added
 - **Flowchart orientation override**: New "Flowchart orientation" setting in Mermaid Settings to override the direction of flowchart diagrams (Top to Bottom, Bottom to Top, Left to Right, Right to Left). Default preserves the orientation defined in the diagram code. This helps report creators choose a layout direction that best fits the available space in the visual.
+- **Font settings**: New "Font settings" group with configurable font family, heading font size (h1), body font size, and Mermaid diagram font size. Heading sizes h2–h6 scale proportionally between h1 and body font size.
+- **Markdown settings**: New "Markdown settings" group with "Enable line breaks" (render single newlines as `<br>`) and "Code block word wrap" (wrap long lines instead of horizontal scrollbar).
 
 ### Changed
 - **Settings reorganization**: Split "Mermaid settings" into two groups for better usability:
   - **Mermaid settings**: Flowchart orientation, Max edges, Security level — commonly used settings
   - **Mermaid debug settings**: HTML labels, Markdown auto wrap, Convert `<br>` to newline, Auto backtick labels, Preserve line breaks CSS — advanced/debug settings
-
----
-
-## [1.1.0.0] - 2026-03-03
-
-### Added
 - **Dark / Light theme support**: New "Color mode" setting to switch between light and dark theme for the visual, Mermaid diagrams, and all UI components
 - **DAX syntax highlighting**: Code blocks with ` ```dax ` are now syntax-highlighted with support for functions, keywords (VAR, RETURN, DEFINE, EVALUATE), table/column references, strings, comments, and operators
 - **Power Query (M) syntax highlighting**: Code blocks with ` ```powerquery `, ` ```pq `, or ` ```mscript ` are now syntax-highlighted with support for keywords, data types, quoted identifiers, constants, and functions

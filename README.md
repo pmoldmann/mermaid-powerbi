@@ -136,7 +136,6 @@ Uh - And now guess only once how this file has been generated...
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| **Show empty message** | Boolean | `true` | Shows a welcome page when no markdown content is provided |
 | **Show debug panel** | Boolean | `false` | Shows debug information including raw and processed Mermaid code |
 | **Color mode** | Enum | `Light` | Switch between light and dark theme for the visual. Affects Markdown rendering, Mermaid diagrams, and all UI components. |
 
@@ -157,6 +156,22 @@ Uh - And now guess only once how this file has been generated...
 | **Convert &lt;br&gt; to newline** | Boolean | `true` | Converts `<br/>` tags to newlines. Mermaid escapes `<br>` as text, this fixes line breaks. |
 | **Auto backtick labels** | Boolean | `true` | Automatically wraps labels containing newlines in backticks. Mermaid only renders newlines in backtick-wrapped labels. |
 | **Preserve line breaks CSS** | Boolean | `true` | Applies CSS to preserve line breaks in Mermaid labels (`white-space: pre-wrap`) |
+
+### Font Settings
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| **Font family** | Font | `DIN` | Font family for Markdown content and Mermaid diagrams |
+| **Heading font size (h1)** | Number | `14` | Font size in pt for the largest heading (h1). Smaller headings (h2–h6) scale down proportionally relative to the body font size. |
+| **Body font size** | Number | `9` | Font size in pt for paragraphs, tables, lists, and other body text. |
+| **Mermaid font size** | Number | `14` | Font size in pt for text in Mermaid diagrams. |
+
+### Markdown Settings
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| **Enable line breaks** | Boolean | `true` | Render single line breaks in Markdown as `<br>` (line break). When disabled, consecutive lines are joined into one paragraph. |
+| **Code block word wrap** | Boolean | `true` | Wrap long lines in code blocks instead of showing a horizontal scrollbar |
 
 ### Line Break Settings Explained
 
