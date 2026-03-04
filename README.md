@@ -79,7 +79,47 @@ The visual supports **dark and light themes** via the "Color mode" setting in th
 - Search bar, debug panel, and all UI components adapt accordingly
 
 > 💡 **Tip:** Match the color mode to your Power BI report background for a seamless look.
-## � Examples
+
+## 🔗 Mermaid Tooltips & Interactive Links
+
+The visual supports **tooltips** and **interactive links** in Mermaid diagrams via the `click` directive. This allows you to add hover information and clickable links to diagram nodes.
+
+### Tooltips
+
+Define tooltips using the `click` directive with a tooltip string. The tooltip appears as a styled popup when hovering over the diagram node:
+
+````markdown
+```mermaid
+flowchart LR
+    A["Data Input"] --> B["Processing"] --> C["Output"]
+    click A "https://example.com" "Click to learn more about data input"
+    click B "https://example.com" "Processing step details"
+    click C "https://example.com" "View output documentation"
+```
+````
+
+The tooltip text is the **second quoted string** in the `click` directive. Supported syntax:
+
+| Syntax | Description |
+|--------|-------------|
+| `click A "URL" "tooltip"` | Node with link and tooltip |
+| `click A href "URL" "tooltip"` | Same, using `href` keyword |
+| `click A callback "tooltip"` | Node with callback and tooltip |
+| `click A "tooltip only"` | Node with tooltip only (no link) |
+
+### Safe Link Handling
+
+Links defined in Mermaid `click` directives are **not opened directly inside the visual**. Instead:
+
+1. Clicking a linked node shows a **confirmation dialog** (Power BI's native dialog)
+2. The dialog displays the **target URL** for review
+3. The user can choose to **open the link in an external browser** or cancel
+
+This prevents users from accidentally navigating away from the report and ensures safe handling of external URLs.
+
+> 💡 **Tip:** The `Security level` setting must be set to `Loose` (default) for tooltips and click handlers to work.
+
+## 📸 Examples
 
 The folder [`pbi_example/`](pbi_example/) contains a sample Power BI report (`.pbix`) and screenshots that demonstrate the visual in action.
 

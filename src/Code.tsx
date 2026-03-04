@@ -4,6 +4,7 @@ import mermaid from "mermaid";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
 import { MermaidSettings, MermaidDebugSettings, FontSettings, MarkdownSettings } from "./settings";
+import { useAppSelector } from './redux/hooks';
 
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
@@ -57,6 +58,232 @@ export const FontSettingsContext = React.createContext<FontSettings>(defaultFont
 // Context for Markdown settings
 export const MarkdownSettingsContext = React.createContext<MarkdownSettings>(defaultMarkdownSettings);
 
+// ============================================
+// Tooltip Management for Mermaid Diagrams
+// ============================================
+
+let tooltipDiv: HTMLDivElement | null = null;
+
+function getOrCreateTooltipDiv(): HTMLDivElement {
+    if (!tooltipDiv || !document.body.contains(tooltipDiv)) {
+        tooltipDiv = document.createElement('div');
+        tooltipDiv.className = 'mermaid-custom-tooltip';
+        document.body.appendChild(tooltipDiv);
+    }
+    return tooltipDiv;
+}
+
+function showMermaidTooltip(text: string, event: MouseEvent): void {
+    const div = getOrCreateTooltipDiv();
+    div.textContent = text;
+    div.style.display = 'block';
+    positionMermaidTooltip(event);
+}
+
+function hideMermaidTooltip(): void {
+    if (tooltipDiv) {
+        tooltipDiv.style.display = 'none';
+    }
+}
+
+function positionMermaidTooltip(event: MouseEvent): void {
+    if (tooltipDiv) {
+        const offset = 12;
+        const x = event.pageX + offset;
+        const y = event.pageY + offset;
+
+        // Keep tooltip within viewport
+        const rect = tooltipDiv.getBoundingClientRect();
+        const maxX = window.innerWidth - (rect.width || 200) - 10;
+        const maxY = window.innerHeight - (rect.height || 30) - 10;
+
+        tooltipDiv.style.left = `${Math.min(x, Math.max(0, maxX))}px`;
+        tooltipDiv.style.top = `${Math.min(y, Math.max(0, maxY))}px`;
+    }
+}
+
+// ============================================
+// Mermaid Click Directive Parser
+// ============================================
+
+interface MermaidClickDirective {
+    nodeId: string;
+    url: string | null;
+    tooltip: string | null;
+}
+
+/**
+ * Parses Mermaid click directives from the diagram code.
+ * Supports: click nodeId "URL" "tooltip", click nodeId href "URL" "tooltip",
+ *           click nodeId callback "tooltip", click nodeId "URL" _blank
+ */
+function parseMermaidClickDirectives(code: string): MermaidClickDirective[] {
+    const directives: MermaidClickDirective[] = [];
+    const lines = code.split('\n');
+
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed.toLowerCase().startsWith('click ')) continue;
+
+        const afterClick = trimmed.substring(6).trim();
+        const spaceIdx = afterClick.indexOf(' ');
+        if (spaceIdx === -1) continue;
+
+        const nodeId = afterClick.substring(0, spaceIdx);
+        let rest = afterClick.substring(spaceIdx + 1).trim();
+
+        // Remove 'href' keyword if present
+        rest = rest.replace(/^href\s+/i, '');
+
+        // Remove target keywords at the end
+        rest = rest.replace(/\s+_(blank|self|parent|top)\s*$/i, '');
+
+        // Extract all quoted strings
+        const quotedStrings: string[] = [];
+        const quoteRegex = /"([^"]*)"/g;
+        let quoteMatch;
+        while ((quoteMatch = quoteRegex.exec(rest)) !== null) {
+            quotedStrings.push(quoteMatch[1]);
+        }
+
+        let url: string | null = null;
+        let tooltip: string | null = null;
+
+        if (quotedStrings.length >= 2) {
+            url = quotedStrings[0];
+            tooltip = quotedStrings[1];
+        } else if (quotedStrings.length === 1) {
+            const val = quotedStrings[0];
+            if (/^https?:\/\//.test(val) || val.startsWith('/') || val.startsWith('#') || val.includes('.')) {
+                url = val;
+            } else {
+                tooltip = val;
+            }
+        }
+
+        directives.push({ nodeId, url, tooltip });
+    }
+
+    return directives;
+}
+
+/**
+ * Finds a Mermaid diagram node element in the SVG by its node ID.
+ */
+function findMermaidNode(container: HTMLElement, nodeId: string): Element | null {
+    // Try multiple selector patterns used by different Mermaid diagram types
+    const selectors = [
+        `[id*="flowchart-${nodeId}-"]`,
+        `[id*="-${nodeId}-"]`,
+        `[id="${nodeId}"]`,
+    ];
+
+    for (const selector of selectors) {
+        try {
+            const el = container.querySelector(selector);
+            if (el) {
+                // Return the .node group if it exists, otherwise the element itself
+                return el.closest('.node') || el;
+            }
+        } catch {
+            continue;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Opens an external link via Power BI host (with confirmation dialog) or fallback browser dialog.
+ * Power BI's host.launchUrl() shows a native confirmation dialog before opening in an external browser.
+ */
+function openExternalLink(url: string, host: unknown): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const pbiHost = host as any;
+    if (pbiHost && typeof pbiHost.launchUrl === 'function') {
+        // Power BI host.launchUrl() shows a native confirmation dialog
+        pbiHost.launchUrl(url);
+    } else {
+        // Fallback for development/testing
+        // eslint-disable-next-line no-restricted-globals
+        if (confirm(`Do you want to open this external link in your browser?\n\n${url}`)) {
+            window.open(url, '_blank', 'noopener,noreferrer');
+        }
+    }
+}
+
+/**
+ * Processes tooltips and link interception for a rendered Mermaid SVG.
+ * - Adds JavaScript-based tooltips for click directive tooltips
+ * - Intercepts <a> links to open via host.launchUrl() (with confirmation dialog)
+ * - Removes direct navigation handlers from Mermaid
+ * - We intentionally do NOT call Mermaid's bindFunctions() to prevent
+ *   uncontrolled navigation that traps the user inside the visual.
+ */
+function processMermaidInteractivity(container: HTMLElement, code: string, host: unknown): void {
+    // 1. Parse click directives from the Mermaid code
+    const clickDirectives = parseMermaidClickDirectives(code);
+
+    // 2. Apply tooltips and click handlers from click directives
+    for (const { nodeId, url, tooltip } of clickDirectives) {
+        const nodeEl = findMermaidNode(container, nodeId);
+        if (!nodeEl) {
+            debugLog('info', 'Mermaid click directive: node not found', `nodeId=${nodeId}`);
+            continue;
+        }
+
+        // Add tooltip on hover
+        if (tooltip) {
+            nodeEl.addEventListener('mouseenter', (e: Event) => {
+                showMermaidTooltip(tooltip, e as MouseEvent);
+            });
+            nodeEl.addEventListener('mouseleave', () => {
+                hideMermaidTooltip();
+            });
+            nodeEl.addEventListener('mousemove', (e: Event) => {
+                positionMermaidTooltip(e as MouseEvent);
+            });
+            (nodeEl as HTMLElement).style.cursor = url ? 'pointer' : 'help';
+        }
+
+        // Add click handler for URL (opens in external browser with confirmation)
+        if (url) {
+            (nodeEl as HTMLElement).style.cursor = 'pointer';
+            nodeEl.addEventListener('click', (e: Event) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openExternalLink(url, host);
+            });
+        }
+    }
+
+    // 3. Intercept <a> elements in the SVG (Mermaid may create these for links)
+    const links = container.querySelectorAll('a[href], a[xlink\\:href]');
+    links.forEach((link) => {
+        const href = link.getAttribute('href') || link.getAttribute('xlink:href');
+        if (href && href !== '#' && !href.startsWith('javascript:')) {
+            link.removeAttribute('href');
+            link.removeAttribute('xlink:href');
+            (link as HTMLElement).style.cursor = 'pointer';
+
+            link.addEventListener('click', (e: Event) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openExternalLink(href, host);
+            });
+        }
+    });
+
+    // 4. Remove any inline onclick attributes (from Mermaid's loose security mode)
+    const onclickEls = container.querySelectorAll('[onclick]');
+    onclickEls.forEach((el) => {
+        el.removeAttribute('onclick');
+    });
+
+    debugLog('info', 'Mermaid interactivity processed',
+        `${clickDirectives.length} click directive(s), ${links.length} link(s) intercepted`);
+}
+
 /**
  * MermaidDiagram component with zoom and pan functionality.
  */
@@ -65,6 +292,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const mermaidDebugSettings = React.useContext(MermaidDebugSettingsContext);
     const fontSettings = React.useContext(FontSettingsContext);
     const colorMode = React.useContext(ColorModeContext);
+    const host = useAppSelector((state) => state.options.host);
     const demoid = React.useRef(`dome${randomid()}`);
     const [container, setContainer] = React.useState<HTMLElement | null>(null);
     const [zoom, setZoom] = React.useState(1);
@@ -148,9 +376,12 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                         }
                     }
                     
-                    if (bindFunctions) {
-                        bindFunctions(container);
-                    }
+                    // Process tooltips and link interception instead of calling
+                    // bindFunctions() directly. This prevents Mermaid from setting up
+                    // direct navigation handlers that trap the user inside the visual.
+                    // Links are instead routed through host.launchUrl() which shows a
+                    // confirmation dialog before opening in an external browser.
+                    processMermaidInteractivity(container, code, host);
                 })
                 .catch((error) => {
                     debugLog('error', 'Mermaid rendering error', String(error));

@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Flowchart orientation override**: New "Flowchart orientation" setting in Mermaid Settings to override the direction of flowchart diagrams (Top to Bottom, Bottom to Top, Left to Right, Right to Left). Default preserves the orientation defined in the diagram code. This helps report creators choose a layout direction that best fits the available space in the visual.
 - **Font settings**: New "Font settings" group with configurable font family, heading font size (h1), body font size, and Mermaid diagram font size. Heading sizes h2–h6 scale proportionally between h1 and body font size.
 - **Markdown settings**: New "Markdown settings" group with "Enable line breaks" (render single newlines as `<br>`) and "Code block word wrap" (wrap long lines instead of horizontal scrollbar).
+- **Mermaid tooltip support**: Tooltips defined in Mermaid `click` directives (e.g. `click A "url" "tooltip text"`) are now displayed as styled popups when hovering over diagram nodes. This uses a custom JavaScript-based tooltip system for reliable rendering across all environments including Power BI Desktop and Service.
+- **Safe external link handling**: Links defined in Mermaid `click` directives are no longer opened directly inside the visual. Instead, clicking a linked node shows a confirmation dialog (via Power BI's native `host.launchUrl()`) asking the user whether to open the URL in an external browser. This prevents users from getting trapped inside the visual after clicking a link.
 
 ### Changed
 - **Settings reorganization**: Split "Mermaid settings" into two groups for better usability:
