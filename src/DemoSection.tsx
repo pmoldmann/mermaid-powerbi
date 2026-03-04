@@ -1,7 +1,7 @@
 import React from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
-import { Code, MermaidSettingsContext, ColorModeContext } from './Code';
+import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext } from './Code';
 import { ErrorBoundary } from './Error';
 import { useAppSelector } from './redux/hooks';
 
@@ -140,10 +140,15 @@ const sanitizeSchema = {
 
 // Default Mermaid settings for demo
 const defaultMermaidSettings = {
+    flowchartOrientation: 'default' as const,
+    maxEdges: 30000,
+    securityLevel: 'loose' as const,
+};
+
+// Default Mermaid debug settings for demo
+const defaultMermaidDebugSettings = {
     htmlLabels: true,
     markdownAutoWrap: true,
-    securityLevel: 'loose' as const,
-    maxEdges: 30000,
     convertBrToNewline: true,
     autoBacktickLabels: true,
     preserveLineBreaksCSS: true,
@@ -234,6 +239,7 @@ export const DemoSection: React.FC = () => {
                             <ErrorBoundary>
                                 <ColorModeContext.Provider value={colorMode}>
                                     <MermaidSettingsContext.Provider value={defaultMermaidSettings}>
+                                        <MermaidDebugSettingsContext.Provider value={defaultMermaidDebugSettings}>
                                         <MDEditor.Markdown
                                             source={DEMO_MARKDOWN}
                                             rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
@@ -241,6 +247,7 @@ export const DemoSection: React.FC = () => {
                                                 code: Code,
                                             }}
                                         />
+                                        </MermaidDebugSettingsContext.Provider>
                                     </MermaidSettingsContext.Provider>
                                 </ColorModeContext.Provider>
                             </ErrorBoundary>

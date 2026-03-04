@@ -3,7 +3,7 @@ import { getCodeString } from 'rehype-rewrite';
 import mermaid from "mermaid";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
-import { MermaidSettings, FontSettings, MarkdownSettings } from "./settings";
+import { MermaidSettings, MermaidDebugSettings, FontSettings, MarkdownSettings } from "./settings";
 
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
@@ -14,10 +14,15 @@ const ZOOM_STEP = 0.25;
 
 // Default Mermaid settings
 const defaultMermaidSettings: MermaidSettings = {
+    flowchartOrientation: "default",
+    maxEdges: 30000,
+    securityLevel: "loose",
+};
+
+// Default Mermaid debug settings
+const defaultMermaidDebugSettings: MermaidDebugSettings = {
     htmlLabels: true,
     markdownAutoWrap: true,
-    securityLevel: "loose",
-    maxEdges: 30000,
     convertBrToNewline: true,
     autoBacktickLabels: true,
     preserveLineBreaksCSS: true
@@ -25,9 +30,9 @@ const defaultMermaidSettings: MermaidSettings = {
 
 // Default Font settings
 const defaultFontSettings: FontSettings = {
-    fontFamily: "Segoe UI",
-    headingFontSize: 20,
-    bodyFontSize: 11,
+    fontFamily: "DIN",
+    headingFontSize: 14,
+    bodyFontSize: 9,
     mermaidFontSize: 14
 };
 
@@ -43,6 +48,9 @@ export const ColorModeContext = React.createContext<string>('light');
 // Context for Mermaid settings
 export const MermaidSettingsContext = React.createContext<MermaidSettings>(defaultMermaidSettings);
 
+// Context for Mermaid debug settings
+export const MermaidDebugSettingsContext = React.createContext<MermaidDebugSettings>(defaultMermaidDebugSettings);
+
 // Context for Font settings
 export const FontSettingsContext = React.createContext<FontSettings>(defaultFontSettings);
 
@@ -54,6 +62,7 @@ export const MarkdownSettingsContext = React.createContext<MarkdownSettings>(def
  */
 const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, className }) => {
     const mermaidSettings = React.useContext(MermaidSettingsContext);
+    const mermaidDebugSettings = React.useContext(MermaidDebugSettingsContext);
     const fontSettings = React.useContext(FontSettingsContext);
     const colorMode = React.useContext(ColorModeContext);
     const demoid = React.useRef(`dome${randomid()}`);
@@ -66,7 +75,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const previousCodeRef = React.useRef<string | null>(null);
 
     // Create a settings key to detect settings changes
-    const settingsKey = JSON.stringify(mermaidSettings) + JSON.stringify(fontSettings) + colorMode;
+    const settingsKey = JSON.stringify(mermaidSettings) + JSON.stringify(mermaidDebugSettings) + JSON.stringify(fontSettings) + colorMode;
     const previousSettingsRef = React.useRef<string | null>(null);
 
     React.useEffect(() => {
@@ -86,10 +95,10 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             mermaid.initialize({
                 securityLevel: mermaidSettings.securityLevel as "loose" | "strict" | "sandbox",
                 maxEdges: mermaidSettings.maxEdges,
-                htmlLabels: mermaidSettings.htmlLabels,
-                markdownAutoWrap: mermaidSettings.markdownAutoWrap,
+                htmlLabels: mermaidDebugSettings.htmlLabels,
+                markdownAutoWrap: mermaidDebugSettings.markdownAutoWrap,
                 theme: colorMode === 'dark' ? 'dark' : 'default',
-                fontFamily: fontSettings.fontFamily || 'Segoe UI',
+                fontFamily: fontSettings.fontFamily || 'DIN',
                 fontSize: fontSettings.mermaidFontSize || 14,
                 secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'suppressErrorRendering'],
                 pie: {
@@ -97,7 +106,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 },
                 flowchart: {
                     useMaxWidth: false,
-                    htmlLabels: mermaidSettings.htmlLabels,
+                    htmlLabels: mermaidDebugSettings.htmlLabels,
                 },
                 sequence: {
                     useMaxWidth: false,
@@ -132,7 +141,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                         svgElement.style.height = 'auto';
                         
                         // Add class for CSS line break preservation if enabled
-                        if (mermaidSettings.preserveLineBreaksCSS !== false) {
+                        if (mermaidDebugSettings.preserveLineBreaksCSS !== false) {
                             svgElement.classList.add('mermaid-preserve-linebreaks');
                         } else {
                             svgElement.classList.remove('mermaid-preserve-linebreaks');
@@ -148,7 +157,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     container.textContent = code;
                 });
         }
-    }, [container, code, mermaidSettings, fontSettings, settingsKey, colorMode]);
+    }, [container, code, mermaidSettings, mermaidDebugSettings, fontSettings, settingsKey, colorMode]);
 
     const refElement = React.useCallback((node: HTMLElement | null) => {
         if (node !== null) {
@@ -242,6 +251,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
 export const Code = (props: any) => {
     // Get settings from context (must be at top level)
     const mermaidSettings = React.useContext(MermaidSettingsContext);
+    const mermaidDebugSettings = React.useContext(MermaidDebugSettingsContext);
     
     const children = props?.children || [];
     const className = props?.className;
@@ -268,14 +278,29 @@ export const Code = (props: any) => {
         textarea.innerHTML = code;
         code = textarea.value;
         
+        // Apply flowchart orientation override
+        if (mermaidSettings.flowchartOrientation && mermaidSettings.flowchartOrientation !== 'default') {
+            // Replace orientation in flowchart/graph declarations
+            // Matches: flowchart TB, flowchart LR, graph TD, etc.
+            code = code.replace(
+                /^(\s*(?:flowchart|graph)\s+)(TB|TD|BT|LR|RL)/im,
+                `$1${mermaidSettings.flowchartOrientation}`
+            );
+            // Also handle flowchart without explicit orientation (defaults to TB)
+            code = code.replace(
+                /^(\s*(?:flowchart|graph))\s*$/im,
+                `$1 ${mermaidSettings.flowchartOrientation}`
+            );
+        }
+        
         // Convert <br/> tags to newlines (Mermaid escapes <br/> as text)
-        if (mermaidSettings.convertBrToNewline !== false) {
+        if (mermaidDebugSettings.convertBrToNewline !== false) {
             code = code.replace(/<br\s*\/?>/gi, '\n');
         }
         
         // Convert node labels with newlines to backtick syntax
         // Mermaid only renders newlines in backtick-wrapped labels: ["`text`"]
-        if (mermaidSettings.autoBacktickLabels !== false) {
+        if (mermaidDebugSettings.autoBacktickLabels !== false) {
             code = code.replace(/\["([^"]*\n[^"]*)"\]/g, (match, content) => {
                 if (content.startsWith('`') && content.endsWith('`')) return match;
                 return '["`' + content + '`"]';

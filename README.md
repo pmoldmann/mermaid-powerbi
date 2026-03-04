@@ -144,10 +144,16 @@ Uh - And now guess only once how this file has been generated...
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
+| **Flowchart orientation** | Enum | `Default (from diagram)` | Override the orientation of flowchart diagrams. Choose between Top to Bottom, Bottom to Top, Left to Right, or Right to Left. 'Default' uses the orientation defined in the diagram code. |
+| **Max edges** | Number | `30000` | Maximum number of edges allowed in a diagram |
+| **Security level** | Enum | `Loose` | Security level for Mermaid rendering: `Loose`, `Strict`, or `Sandbox`. Loose is required for click handlers. |
+
+### Mermaid Debug Settings
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
 | **HTML labels** | Boolean | `true` | Enable HTML rendering in node labels. Required for rich text formatting in labels. |
 | **Markdown auto wrap** | Boolean | `true` | Enable automatic line wrapping in markdown labels |
-| **Security level** | Enum | `Loose` | Security level for Mermaid rendering: `Loose`, `Strict`, or `Sandbox`. Loose is required for click handlers. |
-| **Max edges** | Number | `30000` | Maximum number of edges allowed in a diagram |
 | **Convert &lt;br&gt; to newline** | Boolean | `true` | Converts `<br/>` tags to newlines. Mermaid escapes `<br>` as text, this fixes line breaks. |
 | **Auto backtick labels** | Boolean | `true` | Automatically wraps labels containing newlines in backticks. Mermaid only renders newlines in backtick-wrapped labels. |
 | **Preserve line breaks CSS** | Boolean | `true` | Applies CSS to preserve line breaks in Mermaid labels (`white-space: pre-wrap`) |

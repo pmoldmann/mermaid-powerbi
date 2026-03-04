@@ -35,18 +35,24 @@
             "displayName": "Mermaid settings",
             "description": "Settings for Mermaid diagram rendering",
             "properties": {
-                "htmlLabels": {
-                    "displayName": "HTML labels",
-                    "description": "Enable HTML rendering in node labels (needed for line breaks)",
+                "flowchartOrientation": {
+                    "displayName": "Flowchart orientation",
+                    "description": "Override the orientation of flowchart diagrams. 'Default' uses the orientation defined in the diagram code.",
                     "type": {
-                        "bool": true
+                        "enumeration": [
+                            { "value": "default", "displayName": "Default (from diagram)" },
+                            { "value": "TB", "displayName": "Top to Bottom" },
+                            { "value": "BT", "displayName": "Bottom to Top" },
+                            { "value": "LR", "displayName": "Left to Right" },
+                            { "value": "RL", "displayName": "Right to Left" }
+                        ]
                     }
                 },
-                "markdownAutoWrap": {
-                    "displayName": "Markdown auto wrap",
-                    "description": "Enable automatic line wrapping in markdown labels",
+                "maxEdges": {
+                    "displayName": "Max edges",
+                    "description": "Maximum number of edges allowed in a diagram",
                     "type": {
-                        "bool": true
+                        "numeric": true
                     }
                 },
                 "securityLevel": {
@@ -59,12 +65,25 @@
                             { "value": "sandbox", "displayName": "Sandbox" }
                         ]
                     }
-                },
-                "maxEdges": {
-                    "displayName": "Max edges",
-                    "description": "Maximum number of edges allowed in a diagram",
+                }
+            }
+        },
+        "mermaidDebug": {
+            "displayName": "Mermaid debug settings",
+            "description": "Advanced settings for Mermaid diagram rendering and line break handling",
+            "properties": {
+                "htmlLabels": {
+                    "displayName": "HTML labels",
+                    "description": "Enable HTML rendering in node labels (needed for line breaks)",
                     "type": {
-                        "numeric": true
+                        "bool": true
+                    }
+                },
+                "markdownAutoWrap": {
+                    "displayName": "Markdown auto wrap",
+                    "description": "Enable automatic line wrapping in markdown labels",
+                    "type": {
+                        "bool": true
                     }
                 },
                 "convertBrToNewline": {
@@ -124,30 +143,24 @@
                     }
                 },
                 "headingFontSize": {
-                    "displayName": "Heading font size",
-                    "description": "Base font size for headings (h1). Lower heading levels scale down proportionally.",
+                    "displayName": "Heading font size (h1)",
+                    "description": "Font size in pt for the largest heading (h1). Smaller headings (h2–h6) scale down proportionally relative to the body font size.",
                     "type": {
-                        "formatting": {
-                            "fontSize": true
-                        }
+                        "numeric": true
                     }
                 },
                 "bodyFontSize": {
                     "displayName": "Body font size",
-                    "description": "Font size for paragraphs, tables, lists, and other body text",
+                    "description": "Font size in pt for paragraphs, tables, lists, and other body text.",
                     "type": {
-                        "formatting": {
-                            "fontSize": true
-                        }
+                        "numeric": true
                     }
                 },
                 "mermaidFontSize": {
                     "displayName": "Mermaid font size",
-                    "description": "Font size for text in Mermaid diagrams",
+                    "description": "Font size in pt for text in Mermaid diagrams.",
                     "type": {
-                        "formatting": {
-                            "fontSize": true
-                        }
+                        "numeric": true
                     }
                 }
             }

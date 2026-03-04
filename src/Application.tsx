@@ -4,7 +4,7 @@ import { useAppSelector } from './redux/hooks';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
-import { Code, MermaidSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext } from './Code';
+import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext } from './Code';
 import remarkBreaks from 'remark-breaks';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
@@ -250,28 +250,31 @@ export const Application: React.FC<ApplicationProps> = () => {
                         style={{
                             height: isSearchOpen ? 'calc(100% - 44px)' : '100%',
                             overflowY: 'auto',
-                            '--md-font-family': settings?.font?.fontFamily || 'Segoe UI',
-                            '--md-heading-base-size': `${settings?.font?.headingFontSize || 20}pt`,
-                            '--md-body-font-size': `${settings?.font?.bodyFontSize || 11}pt`,
-                            fontFamily: `"${settings?.font?.fontFamily || 'Segoe UI'}", sans-serif`,
+                            '--md-font-family': settings?.font?.fontFamily || 'DIN',
+                            '--md-heading-base-size': `${settings?.font?.headingFontSize || 14}pt`,
+                            '--md-body-font-size': `${settings?.font?.bodyFontSize || 9}pt`,
+                            fontFamily: `"${settings?.font?.fontFamily || 'DIN'}", sans-serif`,
                         } as React.CSSProperties}
                     >
                         <ColorModeContext.Provider value={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}>
                             <FontSettingsContext.Provider value={settings?.font || {
-                                fontFamily: 'Segoe UI',
-                                headingFontSize: 20,
-                                bodyFontSize: 11,
+                                fontFamily: 'DIN',
+                                headingFontSize: 14,
+                                bodyFontSize: 9,
                                 mermaidFontSize: 14
                             }}>
                                 <MermaidSettingsContext.Provider value={settings?.mermaid || {
-                                    htmlLabels: true,
-                                    markdownAutoWrap: true,
-                                    securityLevel: "loose",
+                                    flowchartOrientation: "default",
                                     maxEdges: 30000,
-                                    convertBrToNewline: true,
-                                    autoBacktickLabels: true,
-                                    preserveLineBreaksCSS: true
+                                    securityLevel: "loose",
                                 }}>
+                                    <MermaidDebugSettingsContext.Provider value={settings?.mermaidDebug || {
+                                        htmlLabels: true,
+                                        markdownAutoWrap: true,
+                                        convertBrToNewline: true,
+                                        autoBacktickLabels: true,
+                                        preserveLineBreaksCSS: true
+                                    }}>
                                     <MarkdownSettingsContext.Provider value={settings?.markdown || {
                                         enableLineBreaks: true,
                                         codeBlockWordWrap: true
@@ -285,6 +288,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                             source={markdownContent}
                                         />
                                     </MarkdownSettingsContext.Provider>
+                                    </MermaidDebugSettingsContext.Provider>
                                 </MermaidSettingsContext.Provider>
                             </FontSettingsContext.Provider>
                         </ColorModeContext.Provider>
