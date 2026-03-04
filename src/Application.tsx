@@ -4,7 +4,8 @@ import { useAppSelector } from './redux/hooks';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
-import { Code, MermaidSettingsContext, ColorModeContext, FontSettingsContext } from './Code';
+import { Code, MermaidSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext } from './Code';
+import remarkBreaks from 'remark-breaks';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar, SearchToggle } from './SearchBar';
@@ -243,7 +244,7 @@ export const Application: React.FC<ApplicationProps> = () => {
 
                     <div
                         ref={container}
-                        className="markdown-content"
+                        className={`markdown-content${settings?.markdown?.codeBlockWordWrap !== false ? ' code-word-wrap' : ''}`}
                         data-color-mode={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}
                         onClick={onLinkClick}
                         style={{
@@ -271,13 +272,19 @@ export const Application: React.FC<ApplicationProps> = () => {
                                     autoBacktickLabels: true,
                                     preserveLineBreaksCSS: true
                                 }}>
-                                    <MDEditor.Markdown
-                                        components={{
-                                            code: Code
-                                        }}
-                                        rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                        source={markdownContent}
-                                    />
+                                    <MarkdownSettingsContext.Provider value={settings?.markdown || {
+                                        enableLineBreaks: true,
+                                        codeBlockWordWrap: true
+                                    }}>
+                                        <MDEditor.Markdown
+                                            components={{
+                                                code: Code
+                                            }}
+                                            rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+                                            remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks] : []}
+                                            source={markdownContent}
+                                        />
+                                    </MarkdownSettingsContext.Provider>
                                 </MermaidSettingsContext.Provider>
                             </FontSettingsContext.Provider>
                         </ColorModeContext.Provider>

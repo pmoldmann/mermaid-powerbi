@@ -3,7 +3,7 @@ import { getCodeString } from 'rehype-rewrite';
 import mermaid from "mermaid";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
-import { MermaidSettings, FontSettings } from "./settings";
+import { MermaidSettings, FontSettings, MarkdownSettings } from "./settings";
 
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
@@ -31,6 +31,12 @@ const defaultFontSettings: FontSettings = {
     mermaidFontSize: 14
 };
 
+// Default Markdown settings
+const defaultMarkdownSettings: MarkdownSettings = {
+    enableLineBreaks: true,
+    codeBlockWordWrap: true
+};
+
 // Context for color mode (light/dark)
 export const ColorModeContext = React.createContext<string>('light');
 
@@ -39,6 +45,9 @@ export const MermaidSettingsContext = React.createContext<MermaidSettings>(defau
 
 // Context for Font settings
 export const FontSettingsContext = React.createContext<FontSettings>(defaultFontSettings);
+
+// Context for Markdown settings
+export const MarkdownSettingsContext = React.createContext<MarkdownSettings>(defaultMarkdownSettings);
 
 /**
  * MermaidDiagram component with zoom and pan functionality.

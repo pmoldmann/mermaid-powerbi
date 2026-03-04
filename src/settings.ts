@@ -8,12 +8,14 @@ export interface IVisualSettings {
     view: ViewSettings;
     mermaid: MermaidSettings;
     font: FontSettings;
+    markdown: MarkdownSettings;
 }
 
 export class VisualSettings extends DataViewObjectsParser implements IVisualSettings {
     public view: ViewSettings = new ViewSettings();
     public mermaid: MermaidSettings = new MermaidSettings();
     public font: FontSettings = new FontSettings();
+    public markdown: MarkdownSettings = new MarkdownSettings();
 }
 
 export class ViewSettings {
@@ -36,4 +38,9 @@ export class FontSettings {
     public headingFontSize: number = 20;
     public bodyFontSize: number = 11;
     public mermaidFontSize: number = 14;
+}
+
+export class MarkdownSettings {
+    public enableLineBreaks: boolean = true;
+    public codeBlockWordWrap: boolean = true;
 }

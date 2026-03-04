@@ -90,6 +90,26 @@
                 }
             }
         },
+        "markdown": {
+            "displayName": "Markdown settings",
+            "description": "Settings for Markdown text rendering",
+            "properties": {
+                "enableLineBreaks": {
+                    "displayName": "Enable line breaks",
+                    "description": "Render single line breaks in Markdown as <br> (line break). When disabled, consecutive lines are joined into one paragraph.",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "codeBlockWordWrap": {
+                    "displayName": "Code block word wrap",
+                    "description": "Wrap long lines in code blocks instead of showing a horizontal scrollbar",
+                    "type": {
+                        "bool": true
+                    }
+                }
+            }
+        },
         "font": {
             "displayName": "Font settings",
             "description": "Font family and size settings for Markdown content and Mermaid diagrams",
