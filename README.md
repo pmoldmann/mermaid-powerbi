@@ -208,6 +208,147 @@ flowchart TD
 
 ---
 
+## 🎨 Power BI Theme Template Support
+
+This visual fully supports **Power BI theme templates**, allowing you to define default settings for the visual in your organization's theme file. Theme settings are applied automatically when the theme is loaded — users can still override individual settings in the property pane.
+
+### How It Works
+
+Power BI themes can include a `visualStyles` section that targets custom visuals by their GUID. For this visual, the GUID is:
+
+```
+markdownMermaidRenderer
+```
+
+Theme-defined values are applied as defaults. Any setting a user changes manually in the property pane takes precedence over the theme value.
+
+### How to Apply
+
+1. Create a `.json` file (or extend your existing theme file) with the template below
+2. In Power BI Desktop, go to **View → Themes → Browse for themes**
+3. Select your `.json` theme file
+4. All instances of the Markdown / Mermaid Renderer visual will use the themed defaults
+
+> 💡 **Tip:** You can combine the `visualStyles` section with other standard theme properties (colors, fonts, backgrounds) in the same file.
+
+### Property Reference
+
+All properties that can be themed, organized by object group:
+
+| Object | Property | Type | Allowed Values | Default |
+|--------|----------|------|----------------|---------|
+| `view` | `colorMode` | enum | `"light"`, `"dark"` | `"light"` |
+| `view` | `showDebugPanel` | bool | `true`, `false` | `false` |
+| `font` | `fontFamily` | string | any font name | `"DIN"` |
+| `font` | `headingFontSize` | number | size in pt | `14` |
+| `font` | `bodyFontSize` | number | size in pt | `9` |
+| `font` | `mermaidFontSize` | number | size in pt | `14` |
+| `mermaid` | `flowchartOrientation` | enum | `"default"`, `"TB"`, `"BT"`, `"LR"`, `"RL"` | `"default"` |
+| `mermaid` | `maxEdges` | number | any positive integer | `30000` |
+| `mermaid` | `securityLevel` | enum | `"loose"`, `"strict"`, `"sandbox"` | `"loose"` |
+| `mermaidDebug` | `htmlLabels` | bool | `true`, `false` | `true` |
+| `mermaidDebug` | `markdownAutoWrap` | bool | `true`, `false` | `true` |
+| `mermaidDebug` | `convertBrToNewline` | bool | `true`, `false` | `true` |
+| `mermaidDebug` | `autoBacktickLabels` | bool | `true`, `false` | `true` |
+| `mermaidDebug` | `preserveLineBreaksCSS` | bool | `true`, `false` | `true` |
+| `markdown` | `enableLineBreaks` | bool | `true`, `false` | `true` |
+| `markdown` | `codeBlockWordWrap` | bool | `true`, `false` | `true` |
+
+### Full Theme Template (Copy & Paste Ready)
+
+Copy this complete template into a `.json` file. Remove or adjust any properties you don't need — only the properties you include will be overridden.
+
+```json
+{
+    "name": "My Theme with Mermaid Visual Settings",
+    "visualStyles": {
+        "markdownMermaidRenderer": {
+            "*": {
+                "view": [{
+                    "colorMode": "light",
+                    "showDebugPanel": false
+                }],
+                "font": [{
+                    "fontFamily": "DIN",
+                    "headingFontSize": 14,
+                    "bodyFontSize": 9,
+                    "mermaidFontSize": 14
+                }],
+                "mermaid": [{
+                    "flowchartOrientation": "default",
+                    "maxEdges": 30000,
+                    "securityLevel": "loose"
+                }],
+                "mermaidDebug": [{
+                    "htmlLabels": true,
+                    "markdownAutoWrap": true,
+                    "convertBrToNewline": true,
+                    "autoBacktickLabels": true,
+                    "preserveLineBreaksCSS": true
+                }],
+                "markdown": [{
+                    "enableLineBreaks": true,
+                    "codeBlockWordWrap": true
+                }]
+            }
+        }
+    }
+}
+```
+
+### Minimal Example: Corporate Dark Theme
+
+If you only want to set a few defaults (e.g. dark mode with a specific font), you only need to include those properties:
+
+```json
+{
+    "name": "Corporate Dark Theme",
+    "visualStyles": {
+        "markdownMermaidRenderer": {
+            "*": {
+                "view": [{
+                    "colorMode": "dark"
+                }],
+                "font": [{
+                    "fontFamily": "Segoe UI",
+                    "bodyFontSize": 11,
+                    "headingFontSize": 16
+                }]
+            }
+        }
+    }
+}
+```
+
+### Extending an Existing Theme
+
+You can add the `visualStyles` block to any existing Power BI theme file. For example, if you already have a theme with custom colors:
+
+```json
+{
+    "name": "My Corporate Theme",
+    "dataColors": ["#1a73e8", "#34a853", "#fbbc04", "#ea4335"],
+    "background": "#ffffff",
+    "foreground": "#202124",
+    "visualStyles": {
+        "markdownMermaidRenderer": {
+            "*": {
+                "view": [{ "colorMode": "light" }],
+                "font": [{
+                    "fontFamily": "Segoe UI",
+                    "bodyFontSize": 10
+                }],
+                "mermaid": [{
+                    "flowchartOrientation": "LR"
+                }]
+            }
+        }
+    }
+}
+```
+
+---
+
 ## 🛠️ Technical Documentation
 
 ### Architecture Overview
