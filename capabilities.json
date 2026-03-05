@@ -12,13 +12,6 @@
             "displayName": "View settings",
             "descriptionKey": "Visual_View",
             "properties": {
-                "showDebugPanel": {
-                    "displayName": "Show debug panel",
-                    "description": "Shows debug information including raw Mermaid code",
-                    "type": {
-                        "bool": true
-                    }
-                },
                 "colorMode": {
                     "displayName": "Color mode",
                     "description": "Switch between light and dark theme for the visual",
@@ -72,6 +65,13 @@
             "displayName": "Mermaid debug settings",
             "description": "Advanced settings for Mermaid diagram rendering and line break handling",
             "properties": {
+                "showDebugPanel": {
+                    "displayName": "Show debug panel",
+                    "description": "Shows debug information including raw Mermaid code",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "htmlLabels": {
                     "displayName": "HTML labels",
                     "description": "Enable HTML rendering in node labels (needed for line breaks)",

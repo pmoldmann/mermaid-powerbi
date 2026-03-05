@@ -115,7 +115,7 @@ export const Application: React.FC<ApplicationProps> = () => {
     const [isDebugOpen, setIsDebugOpen] = React.useState(false);
     const debugLogs = useDebugLogs();
 
-    const showDebugPanel = settings?.view?.showDebugPanel === true;
+    const showDebugPanel = settings?.mermaidDebug?.showDebugPanel === true;
 
     // Enable/disable debug logging based on settings
     React.useEffect(() => {

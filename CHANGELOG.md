@@ -16,19 +16,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Markdown settings**: New "Markdown settings" group with "Enable line breaks" (render single newlines as `<br>`) and "Code block word wrap" (wrap long lines instead of horizontal scrollbar).
 - **Mermaid tooltip support**: Tooltips defined in Mermaid `click` directives (e.g. `click A "url" "tooltip text"`) are now displayed as styled popups when hovering over diagram nodes. This uses a custom JavaScript-based tooltip system for reliable rendering across all environments including Power BI Desktop and Service.
 - **Safe external link handling**: Links defined in Mermaid `click` directives are no longer opened directly inside the visual. Instead, clicking a linked node shows a confirmation dialog (via Power BI's native `host.launchUrl()`) asking the user whether to open the URL in an external browser. This prevents users from getting trapped inside the visual after clicking a link.
+- **Fullscreen mode for Mermaid diagrams**: Each Mermaid diagram now includes a fullscreen button (⛶) in the toolbar. Clicking it expands the diagram to fill the entire visual area, making it easier to inspect complex diagrams. Press ESC or click the close button (✕) to exit fullscreen mode.
 
 ### Changed
-- **Settings reorganization**: Split "Mermaid settings" into two groups for better usability:
+- **Settings reorganization**: Moved "Show debug panel" to the "Mermaid debug settings" group for a cleaner property pane. Split "Mermaid settings" into two groups for better usability:
   - **Mermaid settings**: Flowchart orientation, Max edges, Security level — commonly used settings
   - **Mermaid debug settings**: HTML labels, Markdown auto wrap, Convert `<br>` to newline, Auto backtick labels, Preserve line breaks CSS — advanced/debug settings
 - **Dark / Light theme support**: New "Color mode" setting to switch between light and dark theme for the visual, Mermaid diagrams, and all UI components
 - **DAX syntax highlighting**: Code blocks with ` ```dax ` are now syntax-highlighted with support for functions, keywords (VAR, RETURN, DEFINE, EVALUATE), table/column references, strings, comments, and operators
 - **Power Query (M) syntax highlighting**: Code blocks with ` ```powerquery `, ` ```pq `, or ` ```mscript ` are now syntax-highlighted with support for keywords, data types, quoted identifiers, constants, and functions
-
-### Changed
 - Mermaid diagrams automatically use the dark theme when color mode is set to dark
 - Search bar and debug panel adapt to the selected color mode
 - Switched internal data mapping from `categorical` to `table` for improved settings persistence
+
 
 ### Fixed
 - Settings toggles (Color mode, Show debug panel) now work correctly even when no data field is connected. Added `supportsEmptyDataView` capability so Power BI delivers a DataView with settings metadata even without bound data.

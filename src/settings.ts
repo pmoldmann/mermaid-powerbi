@@ -21,7 +21,6 @@ export class VisualSettings extends DataViewObjectsParser implements IVisualSett
 }
 
 export class ViewSettings {
-    public showDebugPanel: boolean = false;
     public colorMode: string = "light";
 }
 
@@ -32,6 +31,7 @@ export class MermaidSettings {
 }
 
 export class MermaidDebugSettings {
+    public showDebugPanel: boolean = false;
     public htmlLabels: boolean = true;
     public markdownAutoWrap: boolean = true;
     public convertBrToNewline: boolean = true;

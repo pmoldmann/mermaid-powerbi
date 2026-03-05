@@ -80,6 +80,14 @@ The visual supports **dark and light themes** via the "Color mode" setting in th
 
 > 💡 **Tip:** Match the color mode to your Power BI report background for a seamless look.
 
+## ⛶ Fullscreen Mode for Mermaid Diagrams
+
+Each Mermaid diagram includes a **fullscreen button** (⛶) in the toolbar next to the zoom controls. This is useful for inspecting complex or large diagrams in detail.
+
+- Click **⛶** to expand the diagram to fill the entire visual area
+- Use **zoom and pan** controls while in fullscreen
+- Press **ESC** or click **✕** to exit fullscreen mode
+
 ## 🔗 Mermaid Tooltips & Interactive Links
 
 The visual supports **tooltips** and **interactive links** in Mermaid diagrams via the `click` directive. This allows you to add hover information and clickable links to diagram nodes.
@@ -176,7 +184,6 @@ Uh - And now guess only once how this file has been generated...
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| **Show debug panel** | Boolean | `false` | Shows debug information including raw and processed Mermaid code |
 | **Color mode** | Enum | `Light` | Switch between light and dark theme for the visual. Affects Markdown rendering, Mermaid diagrams, and all UI components. |
 
 ### Mermaid Settings
@@ -191,6 +198,7 @@ Uh - And now guess only once how this file has been generated...
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
+| **Show debug panel** | Boolean | `false` | Shows debug information including raw and processed Mermaid code |
 | **HTML labels** | Boolean | `true` | Enable HTML rendering in node labels. Required for rich text formatting in labels. |
 | **Markdown auto wrap** | Boolean | `true` | Enable automatic line wrapping in markdown labels |
 | **Convert &lt;br&gt; to newline** | Boolean | `true` | Converts `<br/>` tags to newlines. Mermaid escapes `<br>` as text, this fixes line breaks. |
@@ -278,7 +286,6 @@ All properties that can be themed, organized by object group:
 | Object | Property | Type | Allowed Values | Default |
 |--------|----------|------|----------------|---------|
 | `view` | `colorMode` | enum | `"light"`, `"dark"` | `"light"` |
-| `view` | `showDebugPanel` | bool | `true`, `false` | `false` |
 | `font` | `fontFamily` | string | any font name | `"DIN"` |
 | `font` | `headingFontSize` | number | size in pt | `14` |
 | `font` | `bodyFontSize` | number | size in pt | `9` |
@@ -286,6 +293,7 @@ All properties that can be themed, organized by object group:
 | `mermaid` | `flowchartOrientation` | enum | `"default"`, `"TB"`, `"BT"`, `"LR"`, `"RL"` | `"default"` |
 | `mermaid` | `maxEdges` | number | any positive integer | `30000` |
 | `mermaid` | `securityLevel` | enum | `"loose"`, `"strict"`, `"sandbox"` | `"loose"` |
+| `mermaidDebug` | `showDebugPanel` | bool | `true`, `false` | `false` |
 | `mermaidDebug` | `htmlLabels` | bool | `true`, `false` | `true` |
 | `mermaidDebug` | `markdownAutoWrap` | bool | `true`, `false` | `true` |
 | `mermaidDebug` | `convertBrToNewline` | bool | `true`, `false` | `true` |
@@ -305,8 +313,7 @@ Copy this complete template into a `.json` file. Remove or adjust any properties
         "markdownMermaidRenderer": {
             "*": {
                 "view": [{
-                    "colorMode": "light",
-                    "showDebugPanel": false
+                    "colorMode": "light"
                 }],
                 "font": [{
                     "fontFamily": "DIN",
@@ -320,6 +327,7 @@ Copy this complete template into a `.json` file. Remove or adjust any properties
                     "securityLevel": "loose"
                 }],
                 "mermaidDebug": [{
+                    "showDebugPanel": false,
                     "htmlLabels": true,
                     "markdownAutoWrap": true,
                     "convertBrToNewline": true,
