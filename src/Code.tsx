@@ -132,8 +132,17 @@ function parseMermaidClickDirectives(code: string): MermaidClickDirective[] {
         const nodeId = afterClick.substring(0, spaceIdx);
         let rest = afterClick.substring(spaceIdx + 1).trim();
 
-        // Remove 'href' keyword if present
-        rest = rest.replace(/^href\s+/i, '');
+        // Detect and remove 'callback' keyword — if present, all quoted strings are tooltips (no URL)
+        const isCallback = /^callback(\s|$)/i.test(rest);
+        if (isCallback) {
+            rest = rest.replace(/^callback\s*/i, '');
+        }
+
+        // Detect and remove 'href' keyword — if present, first quoted string is always a URL
+        const isHref = /^href(\s|$)/i.test(rest);
+        if (isHref) {
+            rest = rest.replace(/^href\s*/i, '');
+        }
 
         // Remove target keywords at the end
         rest = rest.replace(/\s+_(blank|self|parent|top)\s*$/i, '');
@@ -149,12 +158,21 @@ function parseMermaidClickDirectives(code: string): MermaidClickDirective[] {
         let url: string | null = null;
         let tooltip: string | null = null;
 
-        if (quotedStrings.length >= 2) {
+        if (isCallback) {
+            // callback directive: all quoted strings are tooltips, never URLs
+            tooltip = quotedStrings.length > 0 ? quotedStrings[quotedStrings.length - 1] : null;
+        } else if (isHref) {
+            // href directive: first = URL, second = tooltip
+            url = quotedStrings.length >= 1 ? quotedStrings[0] : null;
+            tooltip = quotedStrings.length >= 2 ? quotedStrings[1] : null;
+        } else if (quotedStrings.length >= 2) {
+            // Two quoted strings without keyword: first = URL, second = tooltip
             url = quotedStrings[0];
             tooltip = quotedStrings[1];
         } else if (quotedStrings.length === 1) {
+            // Single quoted string: use stricter URL detection (only real URLs, not arbitrary text with dots)
             const val = quotedStrings[0];
-            if (/^https?:\/\//.test(val) || val.startsWith('/') || val.startsWith('#') || val.includes('.')) {
+            if (/^https?:\/\//i.test(val) || /^(ftp|mailto):/i.test(val)) {
                 url = val;
             } else {
                 tooltip = val;
