@@ -226,6 +226,7 @@
     z-index: 10;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 4px;
     padding: 4px 8px;
     background: #f0f0f0;
@@ -261,6 +262,35 @@
     text-align: center;
     font-size: 12px;
     color: #666;
+}
+
+// Fullscreen button — visually separated from zoom controls
+.mermaid-fullscreen-btn {
+    margin-left: 4px;
+}
+
+// Fullscreen mode
+.mermaid-zoom-wrapper.mermaid-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    background: #ffffff;
+
+    .mermaid-zoom-controls {
+        border-radius: 0;
+        padding-right: 48px; // Leave room for debug toggle button
+    }
+
+    .mermaid-zoom-container {
+        max-height: none;
+        height: calc(100vh - 37px); // Full height minus controls bar
+    }
 }
 
 .mermaid-zoom-container {
@@ -455,7 +485,7 @@
 .search-toggle {
     position: absolute;
     top: 8px;
-    right: 8px;
+    left: 8px;
     z-index: 100;
     width: 32px;
     height: 32px;
@@ -571,7 +601,7 @@ mark.search-highlight {
 .debug-toggle-btn {
     position: absolute;
     top: 8px;
-    right: 48px;
+    right: 8px;
     width: 32px;
     height: 32px;
     border: 1px solid #ccc;
@@ -1046,6 +1076,10 @@ mark.search-highlight {
 
     .mermaid-zoom-level {
         color: #A0AEC0;
+    }
+
+    .mermaid-zoom-wrapper.mermaid-fullscreen {
+        background: #1A202C;
     }
 }
 

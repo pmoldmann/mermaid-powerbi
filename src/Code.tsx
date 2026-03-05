@@ -317,6 +317,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const [isPanning, setIsPanning] = React.useState(false);
     const [panStart, setPanStart] = React.useState({ x: 0, y: 0 });
     const [panOffset, setPanOffset] = React.useState({ x: 0, y: 0 });
+    const [isFullscreen, setIsFullscreen] = React.useState(false);
     const wrapperRef = React.useRef<HTMLDivElement>(null);
     const previousCodeRef = React.useRef<string | null>(null);
 
@@ -460,13 +461,45 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
         setIsPanning(false);
     }, []);
 
+    const handleToggleFullscreen = React.useCallback(() => {
+        setIsFullscreen(fs => !fs);
+    }, []);
+
+    // ESC key listener to exit fullscreen
+    React.useEffect(() => {
+        if (!isFullscreen) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsFullscreen(false);
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [isFullscreen]);
+
+    // Lock body scroll when fullscreen is active
+    React.useEffect(() => {
+        if (isFullscreen) {
+            const prev = document.body.style.overflow;
+            document.body.style.overflow = 'hidden';
+            return () => { document.body.style.overflow = prev; };
+        }
+    }, [isFullscreen]);
+
     return (
-        <div className="mermaid-zoom-wrapper" ref={wrapperRef}>
+        <div className={`mermaid-zoom-wrapper${isFullscreen ? ' mermaid-fullscreen' : ''}`} ref={wrapperRef}>
             <div className="mermaid-zoom-controls">
                 <button onClick={handleZoomOut} title="Zoom Out" disabled={zoom <= MIN_ZOOM}>−</button>
                 <span className="mermaid-zoom-level">{Math.round(zoom * 100)}%</span>
                 <button onClick={handleZoomIn} title="Zoom In" disabled={zoom >= MAX_ZOOM}>+</button>
                 <button onClick={handleZoomReset} title="Reset Zoom">⟲</button>
+                <button
+                    className="mermaid-fullscreen-btn"
+                    onClick={handleToggleFullscreen}
+                    title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+                >
+                    {isFullscreen ? '✕' : '⛶'}
+                </button>
             </div>
             <div
                 className="mermaid-zoom-container"
