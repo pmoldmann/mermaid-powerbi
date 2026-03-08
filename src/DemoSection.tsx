@@ -147,6 +147,7 @@ const defaultMermaidSettings = {
 
 // Default Mermaid debug settings for demo
 const defaultMermaidDebugSettings = {
+    showDebugPanel: false,
     htmlLabels: true,
     markdownAutoWrap: true,
     convertBrToNewline: true,

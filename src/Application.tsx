@@ -269,6 +269,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                     securityLevel: "loose",
                                 }}>
                                     <MermaidDebugSettingsContext.Provider value={settings?.mermaidDebug || {
+                                        showDebugPanel: false,
                                         htmlLabels: true,
                                         markdownAutoWrap: true,
                                         convertBrToNewline: true,

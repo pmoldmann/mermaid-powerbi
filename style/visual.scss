@@ -40,18 +40,68 @@
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
 
-    // Ensure list bullets/numbers are visible (browser defaults can be lost in Power BI sandbox)
-    ul {
-        list-style-type: disc !important;
+    // ============================================
+    // Custom list markers using ::before pseudo-elements
+    // ============================================
+    // Power BI's sandbox iframe resets native list-style properties, making
+    // browser-rendered bullets/numbers invisible. Instead of fighting the
+    // sandbox CSS, we disable native markers entirely and render our own
+    // via CSS `content` on ::before pseudo-elements. This approach is immune
+    // to any list-style resets because it relies only on the `content` property.
+
+    ul, ol {
+        list-style: none !important;
+        padding-left: 2em !important;
+        margin-left: 0 !important;
     }
+
+    // --- Unordered list bullets via ::before ---
+    ul > li:not(.task-list-item) {
+        position: relative !important;
+    }
+    ul > li:not(.task-list-item)::before {
+        content: "\2022" !important;           // • bullet character
+        position: absolute !important;
+        left: -1.2em !important;
+        font-family: Arial, "Segoe UI", sans-serif !important;
+        font-size: 1.2em !important;
+        line-height: 1 !important;
+    }
+    // Nested UL levels use different marker characters
+    ul ul > li:not(.task-list-item)::before {
+        content: "\25E6" !important;           // ◦ white bullet
+        font-size: 1.1em !important;
+    }
+    ul ul ul > li:not(.task-list-item)::before {
+        content: "\25AA" !important;           // ▪ black small square
+        font-size: 0.9em !important;
+    }
+
+    // --- Ordered list numbers via CSS counters + ::before ---
     ol {
-        list-style-type: decimal !important;
+        counter-reset: li-counter !important;
     }
-    ul ul {
-        list-style-type: circle !important;
+    ol > li {
+        counter-increment: li-counter !important;
     }
-    ul ul ul {
-        list-style-type: square !important;
+    ol > li:not(.task-list-item) {
+        position: relative !important;
+    }
+    ol > li:not(.task-list-item)::before {
+        content: counter(li-counter) ".\00a0" !important;  // "1. " with non-breaking space
+        position: absolute !important;
+        left: -2em !important;
+        width: 1.8em !important;
+        text-align: right !important;
+        font-family: inherit !important;
+    }
+
+    // Nested OL resets its own counter automatically via counter-reset on ol
+
+    // Ensure li doesn't have display:none or other hiding
+    li {
+        display: block !important;
+        position: relative !important;
     }
 
     // Inline code - slightly smaller than body text, keeps monospace
@@ -412,12 +462,41 @@
 
     ol, ul {
         margin: 0;
-        padding-left: 20px;
+        padding-left: 2em !important;
         color: #4A5568;
+        list-style: none !important;
 
         li {
             margin-bottom: 6px;
+            position: relative !important;
+            display: block !important;
         }
+    }
+
+    // Custom bullet markers via ::before (Power BI sandbox resets native list-style)
+    ul > li::before {
+        content: "\2022" !important;
+        position: absolute !important;
+        left: -1.2em !important;
+        font-family: Arial, "Segoe UI", sans-serif !important;
+        font-size: 1.2em !important;
+        line-height: 1 !important;
+    }
+
+    // Ordered list numbers via CSS counters
+    ol {
+        counter-reset: welcome-li-counter !important;
+    }
+    ol > li {
+        counter-increment: welcome-li-counter !important;
+    }
+    ol > li::before {
+        content: counter(welcome-li-counter) ".\00a0" !important;
+        position: absolute !important;
+        left: -2em !important;
+        width: 1.8em !important;
+        text-align: right !important;
+        font-family: inherit !important;
     }
 
     code {
@@ -1046,6 +1125,42 @@ mark.search-highlight {
                 color: #E2E8F0;
                 padding: 0;
             }
+        }
+
+        // Custom list markers via ::before (Power BI sandbox resets native list-style)
+        ul, ol {
+            list-style: none !important;
+            padding-left: 2em !important;
+        }
+        ul > li, ol > li {
+            position: relative !important;
+            display: block !important;
+        }
+        ul > li::before {
+            content: "\2022" !important;
+            position: absolute !important;
+            left: -1.2em !important;
+            font-family: Arial, "Segoe UI", sans-serif !important;
+            font-size: 1.2em !important;
+            line-height: 1 !important;
+        }
+        ul ul > li::before {
+            content: "\25E6" !important;
+            font-size: 1.1em !important;
+        }
+        ol {
+            counter-reset: demo-li-counter !important;
+        }
+        ol > li {
+            counter-increment: demo-li-counter !important;
+        }
+        ol > li::before {
+            content: counter(demo-li-counter) ".\00a0" !important;
+            position: absolute !important;
+            left: -2em !important;
+            width: 1.8em !important;
+            text-align: right !important;
+            font-family: inherit !important;
         }
     }
 
