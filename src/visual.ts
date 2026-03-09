@@ -117,6 +117,34 @@ export class Visual implements IVisual {
     }
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstance[] | VisualObjectInstanceEnumerationObject {
+        // Per-measure formatting: return one instance per markdown column
+        if (options.objectName === 'measureFormat') {
+            const dataView = store.getState().options.dataView;
+            const instances: VisualObjectInstance[] = [];
+            if (dataView?.table?.columns) {
+                const mdCols = dataView.table.columns.filter(
+                    (col: powerbiVisualsApi.DataViewMetadataColumn) => col.roles?.['markdown']
+                );
+                // Only show measure formatting when there are 2+ markdown columns
+                if (mdCols.length >= 2) {
+                    mdCols.forEach((col: powerbiVisualsApi.DataViewMetadataColumn) => {
+                        const formatFunction = (col.objects?.measureFormat?.formatFunction as string) || 'none';
+                        const props: Record<string, unknown> = { formatFunction };
+                        // Only show codeLanguage property when code_block is selected
+                        if (formatFunction === 'code_block') {
+                            props.codeLanguage = (col.objects?.measureFormat?.codeLanguage as string) || '';
+                        }
+                        instances.push({
+                            objectName: 'measureFormat',
+                            displayName: col.displayName,
+                            selector: { metadata: col.queryName },
+                            properties: props
+                        });
+                    });
+                }
+            }
+            return { instances };
+        }
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
     }
 }

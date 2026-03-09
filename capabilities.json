@@ -155,6 +155,33 @@
                 }
             }
         },
+        "measureFormat": {
+            "displayName": "Measure formatting",
+            "description": "Apply markdown formatting to individual measures (only available when multiple measures are added)",
+            "properties": {
+                "formatFunction": {
+                    "displayName": "Format as",
+                    "description": "Wrap the measure value in a markdown element",
+                    "type": {
+                        "enumeration": [
+                            { "value": "none", "displayName": "None" },
+                            { "value": "heading_h1", "displayName": "Heading (H1)" },
+                            { "value": "heading_h2", "displayName": "Heading (H2)" },
+                            { "value": "heading_h3", "displayName": "Heading (H3)" },
+                            { "value": "code_block", "displayName": "Code Block" },
+                            { "value": "highlight", "displayName": "Highlight" }
+                        ]
+                    }
+                },
+                "codeLanguage": {
+                    "displayName": "Code language",
+                    "description": "Language identifier for syntax highlighting in code blocks (e.g. json, sql, dax, mermaid)",
+                    "type": {
+                        "text": true
+                    }
+                }
+            }
+        },
         "font": {
             "displayName": "Font settings",
             "description": "Font family and size settings for Markdown content and Mermaid diagrams",

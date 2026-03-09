@@ -106,6 +106,43 @@ export interface TooltipColumnData {
 }
 
 /**
+ * Applies a markdown formatting function to content.
+ * @param content The raw measure value
+ * @param formatFunction The formatting function to apply
+ * @param codeLanguage The language for code blocks (only used when formatFunction is 'code_block')
+ * @returns The formatted markdown string
+ */
+export function applyMeasureFormat(content: string, formatFunction: string, codeLanguage: string): string {
+    switch (formatFunction) {
+        case 'heading_h1':
+            return `# ${content}`;
+        case 'heading_h2':
+            return `## ${content}`;
+        case 'heading_h3':
+            return `### ${content}`;
+        case 'code_block':
+            return `\`\`\`${codeLanguage}\n${content}\n\`\`\``;
+        case 'highlight':
+            return `==${content}==`;
+        case 'none':
+        default:
+            return content;
+    }
+}
+
+/**
+ * Reads the measure format settings from a dataView column's per-column objects.
+ * @param column The dataView metadata column
+ * @returns Object with formatFunction and codeLanguage
+ */
+export function getMeasureFormatFromColumn(column: powerbiVisualsApi.DataViewMetadataColumn): { formatFunction: string; codeLanguage: string } {
+    const objects = column.objects;
+    const formatFunction = (objects?.measureFormat?.formatFunction as string) || 'none';
+    const codeLanguage = (objects?.measureFormat?.codeLanguage as string) || '';
+    return { formatFunction, codeLanguage };
+}
+
+/**
  * Returns the column indices in the dataView table that have the 'markdown' role.
  * Falls back to [0] if no role metadata is available (backward compatibility).
  * @param dataView The Power BI dataView
@@ -143,12 +180,20 @@ export function extractMarkdownSections(dataView: DataView): MarkdownSection[] {
     // Try table mapping (primary mapping)
     if (dataView.table && dataView.table.rows && dataView.table.rows.length > 0) {
         const markdownColIndices = getMarkdownColumnIndices(dataView);
+        const hasMultipleMarkdownCols = markdownColIndices.length > 1;
         const sections: MarkdownSection[] = [];
         dataView.table.rows.forEach((row, rowIndex) => {
             markdownColIndices.forEach(colIdx => {
                 const value = row[colIdx];
                 if (value != null && String(value).trim() !== '') {
-                    sections.push({ content: String(value), rowIndex });
+                    let content = String(value);
+                    // Apply per-measure formatting when in measure mode (multiple markdown columns)
+                    if (hasMultipleMarkdownCols) {
+                        const col = dataView.table.columns[colIdx];
+                        const { formatFunction, codeLanguage } = getMeasureFormatFromColumn(col);
+                        content = applyMeasureFormat(content, formatFunction, codeLanguage);
+                    }
+                    sections.push({ content, rowIndex });
                 }
             });
         });
