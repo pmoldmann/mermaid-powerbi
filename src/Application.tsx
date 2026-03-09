@@ -214,14 +214,13 @@ export const Application: React.FC<ApplicationProps> = () => {
      */
     const handleContextMenu = React.useCallback((e: React.MouseEvent) => {
         // Determine which section was right-clicked (if any)
-        const sectionEl = (e.target as HTMLElement).closest?.('[data-row-index]');
+        const sectionEl = (e.target as HTMLElement).closest?.('[data-section-index]');
         let sectionIdx: number | null = null;
         let selId = null;
 
         if (sectionEl) {
-            const rowIndex = parseInt(sectionEl.getAttribute('data-row-index')!, 10);
-            const secIdx = markdownSections.findIndex(s => s.rowIndex === rowIndex);
-            if (secIdx >= 0) {
+            const secIdx = parseInt(sectionEl.getAttribute('data-section-index')!, 10);
+            if (secIdx >= 0 && secIdx < markdownSections.length) {
                 sectionIdx = secIdx;
                 if (secIdx < selectionIds.length) {
                     selId = selectionIds[secIdx];
@@ -506,9 +505,10 @@ export const Application: React.FC<ApplicationProps> = () => {
                                                 const isDimmed = hasSelection && !selectedSectionIndices.has(sectionIdx);
                                                 const isSelected = selectedSectionIndices.has(sectionIdx);
                                                 return (
-                                                    <React.Fragment key={`section-${section.rowIndex}`}>
+                                                    <React.Fragment key={`section-${sectionIdx}`}>
                                                         <div
                                                             className={`markdown-section${isDimmed ? ' section-dimmed' : ''}${isSelected ? ' section-selected' : ''}`}
+                                                            data-section-index={sectionIdx}
                                                             data-row-index={section.rowIndex}
                                                             onMouseEnter={(e) => handleSectionMouseOver(sectionIdx, e)}
                                                             onMouseMove={(e) => handleSectionMouseMove(sectionIdx, e)}

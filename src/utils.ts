@@ -106,8 +106,27 @@ export interface TooltipColumnData {
 }
 
 /**
+ * Returns the column indices in the dataView table that have the 'markdown' role.
+ * Falls back to [0] if no role metadata is available (backward compatibility).
+ * @param dataView The Power BI dataView
+ * @returns Array of column indices with the markdown role
+ */
+export function getMarkdownColumnIndices(dataView: DataView): number[] {
+    if (!dataView?.table?.columns) return [];
+    const indices: number[] = [];
+    dataView.table.columns.forEach((col, idx) => {
+        if (col.roles && col.roles['markdown']) {
+            indices.push(idx);
+        }
+    });
+    // Fallback: if no role info available, assume column 0 is markdown
+    return indices.length > 0 ? indices : [0];
+}
+
+/**
  * Extracts markdown sections from the dataView, preserving row indices.
- * Each section corresponds to one row in the data source.
+ * - Single markdown column: each row becomes a section (column mode).
+ * - Multiple markdown columns: each column value becomes a section (measure mode).
  * @param dataView The Power BI dataView
  * @returns Array of MarkdownSection with content and rowIndex
  */
@@ -123,12 +142,15 @@ export function extractMarkdownSections(dataView: DataView): MarkdownSection[] {
 
     // Try table mapping (primary mapping)
     if (dataView.table && dataView.table.rows && dataView.table.rows.length > 0) {
+        const markdownColIndices = getMarkdownColumnIndices(dataView);
         const sections: MarkdownSection[] = [];
-        dataView.table.rows.forEach((row, index) => {
-            const value = row[0];
-            if (value != null && String(value).trim() !== '') {
-                sections.push({ content: String(value), rowIndex: index });
-            }
+        dataView.table.rows.forEach((row, rowIndex) => {
+            markdownColIndices.forEach(colIdx => {
+                const value = row[colIdx];
+                if (value != null && String(value).trim() !== '') {
+                    sections.push({ content: String(value), rowIndex });
+                }
+            });
         });
         return sections;
     }
@@ -164,7 +186,7 @@ export function extractMarkdownSections(dataView: DataView): MarkdownSection[] {
 
 /**
  * Extracts tooltip column data from the dataView table.
- * Tooltip columns are any columns beyond the first (markdown) column.
+ * Tooltip columns are all non-markdown columns (identified by role).
  * @param dataView The Power BI dataView
  * @returns Array of TooltipColumnData
  */
@@ -173,9 +195,10 @@ export function extractTooltipColumns(dataView: DataView): TooltipColumnData[] {
         return [];
     }
 
+    const markdownColIndices = new Set(getMarkdownColumnIndices(dataView));
     const tooltipColumns: TooltipColumnData[] = [];
-    // Columns beyond index 0 (the markdown column) are tooltip columns
-    for (let colIdx = 1; colIdx < dataView.table.columns.length; colIdx++) {
+    for (let colIdx = 0; colIdx < dataView.table.columns.length; colIdx++) {
+        if (markdownColIndices.has(colIdx)) continue; // skip markdown columns
         const col = dataView.table.columns[colIdx];
         tooltipColumns.push({
             displayName: col.displayName,

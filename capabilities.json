@@ -4,7 +4,7 @@
             "displayName": "Markdown Content",
             "name": "markdown",
             "kind": "GroupingOrMeasure",
-            "description": "A column or measure containing Markdown text to render. Multiple values from a column will be concatenated."
+            "description": "A column or measures containing Markdown text to render. Use a single column for row-based sections, or add up to 10 measures to render each as a separate section."
         },
         {
             "displayName": "Tooltips",
@@ -195,7 +195,7 @@
     "dataViewMappings": [
         {
             "conditions": [
-                { "markdown": { "max": 1 }, "tooltips": { "max": 5 } }
+                { "markdown": { "max": 10 }, "tooltips": { "max": 5 } }
             ],
             "table": {
                 "rows": {

@@ -21,7 +21,7 @@ import { VisualSettings } from "./settings";
 import { Provider } from 'react-redux';
 import { store } from "./redux/store";
 import { setDataView, setHost, setRowData, setSelectionManager, setSettings, setViewport } from './redux/slice';
-import { deepClone, extractMarkdownSections, extractTooltipColumns } from './utils';
+import { deepClone, extractMarkdownSections, extractTooltipColumns, getMarkdownColumnIndices } from './utils';
 
 
 export class Visual implements IVisual {
@@ -88,13 +88,23 @@ export class Visual implements IVisual {
         // Build selectionIds and row data for interactivity
         if (dataView?.table?.rows) {
             const sections = extractMarkdownSections(dataView);
-            const selectionIds = sections.map(section => {
-                return this.host.createSelectionIdBuilder()
-                    .withTable(dataView.table, section.rowIndex)
-                    .createSelectionId();
-            });
             const tooltipColumns = extractTooltipColumns(dataView);
-            store.dispatch(setRowData({ sections, selectionIds, tooltipColumns }));
+
+            // Only create selectionIds in column mode (single markdown column).
+            // In measure mode (multiple markdown columns), row-based cross-filtering
+            // is not meaningful — each measure value shares the same row.
+            const markdownColCount = getMarkdownColumnIndices(dataView).length;
+            if (markdownColCount <= 1) {
+                const selectionIds = sections.map(section => {
+                    return this.host.createSelectionIdBuilder()
+                        .withTable(dataView.table, section.rowIndex)
+                        .createSelectionId();
+                });
+                store.dispatch(setRowData({ sections, selectionIds, tooltipColumns }));
+            } else {
+                // Measure mode — no cross-filtering
+                store.dispatch(setRowData({ sections, selectionIds: [], tooltipColumns }));
+            }
         } else {
             // Single/measure mode or no data — extract sections but no selectionIds
             const sections = dataView ? extractMarkdownSections(dataView) : [];
