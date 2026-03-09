@@ -18,15 +18,16 @@ This visual allows you to embed rich documentation and diagrams in your Power BI
 - Supporting **dark and light themes** to match your report design
 
 ## Prerequisites
-- You need a column in your data model that contains markdown text.
+- You need a column or one or more measures in your data model that contain markdown text.
 
 ## 🚀 How to Use
 
 1. Add a **column or measure** containing Markdown text to the *"Markdown Content"* field
-4. Use the **zoom controls** (+/−) for detailed diagram viewing
-5. Use **Ctrl+F** to search within the document
+2. Alternatively, add **multiple measures** (up to 10) — each measure is rendered as a separate section
+3. Use the **zoom controls** (+/−) for detailed diagram viewing
+4. Use **Ctrl+F** to search within the document
 
-> 💡 **Tip:** When using a column, multiple rows are automatically concatenated and displayed together.
+> 💡 **Tip:** When using a column, multiple rows are displayed as separate sections. When using multiple measures, each measure becomes its own section.
 
 ### Example Markdown with Mermaid
 
@@ -80,7 +81,46 @@ The visual supports **dark and light themes** via the "Color mode" setting in th
 
 > 💡 **Tip:** Match the color mode to your Power BI report background for a seamless look.
 
-## 🔀 Cross-Filtering
+## � Multiple Measures & Per-Measure Formatting
+
+Instead of a single column, you can add **up to 10 measures** to the "Markdown Content" field. Each measure is rendered as its own section, separated by horizontal rules — just like multiple rows from a column.
+
+When two or more measures are present, a **"Measure formatting"** section appears in the property pane. For each measure, you can choose a formatting function:
+
+| Format | Effect | Example Output |
+|--------|--------|----------------|
+| **None** | No formatting (default) | `value as-is` |
+| **Heading (H1)** | Wraps in `# ...` | <h1>value</h1> |
+| **Heading (H2)** | Wraps in `## ...` | <h2>value</h2> |
+| **Heading (H3)** | Wraps in `### ...` | <h3>value</h3> |
+| **Code Block** | Wraps in fenced code block | ` ```lang ... ``` ` |
+| **Highlight** | Wraps in `== ... ==` | ==value== |
+| **Definition List** | Measure name as term, value as definition | Term<br>: value |
+| **Blockquote** | Wraps each line in `> ...` | > value |
+
+### Definition List — Label/Value Pairs
+
+The **Definition List** format is particularly useful for displaying KPI-style label/value pairs. The measure's display name becomes the **term** and the measure's value becomes the **definition**:
+
+```markdown
+Total Revenue
+: $1,234,567
+
+Growth Rate
+: +12.3%
+```
+
+This renders as a clean definition list — a great way to present key figures without writing DAX string concatenation formulas.
+
+> 💡 **Tip:** Rename your measures in the data model to control the labels shown in the definition list.
+
+### Code Block — Configurable Language
+
+When **Code Block** is selected, an additional "Code language" text field appears. Enter a language identifier (e.g. `json`, `sql`, `dax`, `mermaid`, `powerquery`) for syntax highlighting.
+
+> ⚠️ **Note:** Measure formatting is only available when **two or more measures** are in the field. With a single column or measure, the content is rendered as-is.
+
+## �🔀 Cross-Filtering
 
 When using a **column** (not a single measure) as the markdown data source, each row is rendered as a separate section. With **Cross filter** enabled in the Interactivity settings:
 
@@ -251,6 +291,15 @@ Uh - And now guess only once how this file has been generated...
 
 > ⚠️ **Note:** Cross-filtering and section selection only work when a **column** provides the markdown data. When a single **measure** is used, there are no individual data rows to select, so cross-filtering has no effect.
 
+### Measure Formatting (per-measure)
+
+This section appears in the property pane only when **two or more measures** are added to the "Markdown Content" field. Each measure gets its own entry.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| **Format as** | Enum | `None` | Formatting function to apply: None, Heading (H1/H2/H3), Code Block, Highlight, Definition List, or Blockquote |
+| **Define language** | Text | *(empty)* | Language identifier for code block syntax highlighting (only shown when "Code Block" is selected) |
+
 ### Line Break Settings Explained
 
 The three line-break settings work together to ensure `<br/>` tags render correctly in Mermaid diagrams:
@@ -333,6 +382,10 @@ All properties that can be themed, organized by object group:
 | `markdown` | `enableLineBreaks` | bool | `true`, `false` | `true` |
 | `markdown` | `codeBlockWordWrap` | bool | `true`, `false` | `true` |
 | `interactivity` | `enableCrossFilter` | bool | `true`, `false` | `false` |
+| `measureFormat` | `formatFunction` | enum | `"none"`, `"heading_h1"`, `"heading_h2"`, `"heading_h3"`, `"code_block"`, `"highlight"`, `"definition_list"`, `"blockquote"` | `"none"` |
+| `measureFormat` | `codeLanguage` | string | any language identifier | `""` |
+
+> **Note:** `measureFormat` properties are per-column instances bound via `selector: { metadata: queryName }`. They apply individually to each measure in the field well.
 
 ### Full Theme Template (Copy & Paste Ready)
 

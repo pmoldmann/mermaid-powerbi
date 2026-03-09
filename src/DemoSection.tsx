@@ -1,6 +1,7 @@
 import React from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import remarkDefinitionList from 'remark-definition-list';
 import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext } from './Code';
 import { ErrorBoundary } from './Error';
 import { useAppSelector } from './redux/hooks';
@@ -244,6 +245,7 @@ export const DemoSection: React.FC = () => {
                                         <MDEditor.Markdown
                                             source={DEMO_MARKDOWN}
                                             rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+                                            remarkPlugins={[remarkDefinitionList]}
                                             components={{
                                                 code: Code,
                                             }}

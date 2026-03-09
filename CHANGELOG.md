@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0.0] - 2026-03-09
 
 ### Added
+- **Multiple measures support**: The "Markdown Content" field now accepts up to 10 measures. Each measure is rendered as a separate section (stacked vertically with `<hr>` separators), enabling modular report layouts without DAX string concatenation. Cross-filtering is automatically disabled in measure mode.
+- **Per-measure formatting**: When two or more measures are added, a new "Measure formatting" section appears in the property pane. Each measure can be individually formatted as:
+  - **Heading (H1 / H2 / H3)** — wraps the value in `#`, `##`, or `###`
+  - **Code Block** — wraps the value in a fenced code block with a configurable language (free text, e.g. `json`, `sql`, `dax`, `mermaid`)
+  - **Highlight** — wraps the value in `==highlight==` syntax
+  - **Definition List** — renders the measure name as the term and the value as the definition (`: value`), using Markdown definition list syntax. This is ideal for displaying label/value pairs (e.g. KPI name + value) in a clean, structured format.
+  - **Blockquote** — wraps each line in `> ` prefix with blank lines before and after for correct rendering.
 - **Flowchart orientation override**: New "Flowchart orientation" setting in Mermaid Settings to override the direction of flowchart diagrams (Top to Bottom, Bottom to Top, Left to Right, Right to Left). Default preserves the orientation defined in the diagram code. This helps report creators choose a layout direction that best fits the available space in the visual.
 - **Font settings**: New "Font settings" group with configurable font family, heading font size (h1), body font size, and Mermaid diagram font size. Heading sizes h2–h6 scale proportionally between h1 and body font size.
 - **Markdown settings**: New "Markdown settings" group with "Enable line breaks" (render single newlines as `<br>`) and "Code block word wrap" (wrap long lines instead of horizontal scrollbar).

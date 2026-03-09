@@ -6,6 +6,7 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
 import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext } from './Code';
 import remarkBreaks from 'remark-breaks';
+import remarkDefinitionList from 'remark-definition-list';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar, SearchToggle } from './SearchBar';
@@ -518,7 +519,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                                             <MDEditor.Markdown
                                                                 components={{ code: Code }}
                                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks] : []}
+                                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks, remarkDefinitionList] : [remarkDefinitionList]}
                                                                 source={section.content}
                                                             />
                                                         </div>
@@ -531,7 +532,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                             <MDEditor.Markdown
                                                 components={{ code: Code }}
                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks] : []}
+                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks, remarkDefinitionList] : [remarkDefinitionList]}
                                                 source={markdownContent}
                                             />
                                         )}

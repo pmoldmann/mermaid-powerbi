@@ -169,12 +169,14 @@
                             { "value": "heading_h2", "displayName": "Heading (H2)" },
                             { "value": "heading_h3", "displayName": "Heading (H3)" },
                             { "value": "code_block", "displayName": "Code Block" },
-                            { "value": "highlight", "displayName": "Highlight" }
+                            { "value": "highlight", "displayName": "Highlight" },
+                            { "value": "definition_list", "displayName": "Definition List" },
+                            { "value": "blockquote", "displayName": "Blockquote" }
                         ]
                     }
                 },
                 "codeLanguage": {
-                    "displayName": "Code language",
+                    "displayName": "Define language",
                     "description": "Language identifier for syntax highlighting in code blocks (e.g. json, sql, dax, mermaid)",
                     "type": {
                         "text": true

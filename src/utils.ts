@@ -112,7 +112,7 @@ export interface TooltipColumnData {
  * @param codeLanguage The language for code blocks (only used when formatFunction is 'code_block')
  * @returns The formatted markdown string
  */
-export function applyMeasureFormat(content: string, formatFunction: string, codeLanguage: string): string {
+export function applyMeasureFormat(content: string, formatFunction: string, codeLanguage: string, displayName?: string): string {
     switch (formatFunction) {
         case 'heading_h1':
             return `# ${content}`;
@@ -124,6 +124,12 @@ export function applyMeasureFormat(content: string, formatFunction: string, code
             return `\`\`\`${codeLanguage}\n${content}\n\`\`\``;
         case 'highlight':
             return `==${content}==`;
+        case 'definition_list':
+            return `${displayName || 'Term'}\n: ${content}`;
+        case 'blockquote': {
+            const quoted = content.split('\n').map(line => `> ${line}`).join('\n');
+            return `\n${quoted}\n`;
+        }
         case 'none':
         default:
             return content;
@@ -191,7 +197,7 @@ export function extractMarkdownSections(dataView: DataView): MarkdownSection[] {
                     if (hasMultipleMarkdownCols) {
                         const col = dataView.table.columns[colIdx];
                         const { formatFunction, codeLanguage } = getMeasureFormatFromColumn(col);
-                        content = applyMeasureFormat(content, formatFunction, codeLanguage);
+                        content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName);
                     }
                     sections.push({ content, rowIndex });
                 }
