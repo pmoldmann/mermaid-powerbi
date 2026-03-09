@@ -5,6 +5,12 @@
             "name": "markdown",
             "kind": "GroupingOrMeasure",
             "description": "A column or measure containing Markdown text to render. Multiple values from a column will be concatenated."
+        },
+        {
+            "displayName": "Tooltips",
+            "name": "tooltips",
+            "kind": "Measure",
+            "description": "Columns or measures to display in the tooltip when hovering over a markdown section."
         }
     ],
     "objects": {
@@ -129,6 +135,19 @@
                 }
             }
         },
+        "interactivity": {
+            "displayName": "Interactivity",
+            "description": "Settings for cross-filtering and selection behavior",
+            "properties": {
+                "enableCrossFilter": {
+                    "displayName": "Cross filter",
+                    "description": "When enabled, clicking on a markdown section filters other visuals based on the corresponding data row. Ctrl+Click to select multiple sections. Only available when a column (not a measure) provides the markdown data.",
+                    "type": {
+                        "bool": true
+                    }
+                }
+            }
+        },
         "font": {
             "displayName": "Font settings",
             "description": "Font family and size settings for Markdown content and Mermaid diagrams",
@@ -169,20 +188,28 @@
     "dataViewMappings": [
         {
             "conditions": [
-                { "markdown": { "max": 1 } }
+                { "markdown": { "max": 1 }, "tooltips": { "max": 5 } }
             ],
             "table": {
                 "rows": {
                     "select": [
-                        { "for": { "in": "markdown" } }
+                        { "for": { "in": "markdown" } },
+                        { "for": { "in": "tooltips" } }
                     ],
                     "dataReductionAlgorithm": { "top": { "count": 10000 } }
                 }
             }
         }
     ],
+    "tooltips": {
+        "supportedTypes": {
+            "default": true,
+            "canvas": true
+        },
+        "roles": ["tooltips"]
+    },
     "advancedEditModeSupport": 0,
-    "supportsHighlight": false,
+    "supportsHighlight": true,
     "supportsLandingPage": true,
     "supportsEmptyDataView": true,
     "sorting": {

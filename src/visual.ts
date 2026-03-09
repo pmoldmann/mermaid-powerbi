@@ -13,26 +13,31 @@ import EnumerateVisualObjectInstancesOptions = powerbiVisualsApi.EnumerateVisual
 import VisualObjectInstance = powerbiVisualsApi.VisualObjectInstance;
 import DataView = powerbiVisualsApi.DataView;
 import VisualObjectInstanceEnumerationObject = powerbiVisualsApi.VisualObjectInstanceEnumerationObject;
-import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost
+import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
+import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 
 import { VisualSettings } from "./settings";
 
 import { Provider } from 'react-redux';
 import { store } from "./redux/store";
-import { setDataView, setHost, setSettings, setViewport } from './redux/slice';
-import { deepClone } from './utils';
+import { setDataView, setHost, setRowData, setSelectionManager, setSettings, setViewport } from './redux/slice';
+import { deepClone, extractMarkdownSections, extractTooltipColumns } from './utils';
 
 
 export class Visual implements IVisual {
     private target: HTMLElement;
     private settings: VisualSettings;
     private host: IVisualHost;
+    private selectionManager: ISelectionManager;
     private root: Root;
 
     constructor(options: VisualConstructorOptions) {
         this.target = options.element;
         this.host = options.host;
         this.settings = VisualSettings.getDefault() as VisualSettings;
+
+        // Create selection manager for cross-filtering and context menu
+        this.selectionManager = this.host.createSelectionManager();
 
         window.open = (url?: string | URL) => {
             if (typeof url === "string") {
@@ -42,6 +47,32 @@ export class Visual implements IVisual {
         };
 
         store.dispatch(setHost(options.host));
+        store.dispatch(setSelectionManager(this.selectionManager));
+
+        // Register context menu handler on the visual element
+        this.target.addEventListener('contextmenu', (event: MouseEvent) => {
+            event.preventDefault();
+            
+            // Try to find the closest markdown section to get its selectionId
+            const sectionEl = (event.target as HTMLElement).closest?.('[data-row-index]');
+            let selectionId = null;
+            if (sectionEl) {
+                const rowIndex = parseInt(sectionEl.getAttribute('data-row-index'), 10);
+                const state = store.getState();
+                const selectionIds = state.options.selectionIds;
+                // Find the selectionId that matches this row index
+                const sections = state.options.markdownSections;
+                const sectionIdx = sections.findIndex(s => s.rowIndex === rowIndex);
+                if (sectionIdx >= 0 && sectionIdx < selectionIds.length) {
+                    selectionId = selectionIds[sectionIdx];
+                }
+            }
+
+            this.selectionManager.showContextMenu(
+                selectionId,
+                { x: event.clientX, y: event.clientY }
+            );
+        });
 
         if (document) {
             const reactApplication = React.createElement(Application, {
@@ -70,6 +101,22 @@ export class Visual implements IVisual {
         // Always dispatch dataView - null/undefined will clear the content and show welcome page
         store.dispatch(setDataView(dataView ? deepClone(dataView) : null));
         store.dispatch(setViewport(deepClone(options.viewport)));
+
+        // Build selectionIds and row data for interactivity
+        if (dataView?.table?.rows) {
+            const sections = extractMarkdownSections(dataView);
+            const selectionIds = sections.map(section => {
+                return this.host.createSelectionIdBuilder()
+                    .withTable(dataView.table, section.rowIndex)
+                    .createSelectionId();
+            });
+            const tooltipColumns = extractTooltipColumns(dataView);
+            store.dispatch(setRowData({ sections, selectionIds, tooltipColumns }));
+        } else {
+            // Single/measure mode or no data — extract sections but no selectionIds
+            const sections = dataView ? extractMarkdownSections(dataView) : [];
+            store.dispatch(setRowData({ sections, selectionIds: [], tooltipColumns: [] }));
+        }
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {

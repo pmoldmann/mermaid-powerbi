@@ -1418,3 +1418,54 @@ mark.search-highlight {
         }
     }
 }
+
+// ============================================
+// Section-level interactivity styles
+// ============================================
+
+// Separator between rendered markdown sections (replaces the old --- join)
+.section-separator {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 1em 0;
+}
+
+[data-color-mode="dark"] .section-separator {
+    border-top-color: #4a5568;
+}
+
+// Individual markdown section wrapper
+.markdown-section {
+    transition: opacity 0.2s ease;
+}
+
+// When cross-filter is enabled, show pointer cursor on sections
+.cross-filter-enabled .markdown-section {
+    cursor: pointer;
+}
+
+// Hover highlight for sections when cross-filter is enabled
+.cross-filter-enabled .markdown-section:hover {
+    background-color: rgba(0, 120, 212, 0.04);
+}
+
+[data-color-mode="dark"] .cross-filter-enabled .markdown-section:hover {
+    background-color: rgba(79, 209, 197, 0.06);
+}
+
+// Dimmed sections (non-selected when cross-filter selection is active)
+.markdown-section.section-dimmed {
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+}
+
+// Selected section highlight
+.markdown-section.section-selected {
+    opacity: 1;
+    border-left: 3px solid #0078d4;
+    padding-left: 8px;
+}
+
+[data-color-mode="dark"] .markdown-section.section-selected {
+    border-left-color: #4FD1C5;
+}

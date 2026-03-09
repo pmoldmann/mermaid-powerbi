@@ -10,6 +10,7 @@ export interface IVisualSettings {
     mermaidDebug: MermaidDebugSettings;
     font: FontSettings;
     markdown: MarkdownSettings;
+    interactivity: InteractivitySettings;
 }
 
 export class VisualSettings extends DataViewObjectsParser implements IVisualSettings {
@@ -18,6 +19,7 @@ export class VisualSettings extends DataViewObjectsParser implements IVisualSett
     public mermaidDebug: MermaidDebugSettings = new MermaidDebugSettings();
     public font: FontSettings = new FontSettings();
     public markdown: MarkdownSettings = new MarkdownSettings();
+    public interactivity: InteractivitySettings = new InteractivitySettings();
 }
 
 export class ViewSettings {
@@ -49,4 +51,8 @@ export class FontSettings {
 export class MarkdownSettings {
     public enableLineBreaks: boolean = true;
     public codeBlockWordWrap: boolean = true;
+}
+
+export class InteractivitySettings {
+    public enableCrossFilter: boolean = false;
 }

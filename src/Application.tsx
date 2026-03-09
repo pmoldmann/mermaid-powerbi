@@ -11,6 +11,10 @@ import { WelcomePage } from './WelcomePage';
 import { SearchBar, SearchToggle } from './SearchBar';
 import { DebugPanel, useDebugLogs, clearDebugLogs, setDebugEnabled } from './DebugPanel';
 
+import powerbiVisualsApi from "powerbi-visuals-api";
+import ITooltipService = powerbiVisualsApi.extensibility.ITooltipService;
+import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import "mermaid";
 
@@ -107,12 +111,17 @@ export const Application: React.FC<ApplicationProps> = () => {
     const settings = useAppSelector((state) => state.options.settings);
     const viewport = useAppSelector((state) => state.options.viewport);
     const markdownContent = useAppSelector((state) => state.options.markdownContent);
+    const markdownSections = useAppSelector((state) => state.options.markdownSections);
+    const selectionIds = useAppSelector((state) => state.options.selectionIds);
+    const selectionManager = useAppSelector((state) => state.options.selectionManager);
+    const tooltipColumns = useAppSelector((state) => state.options.tooltipColumns);
 
     const container = React.useRef<HTMLDivElement>(null);
     const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [highlights, setHighlights] = React.useState<HTMLElement[]>([]);
     const [currentMatchIndex, setCurrentMatchIndex] = React.useState(0);
     const [isDebugOpen, setIsDebugOpen] = React.useState(false);
+    const [selectedSectionIndices, setSelectedSectionIndices] = React.useState<Set<number>>(new Set());
     const debugLogs = useDebugLogs();
 
     const showDebugPanel = settings?.mermaidDebug?.showDebugPanel === true;
@@ -189,6 +198,116 @@ export const Application: React.FC<ApplicationProps> = () => {
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, []);
 
+    // Clear selection when data changes
+    React.useEffect(() => {
+        setSelectedSectionIndices(new Set());
+    }, [markdownSections]);
+
+    /**
+     * Builds tooltip data items for a given section index.
+     */
+    const getTooltipDataItems = React.useCallback((sectionIdx: number): VisualTooltipDataItem[] => {
+        if (!tooltipColumns || tooltipColumns.length === 0 || sectionIdx < 0) return [];
+        const section = markdownSections[sectionIdx];
+        if (!section) return [];
+        const rowIdx = section.rowIndex;
+
+        return tooltipColumns
+            .filter(col => col.values[rowIdx] != null)
+            .map(col => ({
+                displayName: col.displayName,
+                value: String(col.values[rowIdx])
+            }));
+    }, [tooltipColumns, markdownSections]);
+
+    /**
+     * Handles tooltip show on section mouse enter/move.
+     */
+    const handleSectionMouseOver = React.useCallback((sectionIdx: number, event: React.MouseEvent) => {
+        if (!host?.tooltipService) return;
+        const dataItems = getTooltipDataItems(sectionIdx);
+        if (dataItems.length === 0) return;
+
+        const identities = sectionIdx < selectionIds.length ? [selectionIds[sectionIdx]] : [];
+
+        host.tooltipService.show({
+            coordinates: [event.clientX, event.clientY],
+            dataItems,
+            isTouchEvent: false,
+            identities
+        });
+    }, [host, getTooltipDataItems, selectionIds]);
+
+    /**
+     * Handles tooltip move when mouse moves within a section.
+     */
+    const handleSectionMouseMove = React.useCallback((sectionIdx: number, event: React.MouseEvent) => {
+        if (!host?.tooltipService) return;
+        const dataItems = getTooltipDataItems(sectionIdx);
+        if (dataItems.length === 0) return;
+
+        const identities = sectionIdx < selectionIds.length ? [selectionIds[sectionIdx]] : [];
+
+        host.tooltipService.move({
+            coordinates: [event.clientX, event.clientY],
+            dataItems,
+            isTouchEvent: false,
+            identities
+        });
+    }, [host, getTooltipDataItems, selectionIds]);
+
+    /**
+     * Handles tooltip hide on section mouse leave.
+     */
+    const handleSectionMouseLeave = React.useCallback(() => {
+        if (!host?.tooltipService) return;
+        host.tooltipService.hide({
+            immediately: true,
+            isTouchEvent: false
+        });
+    }, [host]);
+
+    /**
+     * Handles cross-filter click on a section.
+     */
+    const handleSectionClick = React.useCallback((sectionIdx: number, event: React.MouseEvent) => {
+        // Check if cross-filtering is enabled
+        if (!settings?.interactivity?.enableCrossFilter) return;
+        // Don't cross-filter if there are no selectionIds (measure mode)
+        if (!selectionIds || selectionIds.length === 0 || !selectionManager) return;
+        // Don't cross-filter if host doesn't allow interactions
+        if (host && (host as any).allowInteractions === false) return;
+
+        // Don't cross-filter if user clicked a link
+        const target = event.target as HTMLElement;
+        if (target.tagName === 'A' || target.closest('a')) return;
+
+        const selectionId = selectionIds[sectionIdx];
+        if (!selectionId) return;
+
+        const isMultiSelect = event.ctrlKey || event.metaKey;
+
+        // If clicking an already-selected section (single selection), toggle off
+        if (!isMultiSelect && selectedSectionIndices.has(sectionIdx) && selectedSectionIndices.size === 1) {
+            selectionManager.clear();
+            setSelectedSectionIndices(new Set());
+            return;
+        }
+
+        selectionManager.select(selectionId, isMultiSelect).then((ids) => {
+            if (ids.length === 0) {
+                setSelectedSectionIndices(new Set());
+            } else {
+                const next = new Set(isMultiSelect ? Array.from(selectedSectionIndices) : []);
+                next.add(sectionIdx);
+                setSelectedSectionIndices(next);
+            }
+        });
+    }, [settings, selectionIds, selectionManager, host]);
+
+    const crossFilterEnabled = settings?.interactivity?.enableCrossFilter && selectionIds.length > 0;
+    const hasSelection = selectedSectionIndices.size > 0;
+
     const isEmpty = !markdownContent || markdownContent.trim() === '';
 
     return (
@@ -244,7 +363,7 @@ export const Application: React.FC<ApplicationProps> = () => {
 
                     <div
                         ref={container}
-                        className={`markdown-content${settings?.markdown?.codeBlockWordWrap !== false ? ' code-word-wrap' : ''}`}
+                        className={`markdown-content${settings?.markdown?.codeBlockWordWrap !== false ? ' code-word-wrap' : ''}${crossFilterEnabled ? ' cross-filter-enabled' : ''}`}
                         data-color-mode={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}
                         onClick={onLinkClick}
                         style={{
@@ -280,14 +399,41 @@ export const Application: React.FC<ApplicationProps> = () => {
                                         enableLineBreaks: true,
                                         codeBlockWordWrap: true
                                     }}>
-                                        <MDEditor.Markdown
-                                            components={{
-                                                code: Code
-                                            }}
-                                            rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                            remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks] : []}
-                                            source={markdownContent}
-                                        />
+                                        {markdownSections.length > 1 ? (
+                                            /* Multi-section: render each row as separate markdown block */
+                                            markdownSections.map((section, sectionIdx) => {
+                                                const isDimmed = hasSelection && !selectedSectionIndices.has(sectionIdx);
+                                                const isSelected = selectedSectionIndices.has(sectionIdx);
+                                                return (
+                                                    <React.Fragment key={`section-${section.rowIndex}`}>
+                                                        <div
+                                                            className={`markdown-section${isDimmed ? ' section-dimmed' : ''}${isSelected ? ' section-selected' : ''}`}
+                                                            data-row-index={section.rowIndex}
+                                                            onMouseEnter={(e) => handleSectionMouseOver(sectionIdx, e)}
+                                                            onMouseMove={(e) => handleSectionMouseMove(sectionIdx, e)}
+                                                            onMouseLeave={handleSectionMouseLeave}
+                                                            onClick={(e) => handleSectionClick(sectionIdx, e)}
+                                                        >
+                                                            <MDEditor.Markdown
+                                                                components={{ code: Code }}
+                                                                rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+                                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks] : []}
+                                                                source={section.content}
+                                                            />
+                                                        </div>
+                                                        {sectionIdx < markdownSections.length - 1 && <hr className="section-separator" />}
+                                                    </React.Fragment>
+                                                );
+                                            })
+                                        ) : (
+                                            /* Single section (measure or single row) — render as before */
+                                            <MDEditor.Markdown
+                                                components={{ code: Code }}
+                                                rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
+                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks] : []}
+                                                source={markdownContent}
+                                            />
+                                        )}
                                     </MarkdownSettingsContext.Provider>
                                     </MermaidDebugSettingsContext.Provider>
                                 </MermaidSettingsContext.Provider>
