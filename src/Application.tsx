@@ -201,6 +201,8 @@ export const Application: React.FC<ApplicationProps> = () => {
     // Clear selection when data changes
     React.useEffect(() => {
         setSelectedSectionIndices(new Set());
+        // Also clear Power BI selection to keep selectionManager in sync
+        selectionManager?.clear();
     }, [markdownSections]);
 
     /**
@@ -294,16 +296,28 @@ export const Application: React.FC<ApplicationProps> = () => {
             return;
         }
 
-        selectionManager.select(selectionId, isMultiSelect).then((ids) => {
-            if (ids.length === 0) {
-                setSelectedSectionIndices(new Set());
-            } else {
-                const next = new Set(isMultiSelect ? Array.from(selectedSectionIndices) : []);
-                next.add(sectionIdx);
-                setSelectedSectionIndices(next);
-            }
-        });
-    }, [settings, selectionIds, selectionManager, host]);
+        // Helper to perform the selection and update local state
+        const performSelect = () => {
+            selectionManager.select(selectionId, isMultiSelect).then((ids) => {
+                if (ids.length === 0) {
+                    setSelectedSectionIndices(new Set());
+                } else {
+                    const next = new Set(isMultiSelect ? Array.from(selectedSectionIndices) : []);
+                    next.add(sectionIdx);
+                    setSelectedSectionIndices(next);
+                }
+            });
+        };
+
+        // For single-select with an active selection: clear first to avoid
+        // Power BI toggling off when rows share the same data identity
+        // (duplicate content produces equivalent selectionIds).
+        if (!isMultiSelect && selectedSectionIndices.size > 0) {
+            selectionManager.clear().then(performSelect);
+        } else {
+            performSelect();
+        }
+    }, [settings, selectionIds, selectionManager, host, selectedSectionIndices]);
 
     const crossFilterEnabled = settings?.interactivity?.enableCrossFilter && selectionIds.length > 0;
     const hasSelection = selectedSectionIndices.size > 0;

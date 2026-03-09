@@ -572,6 +572,15 @@
 .markdown-content {
     flex: 1;
     overflow-y: auto;
+    // Provide the base background that wmde-markdown normally sets,
+    // since we make wmde-markdown transparent inside sections for hover effects.
+    // Cannot use var(--color-canvas-default) here because the variable is scoped
+    // to .wmde-markdown by the library, not to this container.
+    background-color: #ffffff;
+}
+
+[data-color-mode="dark"].markdown-content {
+    background-color: #0d1117;
 }
 
 // Search Toggle Button
@@ -1427,7 +1436,7 @@ mark.search-highlight {
 .section-separator {
     border: none;
     border-top: 1px solid #e2e8f0;
-    margin: 1em 0;
+    margin: 0;
 }
 
 [data-color-mode="dark"] .section-separator {
@@ -1436,7 +1445,15 @@ mark.search-highlight {
 
 // Individual markdown section wrapper
 .markdown-section {
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, background-color 0.15s ease;
+    padding: 8px 6px;
+    border-radius: 4px;
+
+    // Make the inner wmde-markdown background transparent so the section
+    // hover background shows through (wmde-markdown sets an opaque bg).
+    .wmde-markdown {
+        background-color: transparent !important;
+    }
 }
 
 // When cross-filter is enabled, show pointer cursor on sections
@@ -1446,11 +1463,12 @@ mark.search-highlight {
 
 // Hover highlight for sections when cross-filter is enabled
 .cross-filter-enabled .markdown-section:hover {
-    background-color: rgba(0, 120, 212, 0.04);
+    background-color: #f0f0f0;
 }
 
-[data-color-mode="dark"] .cross-filter-enabled .markdown-section:hover {
-    background-color: rgba(79, 209, 197, 0.06);
+// data-color-mode sits on the SAME element as .cross-filter-enabled, so no space between selectors
+[data-color-mode="dark"].cross-filter-enabled .markdown-section:hover {
+    background-color: #2a3245;
 }
 
 // Dimmed sections (non-selected when cross-filter selection is active)
