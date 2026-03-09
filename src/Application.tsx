@@ -10,6 +10,7 @@ import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar, SearchToggle } from './SearchBar';
 import { DebugPanel, useDebugLogs, clearDebugLogs, setDebugEnabled } from './DebugPanel';
+import { ContextMenu } from './ContextMenu';
 
 import powerbiVisualsApi from "powerbi-visuals-api";
 import ITooltipService = powerbiVisualsApi.extensibility.ITooltipService;
@@ -124,6 +125,15 @@ export const Application: React.FC<ApplicationProps> = () => {
     const [selectedSectionIndices, setSelectedSectionIndices] = React.useState<Set<number>>(new Set());
     const debugLogs = useDebugLogs();
 
+    // Context menu state
+    const [contextMenu, setContextMenu] = React.useState<{
+        visible: boolean;
+        x: number;
+        y: number;
+        sectionIdx: number | null;
+        selectionId: any;
+    }>({ visible: false, x: 0, y: 0, sectionIdx: null, selectionId: null });
+
     const showDebugPanel = settings?.mermaidDebug?.showDebugPanel === true;
 
     // Enable/disable debug logging based on settings
@@ -197,6 +207,67 @@ export const Application: React.FC<ApplicationProps> = () => {
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
     }, []);
+
+    /**
+     * Handles right-click to show the custom context menu (if enabled)
+     * or falls back to the native Power BI context menu.
+     */
+    const handleContextMenu = React.useCallback((e: React.MouseEvent) => {
+        // Determine which section was right-clicked (if any)
+        const sectionEl = (e.target as HTMLElement).closest?.('[data-row-index]');
+        let sectionIdx: number | null = null;
+        let selId = null;
+
+        if (sectionEl) {
+            const rowIndex = parseInt(sectionEl.getAttribute('data-row-index')!, 10);
+            const secIdx = markdownSections.findIndex(s => s.rowIndex === rowIndex);
+            if (secIdx >= 0) {
+                sectionIdx = secIdx;
+                if (secIdx < selectionIds.length) {
+                    selId = selectionIds[secIdx];
+                }
+            }
+        }
+
+        // When the copy menu setting is off, show the native Power BI context menu
+        if (!settings?.view?.enableCopyMenu) {
+            e.preventDefault();
+            if (selectionManager) {
+                selectionManager.showContextMenu(
+                    selId,
+                    { x: e.clientX, y: e.clientY }
+                );
+            }
+            return;
+        }
+
+        // Custom context menu
+        e.preventDefault();
+        e.stopPropagation();
+
+        setContextMenu({
+            visible: true,
+            x: e.clientX,
+            y: e.clientY,
+            sectionIdx,
+            selectionId: selId,
+        });
+    }, [markdownSections, selectionIds, settings, selectionManager]);
+
+    const handleCloseContextMenu = React.useCallback(() => {
+        setContextMenu(prev => ({ ...prev, visible: false }));
+    }, []);
+
+    /**
+     * Triggers the native Power BI context menu.
+     */
+    const handleShowPbiMenu = React.useCallback(() => {
+        if (!selectionManager) return;
+        selectionManager.showContextMenu(
+            contextMenu.selectionId,
+            { x: contextMenu.x, y: contextMenu.y }
+        );
+    }, [selectionManager, contextMenu]);
 
     // Clear selection when data changes
     React.useEffect(() => {
@@ -338,7 +409,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                     <WelcomePage />
                 </div>
             ) : (
-                <div className="markdown-container" style={{ width: viewport.width, height: viewport.height }}>
+                <div className="markdown-container" style={{ width: viewport.width, height: viewport.height }} onContextMenu={handleContextMenu}>
                     {/* Debug toggle button */}
                     {showDebugPanel && !isDebugOpen && (
                         <button 
@@ -374,6 +445,22 @@ export const Application: React.FC<ApplicationProps> = () => {
                             currentMatch={currentMatchIndex}
                         />
                     )}
+
+                    {/* Custom context menu */}
+                    <ContextMenu
+                        visible={contextMenu.visible}
+                        x={contextMenu.x}
+                        y={contextMenu.y}
+                        sectionMarkdown={
+                            contextMenu.sectionIdx !== null && contextMenu.sectionIdx < markdownSections.length
+                                ? markdownSections[contextMenu.sectionIdx].content
+                                : null
+                        }
+                        fullMarkdown={markdownContent}
+                        colorMode={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}
+                        onClose={handleCloseContextMenu}
+                        onShowPbiMenu={handleShowPbiMenu}
+                    />
 
                     <div
                         ref={container}

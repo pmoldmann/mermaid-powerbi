@@ -1487,3 +1487,101 @@ mark.search-highlight {
 [data-color-mode="dark"] .markdown-section.section-selected {
     border-left-color: #4FD1C5;
 }
+
+// ============================================
+// Custom Context Menu
+// ============================================
+.custom-context-menu {
+    position: fixed;
+    z-index: 10000;
+    min-width: 260px;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    padding: 4px 0;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 12px;
+    color: #1f2937;
+    animation: contextMenuFadeIn 0.1s ease-out;
+
+    .context-menu-item {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 7px 12px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 12px;
+        font-family: inherit;
+        color: inherit;
+        text-align: left;
+        white-space: nowrap;
+
+        &:hover {
+            background-color: #f3f4f6;
+        }
+
+        &:active {
+            background-color: #e5e7eb;
+        }
+
+        .context-menu-icon {
+            margin-right: 8px;
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+    }
+
+    .context-menu-separator {
+        height: 1px;
+        background-color: #e5e7eb;
+        margin: 4px 0;
+    }
+
+    .context-menu-feedback {
+        padding: 7px 12px;
+        color: #059669;
+        font-weight: 500;
+        text-align: center;
+    }
+}
+
+// Dark mode context menu
+[data-color-mode="dark"] ~ .custom-context-menu,
+.custom-context-menu--dark {
+    background: #1e293b;
+    border-color: #475569;
+    color: #e2e8f0;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+
+    .context-menu-item:hover {
+        background-color: #334155;
+    }
+
+    .context-menu-item:active {
+        background-color: #475569;
+    }
+
+    .context-menu-separator {
+        background-color: #475569;
+    }
+
+    .context-menu-feedback {
+        color: #34d399;
+    }
+}
+
+@keyframes contextMenuFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

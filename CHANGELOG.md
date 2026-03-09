@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.1.0.0] - 2026-03-04
+## [1.1.0.0] - 2026-03-09
 
 ### Added
 - **Flowchart orientation override**: New "Flowchart orientation" setting in Mermaid Settings to override the direction of flowchart diagrams (Top to Bottom, Bottom to Top, Left to Right, Right to Left). Default preserves the orientation defined in the diagram code. This helps report creators choose a layout direction that best fits the available space in the visual.
@@ -17,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mermaid tooltip support**: Tooltips defined in Mermaid `click` directives (e.g. `click A "url" "tooltip text"`) are now displayed as styled popups when hovering over diagram nodes. This uses a custom JavaScript-based tooltip system for reliable rendering across all environments including Power BI Desktop and Service.
 - **Safe external link handling**: Links defined in Mermaid `click` directives are no longer opened directly inside the visual. Instead, clicking a linked node shows a confirmation dialog (via Power BI's native `host.launchUrl()`) asking the user whether to open the URL in an external browser. This prevents users from getting trapped inside the visual after clicking a link.
 - **Fullscreen mode for Mermaid diagrams**: Each Mermaid diagram now includes a fullscreen button (⛶) in the toolbar. Clicking it expands the diagram to fill the entire visual area, making it easier to inspect complex diagrams. Press ESC or click the close button (✕) to exit fullscreen mode.
+- **Cross-filtering**: New "Interactivity" settings group with a "Cross filter" toggle (default: off). When enabled and a column (not a measure) provides the data, clicking on a markdown section filters other visuals by the corresponding data row. Ctrl+Click to select multiple sections. Non-selected sections are visually dimmed.
+- **Copy markdown context menu**: New "Copy markdown menu" toggle in View settings (default: off). When enabled, right-clicking the visual shows a custom context menu with "Copy section markdown" (copies the Markdown of the clicked section) and "Copy all markdown" (copies the entire content). A "More options…" entry opens the standard Power BI context menu. When disabled, right-click shows the standard Power BI menu directly.
+- **Power BI data tooltips**: When using a column as data source, additional columns can be added to the "Tooltips" data role. Hovering over a markdown section displays the tooltip values for the corresponding row.
 
 ### Changed
 - **Settings reorganization**: Moved "Show debug panel" to the "Mermaid debug settings" group for a cleaner property pane. Split "Mermaid settings" into two groups for better usability:

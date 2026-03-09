@@ -49,29 +49,12 @@ export class Visual implements IVisual {
         store.dispatch(setHost(options.host));
         store.dispatch(setSelectionManager(this.selectionManager));
 
-        // Register context menu handler on the visual element
+        // Prevent the browser default context menu on the visual element.
+        // The React-based handleContextMenu in Application.tsx decides whether
+        // to show the custom copy-markdown menu or the native Power BI menu
+        // based on the enableCopyMenu setting.
         this.target.addEventListener('contextmenu', (event: MouseEvent) => {
             event.preventDefault();
-            
-            // Try to find the closest markdown section to get its selectionId
-            const sectionEl = (event.target as HTMLElement).closest?.('[data-row-index]');
-            let selectionId = null;
-            if (sectionEl) {
-                const rowIndex = parseInt(sectionEl.getAttribute('data-row-index'), 10);
-                const state = store.getState();
-                const selectionIds = state.options.selectionIds;
-                // Find the selectionId that matches this row index
-                const sections = state.options.markdownSections;
-                const sectionIdx = sections.findIndex(s => s.rowIndex === rowIndex);
-                if (sectionIdx >= 0 && sectionIdx < selectionIds.length) {
-                    selectionId = selectionIds[sectionIdx];
-                }
-            }
-
-            this.selectionManager.showContextMenu(
-                selectionId,
-                { x: event.clientX, y: event.clientY }
-            );
         });
 
         if (document) {

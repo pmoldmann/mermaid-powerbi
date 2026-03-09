@@ -80,6 +80,27 @@ The visual supports **dark and light themes** via the "Color mode" setting in th
 
 > 💡 **Tip:** Match the color mode to your Power BI report background for a seamless look.
 
+## 🔀 Cross-Filtering
+
+When using a **column** (not a single measure) as the markdown data source, each row is rendered as a separate section. With **Cross filter** enabled in the Interactivity settings:
+
+- **Click** a section to filter other visuals by the corresponding data row
+- **Ctrl+Click** to select multiple sections
+- Click an already-selected section to **clear** the selection
+- Non-selected sections are **dimmed** to highlight the active selection
+
+> ⚠️ **Important:** Cross-filtering requires a column-based data binding. When a single measure provides the markdown content, there are no individual rows to select, and the cross-filter setting has no effect.
+
+## 📋 Copy Markdown Menu
+
+When **Copy markdown menu** is enabled in the View settings, right-clicking the visual shows a custom context menu with two copy options:
+
+- **Copy section markdown** — copies the raw markdown text of the right-clicked section to the clipboard (only shown when multiple sections are rendered)
+- **Copy all markdown** — copies the entire markdown content of the visual
+- **More options…** — opens the standard Power BI context menu (copy visual, export data, etc.)
+
+When the setting is disabled (default), right-click shows the standard Power BI context menu directly.
+
 ## ⛶ Fullscreen Mode for Mermaid Diagrams
 
 Each Mermaid diagram includes a **fullscreen button** (⛶) in the toolbar next to the zoom controls. This is useful for inspecting complex or large diagrams in detail.
@@ -185,6 +206,7 @@ Uh - And now guess only once how this file has been generated...
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
 | **Color mode** | Enum | `Light` | Switch between light and dark theme for the visual. Affects Markdown rendering, Mermaid diagrams, and all UI components. |
+| **Copy markdown menu** | Boolean | `false` | Show a custom right-click menu with options to copy the markdown content of a single section or the entire visual to the clipboard. When disabled (default), right-click shows the standard Power BI context menu. |
 
 ### Mermaid Settings
 
@@ -220,6 +242,14 @@ Uh - And now guess only once how this file has been generated...
 |---------|------|---------|-------------|
 | **Enable line breaks** | Boolean | `true` | Render single line breaks in Markdown as `<br>` (line break). When disabled, consecutive lines are joined into one paragraph. |
 | **Code block word wrap** | Boolean | `true` | Wrap long lines in code blocks instead of showing a horizontal scrollbar |
+
+### Interactivity Settings
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| **Cross filter** | Boolean | `false` | When enabled, clicking on a markdown section filters other visuals based on the corresponding data row. Ctrl+Click to select multiple sections. |
+
+> ⚠️ **Note:** Cross-filtering and section selection only work when a **column** provides the markdown data. When a single **measure** is used, there are no individual data rows to select, so cross-filtering has no effect.
 
 ### Line Break Settings Explained
 
@@ -286,6 +316,7 @@ All properties that can be themed, organized by object group:
 | Object | Property | Type | Allowed Values | Default |
 |--------|----------|------|----------------|---------|
 | `view` | `colorMode` | enum | `"light"`, `"dark"` | `"light"` |
+| `view` | `enableCopyMenu` | bool | `true`, `false` | `false` |
 | `font` | `fontFamily` | string | any font name | `"DIN"` |
 | `font` | `headingFontSize` | number | size in pt | `14` |
 | `font` | `bodyFontSize` | number | size in pt | `9` |
@@ -301,6 +332,7 @@ All properties that can be themed, organized by object group:
 | `mermaidDebug` | `preserveLineBreaksCSS` | bool | `true`, `false` | `true` |
 | `markdown` | `enableLineBreaks` | bool | `true`, `false` | `true` |
 | `markdown` | `codeBlockWordWrap` | bool | `true`, `false` | `true` |
+| `interactivity` | `enableCrossFilter` | bool | `true`, `false` | `false` |
 
 ### Full Theme Template (Copy & Paste Ready)
 
@@ -313,7 +345,8 @@ Copy this complete template into a `.json` file. Remove or adjust any properties
         "markdownMermaidRenderer": {
             "*": {
                 "view": [{
-                    "colorMode": "light"
+                    "colorMode": "light",
+                    "enableCopyMenu": false
                 }],
                 "font": [{
                     "fontFamily": "DIN",
@@ -337,6 +370,9 @@ Copy this complete template into a `.json` file. Remove or adjust any properties
                 "markdown": [{
                     "enableLineBreaks": true,
                     "codeBlockWordWrap": true
+                }],
+                "interactivity": [{
+                    "enableCrossFilter": false
                 }]
             }
         }

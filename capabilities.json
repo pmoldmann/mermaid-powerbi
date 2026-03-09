@@ -27,6 +27,13 @@
                             { "value": "dark", "displayName": "Dark" }
                         ]
                     }
+                },
+                "enableCopyMenu": {
+                    "displayName": "Copy markdown menu",
+                    "description": "Show a custom right-click menu with options to copy markdown content to the clipboard",
+                    "type": {
+                        "bool": true
+                    }
                 }
             }
         },
