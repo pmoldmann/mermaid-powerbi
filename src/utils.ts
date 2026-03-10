@@ -229,7 +229,7 @@ export function getMarkdownColumnIndices(dataView: DataView): number[] {
  * @param markdownFunctions Visual-level settings for definition lists and list headings
  * @returns Array of MarkdownSection with content and rowIndex
  */
-export function extractMarkdownSections(dataView: DataView, markdownFunctions?: MarkdownFunctionsSettings): MarkdownSection[] {
+export function extractMarkdownSections(dataView: DataView, markdownFunctions?: MarkdownFunctionsSettings, deduplicateValues?: boolean): MarkdownSection[] {
     if (!dataView) {
         return [];
     }
@@ -250,6 +250,13 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
         const rows = dataView.table.rows;
         const isMultiRow = rows.length > 1;
 
+        // When deduplication is enabled, compute distinct values per column.
+        // Each column is treated independently — only unique string representations are kept.
+        // This avoids duplicate measure values when measures and columns are mixed.
+        const distinctValueSets: Map<number, Set<string>> | null = deduplicateValues
+            ? new Map(markdownColIndices.map(colIdx => [colIdx, new Set<string>()]))
+            : null;
+
         // For list columns with multiple rows, aggregate all row values into a single list
         // (each row becomes one list item, no delimiter splitting).
         // Collect which columns need aggregation so we can skip them in the per-row loop.
@@ -258,19 +265,46 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
         if (isMultiRow) {
             markdownColIndices.forEach(colIdx => {
                 const col = dataView.table.columns[colIdx];
-                const { formatFunction } = getMeasureFormatFromColumn(col);
+                const { formatFunction, listDelimiter } = getMeasureFormatFromColumn(col);
 
                 if (formatFunction === 'list_unordered' || formatFunction === 'list_ordered') {
                     aggregatedCols.add(colIdx);
+                    const delimiter = listDelimiter || ',';
 
-                    // Collect all non-empty row values for this column
-                    const items: string[] = [];
+                    // Step 1: Collect all non-empty row values, deduplicate if enabled
+                    const rawValues: string[] = [];
+                    const seenRawValues = deduplicateValues ? new Set<string>() : null;
                     rows.forEach(row => {
                         const value = row[colIdx];
                         if (value != null && String(value).trim() !== '') {
-                            items.push(String(value).trim());
+                            const trimmed = String(value).trim();
+                            if (seenRawValues && seenRawValues.has(trimmed)) return;
+                            seenRawValues?.add(trimmed);
+                            rawValues.push(trimmed);
                         }
                     });
+
+                    // Step 2: When deduplicating, split each distinct value by delimiter
+                    // and deduplicate the resulting items. This ensures that measure values
+                    // like "A;B" are properly expanded into individual list items after
+                    // duplicate rows have been removed.
+                    let items: string[];
+                    if (deduplicateValues) {
+                        const seenItems = new Set<string>();
+                        items = [];
+                        rawValues.forEach(raw => {
+                            const splitItems = raw.split(delimiter).map(item => item.trim()).filter(item => item !== '');
+                            splitItems.forEach(item => {
+                                if (!seenItems.has(item)) {
+                                    seenItems.add(item);
+                                    items.push(item);
+                                }
+                            });
+                        });
+                    } else {
+                        // Standard behavior: each row value = one list item (no delimiter splitting)
+                        items = rawValues;
+                    }
 
                     if (items.length > 0) {
                         const lPrefix = headingPrefix(listHeading || 'h4');
@@ -305,6 +339,13 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
                 }
 
                 if (value != null && String(value).trim() !== '') {
+                    // Deduplicate: skip if this column value was already seen
+                    if (distinctValueSets) {
+                        const key = String(value).trim();
+                        const colSet = distinctValueSets.get(colIdx)!;
+                        if (colSet.has(key)) return;
+                        colSet.add(key);
+                    }
                     let content = String(value);
                     // Apply per-column/measure formatting (works for both single and multiple columns)
                     content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading);

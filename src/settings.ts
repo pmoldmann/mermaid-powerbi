@@ -27,6 +27,7 @@ export class VisualSettings extends DataViewObjectsParser implements IVisualSett
 export class ViewSettings {
     public colorMode: string = "light";
     public enableCopyMenu: boolean = false;
+    public deduplicateValues: boolean = false;
 }
 
 export class MermaidSettings {

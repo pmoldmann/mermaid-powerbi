@@ -34,6 +34,13 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "deduplicateValues": {
+                    "displayName": "Deduplicate values",
+                    "description": "Remove duplicate values per column before rendering. When enabled, each column is treated independently and only distinct values are shown. Useful when mixing measures and columns to avoid repeated measure values.",
+                    "type": {
+                        "bool": true
+                    }
                 }
             }
         },

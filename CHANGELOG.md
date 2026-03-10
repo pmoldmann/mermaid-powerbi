@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0.0] - 2026-03-09
 
 ### Added
+- **Deduplicate values**: New "Deduplicate values" toggle in View settings (default: off). When enabled, each column is treated independently and only distinct values are rendered. This prevents repeated measure values when combining measures and columns in the same visual — without deduplication, Power BI repeats each measure value once per row of any column present.
 - **Multiple measures support**: The "Markdown Content" field now accepts up to 10 measures. Each measure is rendered as a separate section (stacked vertically with `<hr>` separators), enabling modular report layouts without DAX string concatenation. Cross-filtering is automatically disabled in measure mode.
 - **Per-measure formatting**: When two or more measures are added, a new "Measure formatting" section appears in the property pane. Each measure can be individually formatted as:
   - **Heading (H1 / H2 / H3)** — wraps the value in `#`, `##`, or `###`

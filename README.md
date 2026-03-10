@@ -313,6 +313,7 @@ Uh - And now guess only once how this file has been generated...
 |---------|------|---------|-------------|
 | **Color mode** | Enum | `Light` | Switch between light and dark theme for the visual. Affects Markdown rendering, Mermaid diagrams, and all UI components. |
 | **Copy markdown menu** | Boolean | `false` | Show a custom right-click menu with options to copy the markdown content of a single section or the entire visual to the clipboard. When disabled (default), right-click shows the standard Power BI context menu. |
+| **Deduplicate values** | Boolean | `false` | Remove duplicate values per column before rendering. When enabled, each column is treated independently and only distinct values are shown. This is useful when mixing measures and columns in the same visual — without deduplication, measure values are repeated for every row of the column. |
 
 ### Mermaid Settings
 
@@ -443,6 +444,7 @@ All properties that can be themed, organized by object group:
 |--------|----------|------|----------------|---------|
 | `view` | `colorMode` | enum | `"light"`, `"dark"` | `"light"` |
 | `view` | `enableCopyMenu` | bool | `true`, `false` | `false` |
+| `view` | `deduplicateValues` | bool | `true`, `false` | `false` |
 | `font` | `fontFamily` | string | any font name | `"DIN"` |
 | `font` | `headingFontSize` | number | size in pt | `14` |
 | `font` | `bodyFontSize` | number | size in pt | `9` |
@@ -480,7 +482,8 @@ Copy this complete template into a `.json` file. Remove or adjust any properties
             "*": {
                 "view": [{
                     "colorMode": "light",
-                    "enableCopyMenu": false
+                    "enableCopyMenu": false,
+                    "deduplicateValues": false
                 }],
                 "font": [{
                     "fontFamily": "DIN",

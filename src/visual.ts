@@ -87,7 +87,7 @@ export class Visual implements IVisual {
 
         // Build selectionIds and row data for interactivity
         if (dataView?.table?.rows) {
-            const sections = extractMarkdownSections(dataView, this.settings.markdownFunctions);
+            const sections = extractMarkdownSections(dataView, this.settings.markdownFunctions, this.settings.view.deduplicateValues);
             const tooltipColumns = extractTooltipColumns(dataView);
 
             // Only create selectionIds in column mode (single markdown column).
@@ -107,7 +107,7 @@ export class Visual implements IVisual {
             }
         } else {
             // Single/measure mode or no data — extract sections but no selectionIds
-            const sections = dataView ? extractMarkdownSections(dataView, this.settings.markdownFunctions) : [];
+            const sections = dataView ? extractMarkdownSections(dataView, this.settings.markdownFunctions, this.settings.view?.deduplicateValues) : [];
             store.dispatch(setRowData({ sections, selectionIds: [], tooltipColumns: [] }));
         }
     }
