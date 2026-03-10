@@ -97,6 +97,10 @@ When two or more measures are present, a **"Measure formatting"** section appear
 | **Highlight** | Wraps in `== ... ==` | ==value== |
 | **Definition List** | Measure name as term, value as definition | Term<br>: value |
 | **Blockquote** | Wraps each line in `> ...` | > value |
+| **Unordered List** | Splits by delimiter into `- item` list with heading | #### Name<br>- item1<br>- item2 |
+| **Ordered List** | Splits by delimiter into `1. item` list with heading | #### Name<br>1. item1<br>2. item2 |
+
+> 💡 **Tip:** The heading level for definition lists and list titles is configurable per column/measure — see the property pane settings.
 
 ### Definition List — Label/Value Pairs
 
@@ -112,6 +116,15 @@ Growth Rate
 
 This renders as a clean definition list — a great way to present key figures without writing DAX string concatenation formulas.
 
+When **Definition List** is selected, an additional **"Definition heading"** dropdown appears. Choose a heading level (H1–H6) to style the term, or leave it at **None** (default) for plain text:
+
+```markdown
+## Total Revenue
+: $1,234,567
+```
+
+If a measure value is **null or empty**, the definition list still renders — with a configurable placeholder text (default: `(blank)`). This ensures every KPI is always visible, even when no data is available. Customize the text via the **"Blank value text"** field (e.g. `n/a`, `–`, or a localized term like `(leer)`).
+
 > 💡 **Tip:** Rename your measures in the data model to control the labels shown in the definition list.
 
 ### Code Block — Configurable Language
@@ -119,6 +132,59 @@ This renders as a clean definition list — a great way to present key figures w
 When **Code Block** is selected, an additional "Code language" text field appears. Enter a language identifier (e.g. `json`, `sql`, `dax`, `mermaid`, `powerquery`) for syntax highlighting.
 
 > ⚠️ **Note:** Measure formatting is only available when **two or more measures** are in the field. With a single column or measure, the content is rendered as-is.
+
+### Lists — Ordered & Unordered
+
+The **Unordered List** and **Ordered List** formats split a value by a configurable delimiter and render each part as a list item. A heading with the column/measure display name is added automatically (default: H4).
+
+When a list format is selected, additional settings appear:
+- **"List delimiter"** — character(s) to split on (default: `,`). Set it to match whatever separator your data uses (e.g. `,`, `;`, ` | `).
+- **"List heading"** — heading level for the list title (H1–H6, default: H4). Choose **None** to suppress the heading entirely.
+
+This is especially powerful with DAX `CONCATENATEX()` measures that aggregate values into a single string:
+
+```dax
+Top Products = 
+    CONCATENATEX(
+        TOPN(5, Products, Products[Revenue], DESC),
+        Products[ProductName],
+        ", "
+    )
+```
+
+With the measure above added to the visual and formatted as **Unordered List** (delimiter `,`), the output renders as:
+
+```markdown
+#### Top Products
+- Widget A
+- Gadget B
+- Module C
+- Sensor D
+- Adapter E
+```
+
+Another example using `;` as delimiter:
+
+```dax
+Project Milestones = 
+    CONCATENATEX(
+        Milestones,
+        Milestones[Date] & " – " & Milestones[Name],
+        "; ",
+        Milestones[Date], ASC
+    )
+```
+
+Formatted as **Ordered List** (delimiter `;`):
+
+```markdown
+#### Project Milestones
+1. 2025-01-15 – Kickoff
+2. 2025-03-01 – Prototype
+3. 2025-06-30 – Launch
+```
+
+> 💡 **Tip:** The delimiter is applied literally, so make sure it matches the third argument of `CONCATENATEX()` exactly.
 
 ## �🔀 Cross-Filtering
 
@@ -291,14 +357,25 @@ Uh - And now guess only once how this file has been generated...
 
 > ⚠️ **Note:** Cross-filtering and section selection only work when a **column** provides the markdown data. When a single **measure** is used, there are no individual data rows to select, so cross-filtering has no effect.
 
-### Measure Formatting (per-measure)
+### Content Formatting (per-column/measure)
 
-This section appears in the property pane only when **two or more measures** are added to the "Markdown Content" field. Each measure gets its own entry.
+This section appears in the property pane for each column or measure added to the "Markdown Content" field.
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| **Format as** | Enum | `None` | Formatting function to apply: None, Heading (H1/H2/H3), Code Block, Highlight, Definition List, or Blockquote |
+| **Format as** | Enum | `None` | Formatting function to apply: None, Heading (H1/H2/H3), Code Block, Highlight, Definition List, Blockquote, Unordered List, or Ordered List |
 | **Define language** | Text | *(empty)* | Language identifier for code block syntax highlighting (only shown when "Code Block" is selected) |
+| **List delimiter** | Text | `,` | Character(s) used to split the value into list items (only shown when "Unordered List" or "Ordered List" is selected) |
+
+### Markdown Functions
+
+Visual-wide settings that control how definition lists and lists are rendered. These apply to all columns/measures that use the corresponding format function.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| **Definition list heading** | Enum | `None` | Heading level (H1–H6) for the term in definition lists. "None" renders plain text. |
+| **Definition list blank text** | Text | `(blank)` | Text shown when a definition list value is null or empty. Useful for localization (e.g. `n/a`, `–`, `(leer)`). |
+| **List heading** | Enum | `H4` | Heading level (H1–H6) for the title of ordered and unordered lists. "None" suppresses the heading entirely. |
 
 ### Line Break Settings Explained
 
@@ -382,10 +459,14 @@ All properties that can be themed, organized by object group:
 | `markdown` | `enableLineBreaks` | bool | `true`, `false` | `true` |
 | `markdown` | `codeBlockWordWrap` | bool | `true`, `false` | `true` |
 | `interactivity` | `enableCrossFilter` | bool | `true`, `false` | `false` |
-| `measureFormat` | `formatFunction` | enum | `"none"`, `"heading_h1"`, `"heading_h2"`, `"heading_h3"`, `"code_block"`, `"highlight"`, `"definition_list"`, `"blockquote"` | `"none"` |
+| `measureFormat` | `formatFunction` | enum | `"none"`, `"heading_h1"`, `"heading_h2"`, `"heading_h3"`, `"code_block"`, `"highlight"`, `"definition_list"`, `"blockquote"`, `"list_unordered"`, `"list_ordered"` | `"none"` |
 | `measureFormat` | `codeLanguage` | string | any language identifier | `""` |
+| `measureFormat` | `listDelimiter` | string | any delimiter character(s) | `","` |
+| `markdownFunctions` | `definitionHeadingLevel` | enum | `"none"`, `"h1"`, `"h2"`, `"h3"`, `"h4"`, `"h5"`, `"h6"` | `"none"` |
+| `markdownFunctions` | `blankText` | string | any text | `"(blank)"` |
+| `markdownFunctions` | `listHeadingLevel` | enum | `"none"`, `"h1"`, `"h2"`, `"h3"`, `"h4"`, `"h5"`, `"h6"` | `"h4"` |
 
-> **Note:** `measureFormat` properties are per-column instances bound via `selector: { metadata: queryName }`. They apply individually to each measure in the field well.
+> **Note:** `measureFormat` properties are per-column instances bound via `selector: { metadata: queryName }`. They apply individually to each measure in the field well. `markdownFunctions` properties are visual-wide and apply to all columns/measures.
 
 ### Full Theme Template (Copy & Paste Ready)
 
@@ -426,6 +507,11 @@ Copy this complete template into a `.json` file. Remove or adjust any properties
                 }],
                 "interactivity": [{
                     "enableCrossFilter": false
+                }],
+                "markdownFunctions": [{
+                    "definitionHeadingLevel": "none",
+                    "blankText": "(blank)",
+                    "listHeadingLevel": "h4"
                 }]
             }
         }

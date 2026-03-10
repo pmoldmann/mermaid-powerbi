@@ -87,7 +87,7 @@ export class Visual implements IVisual {
 
         // Build selectionIds and row data for interactivity
         if (dataView?.table?.rows) {
-            const sections = extractMarkdownSections(dataView);
+            const sections = extractMarkdownSections(dataView, this.settings.markdownFunctions);
             const tooltipColumns = extractTooltipColumns(dataView);
 
             // Only create selectionIds in column mode (single markdown column).
@@ -107,7 +107,7 @@ export class Visual implements IVisual {
             }
         } else {
             // Single/measure mode or no data — extract sections but no selectionIds
-            const sections = dataView ? extractMarkdownSections(dataView) : [];
+            const sections = dataView ? extractMarkdownSections(dataView, this.settings.markdownFunctions) : [];
             store.dispatch(setRowData({ sections, selectionIds: [], tooltipColumns: [] }));
         }
     }
@@ -132,6 +132,10 @@ export class Visual implements IVisual {
                     // Only show codeLanguage property when code_block is selected
                     if (formatFunction === 'code_block') {
                         props.codeLanguage = (col.objects?.measureFormat?.codeLanguage as string) || '';
+                    }
+                    // Only show listDelimiter property when a list format is selected
+                    if (formatFunction === 'list_unordered' || formatFunction === 'list_ordered') {
+                        props.listDelimiter = (col.objects?.measureFormat?.listDelimiter as string) || ',';
                     }
                     instances.push({
                         objectName: 'measureFormat',

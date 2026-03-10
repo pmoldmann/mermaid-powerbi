@@ -2,6 +2,7 @@ import powerbiVisualsApi from "powerbi-visuals-api";
 import DataView = powerbiVisualsApi.DataView;
 
 import dompurify from "dompurify";
+import { MarkdownFunctionsSettings } from "./settings";
 
 export const defaultDompurifyConfig = <dompurify.Config>{
     RETURN_DOM: false,
@@ -106,13 +107,42 @@ export interface TooltipColumnData {
 }
 
 /**
+ * Returns the markdown heading prefix for a given heading level string.
+ * @param level The heading level ('h1' through 'h6', or 'none')
+ * @returns The markdown heading prefix (e.g. '# ') or empty string for 'none'
+ */
+function headingPrefix(level: string): string {
+    switch (level) {
+        case 'h1': return '# ';
+        case 'h2': return '## ';
+        case 'h3': return '### ';
+        case 'h4': return '#### ';
+        case 'h5': return '##### ';
+        case 'h6': return '###### ';
+        default: return '';
+    }
+}
+
+/**
  * Applies a markdown formatting function to content.
  * @param content The raw measure value
  * @param formatFunction The formatting function to apply
  * @param codeLanguage The language for code blocks (only used when formatFunction is 'code_block')
+ * @param displayName The display name of the column/measure (used as heading for lists and definition lists)
+ * @param listDelimiter The delimiter used to split content into list items (only used for list_ordered / list_unordered)
+ * @param definitionHeadingLevel The heading level for definition list terms ('none', 'h1'–'h6')
+ * @param listHeadingLevel The heading level for list titles ('none', 'h1'–'h6')
  * @returns The formatted markdown string
  */
-export function applyMeasureFormat(content: string, formatFunction: string, codeLanguage: string, displayName?: string): string {
+export function applyMeasureFormat(
+    content: string,
+    formatFunction: string,
+    codeLanguage: string,
+    displayName?: string,
+    listDelimiter?: string,
+    definitionHeadingLevel?: string,
+    listHeadingLevel?: string
+): string {
     switch (formatFunction) {
         case 'heading_h1':
             return `# ${content}`;
@@ -124,11 +154,35 @@ export function applyMeasureFormat(content: string, formatFunction: string, code
             return `\`\`\`${codeLanguage}\n${content}\n\`\`\``;
         case 'highlight':
             return `==${content}==`;
-        case 'definition_list':
+        case 'definition_list': {
+            const prefix = headingPrefix(definitionHeadingLevel || 'none');
+            if (prefix) {
+                // Heading + paragraph: definition list syntax (: ) is incompatible with headings
+                return `${prefix}${displayName || 'Term'}\n\n${content}`;
+            }
             return `${displayName || 'Term'}\n: ${content}`;
+        }
         case 'blockquote': {
             const quoted = content.split('\n').map(line => `> ${line}`).join('\n');
             return `\n${quoted}\n`;
+        }
+        case 'list_unordered': {
+            const delimiter = listDelimiter || ',';
+            const items = content.split(delimiter).map(item => `- ${item.trim()}`).filter(item => item !== '- ').join('\n');
+            const lPrefix = headingPrefix(listHeadingLevel || 'h4');
+            const heading = lPrefix ? `${lPrefix}${displayName || 'List'}\n` : '';
+            return `${heading}${items}`;
+        }
+        case 'list_ordered': {
+            const delimiter = listDelimiter || ',';
+            const items = content.split(delimiter)
+                .map(item => item.trim())
+                .filter(item => item !== '')
+                .map((item, idx) => `${idx + 1}. ${item}`)
+                .join('\n');
+            const lPrefix = headingPrefix(listHeadingLevel || 'h4');
+            const heading = lPrefix ? `${lPrefix}${displayName || 'List'}\n` : '';
+            return `${heading}${items}`;
         }
         case 'none':
         default:
@@ -141,11 +195,12 @@ export function applyMeasureFormat(content: string, formatFunction: string, code
  * @param column The dataView metadata column
  * @returns Object with formatFunction and codeLanguage
  */
-export function getMeasureFormatFromColumn(column: powerbiVisualsApi.DataViewMetadataColumn): { formatFunction: string; codeLanguage: string } {
+export function getMeasureFormatFromColumn(column: powerbiVisualsApi.DataViewMetadataColumn): { formatFunction: string; codeLanguage: string; listDelimiter: string } {
     const objects = column.objects;
     const formatFunction = (objects?.measureFormat?.formatFunction as string) || 'none';
     const codeLanguage = (objects?.measureFormat?.codeLanguage as string) || '';
-    return { formatFunction, codeLanguage };
+    const listDelimiter = (objects?.measureFormat?.listDelimiter as string) || ',';
+    return { formatFunction, codeLanguage, listDelimiter };
 }
 
 /**
@@ -171,12 +226,17 @@ export function getMarkdownColumnIndices(dataView: DataView): number[] {
  * - Single markdown column: each row becomes a section (column mode).
  * - Multiple markdown columns: each column value becomes a section (measure mode).
  * @param dataView The Power BI dataView
+ * @param markdownFunctions Visual-level settings for definition lists and list headings
  * @returns Array of MarkdownSection with content and rowIndex
  */
-export function extractMarkdownSections(dataView: DataView): MarkdownSection[] {
+export function extractMarkdownSections(dataView: DataView, markdownFunctions?: MarkdownFunctionsSettings): MarkdownSection[] {
     if (!dataView) {
         return [];
     }
+
+    const defHeading = markdownFunctions?.definitionHeadingLevel || 'none';
+    const listHeading = markdownFunctions?.listHeadingLevel || 'h4';
+    const blankText = markdownFunctions?.blankText || '(blank)';
 
     // Try single value first (measure) - via single mapping
     if (dataView.single && dataView.single.value != null) {
@@ -190,12 +250,20 @@ export function extractMarkdownSections(dataView: DataView): MarkdownSection[] {
         dataView.table.rows.forEach((row, rowIndex) => {
             markdownColIndices.forEach(colIdx => {
                 const value = row[colIdx];
+                const col = dataView.table.columns[colIdx];
+                const { formatFunction, codeLanguage, listDelimiter } = getMeasureFormatFromColumn(col);
+
+                // For definition_list format, render null/empty values with the blank text placeholder
+                if (formatFunction === 'definition_list' && (value == null || String(value).trim() === '')) {
+                    const content = applyMeasureFormat(blankText, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading);
+                    sections.push({ content, rowIndex });
+                    return;
+                }
+
                 if (value != null && String(value).trim() !== '') {
                     let content = String(value);
                     // Apply per-column/measure formatting (works for both single and multiple columns)
-                    const col = dataView.table.columns[colIdx];
-                    const { formatFunction, codeLanguage } = getMeasureFormatFromColumn(col);
-                    content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName);
+                    content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading);
                     sections.push({ content, rowIndex });
                 }
             });

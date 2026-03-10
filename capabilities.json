@@ -155,6 +155,49 @@
                 }
             }
         },
+        "markdownFunctions": {
+            "displayName": "Markdown functions",
+            "description": "Visual-wide settings for content formatting functions (definition lists, ordered/unordered lists)",
+            "properties": {
+                "definitionHeadingLevel": {
+                    "displayName": "Definition list heading",
+                    "description": "Heading level (H1–H6) applied to the term in definition lists",
+                    "type": {
+                        "enumeration": [
+                            { "value": "none", "displayName": "None (plain text)" },
+                            { "value": "h1", "displayName": "H1" },
+                            { "value": "h2", "displayName": "H2" },
+                            { "value": "h3", "displayName": "H3" },
+                            { "value": "h4", "displayName": "H4" },
+                            { "value": "h5", "displayName": "H5" },
+                            { "value": "h6", "displayName": "H6" }
+                        ]
+                    }
+                },
+                "blankText": {
+                    "displayName": "Definition list blank text",
+                    "description": "Text shown when the value is null or empty in definition lists (e.g. '(blank)', 'n/a', '(leer)')",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "listHeadingLevel": {
+                    "displayName": "List heading",
+                    "description": "Heading level (H1–H6) for the title of ordered and unordered lists. Uses the column/measure display name.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "none", "displayName": "None (no heading)" },
+                            { "value": "h1", "displayName": "H1" },
+                            { "value": "h2", "displayName": "H2" },
+                            { "value": "h3", "displayName": "H3" },
+                            { "value": "h4", "displayName": "H4" },
+                            { "value": "h5", "displayName": "H5" },
+                            { "value": "h6", "displayName": "H6" }
+                        ]
+                    }
+                }
+            }
+        },
         "measureFormat": {
             "displayName": "Content formatting",
             "description": "Apply markdown formatting to individual columns or measures. For columns, each row value is formatted accordingly.",
@@ -171,13 +214,22 @@
                             { "value": "code_block", "displayName": "Code Block" },
                             { "value": "highlight", "displayName": "Highlight" },
                             { "value": "definition_list", "displayName": "Definition List" },
-                            { "value": "blockquote", "displayName": "Blockquote" }
+                            { "value": "blockquote", "displayName": "Blockquote" },
+                            { "value": "list_unordered", "displayName": "Unordered List" },
+                            { "value": "list_ordered", "displayName": "Ordered List" }
                         ]
                     }
                 },
                 "codeLanguage": {
                     "displayName": "Define language",
                     "description": "Language identifier for syntax highlighting in code blocks (e.g. json, sql, dax, mermaid)",
+                    "type": {
+                        "text": true
+                    }
+                },
+                "listDelimiter": {
+                    "displayName": "List delimiter",
+                    "description": "Character(s) used to split the value into list items (e.g. ',' or ';')",
                     "type": {
                         "text": true
                     }
