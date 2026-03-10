@@ -3,7 +3,7 @@ import React from 'react';
 export interface SearchBarProps {
     onSearch: (query: string) => void;
     onNavigate: (direction: 'prev' | 'next') => void;
-    onClose: () => void;
+    onClear: () => void;
     matchCount: number;
     currentMatch: number;
 }
@@ -24,25 +24,6 @@ const SearchIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
     >
         <circle cx="11" cy="11" r="8" />
         <path d="M21 21l-4.35-4.35" />
-    </svg>
-);
-
-/**
- * Close icon component
- */
-const CloseIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
-    <svg
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-    >
-        <path d="M18 6L6 18" />
-        <path d="M6 6l12 12" />
     </svg>
 );
 
@@ -71,7 +52,7 @@ const ChevronIcon: React.FC<{ direction: 'up' | 'down'; size?: number }> = ({ di
 export const SearchBar: React.FC<SearchBarProps> = ({
     onSearch,
     onNavigate,
-    onClose,
+    onClear,
     matchCount,
     currentMatch
 }) => {
@@ -93,9 +74,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             e.preventDefault();
             onNavigate(e.shiftKey ? 'prev' : 'next');
         } else if (e.key === 'Escape') {
-            onClose();
+            setQuery('');
+            onSearch('');
+            onClear();
         }
-    }, [onNavigate, onClose]);
+    }, [onNavigate, onSearch, onClear]);
 
     return (
         <div className="search-bar">
@@ -134,22 +117,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     </button>
                 </>
             )}
-            <button
-                className="search-bar-close"
-                onClick={onClose}
-                title="Close (Esc)"
-            >
-                <CloseIcon />
-            </button>
         </div>
     );
 };
-
-/**
- * Search toggle button (magnifying glass)
- */
-export const SearchToggle: React.FC<{ onClick: () => void }> = ({ onClick }) => (
-    <button className="search-toggle" onClick={onClick} title="Search (Ctrl+F)">
-        <SearchIcon size={18} />
-    </button>
-);

@@ -41,6 +41,13 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "useSearchBar": {
+                    "displayName": "Use search bar",
+                    "description": "Show a search bar to find and highlight text within the rendered markdown content",
+                    "type": {
+                        "bool": true
+                    }
                 }
             }
         },

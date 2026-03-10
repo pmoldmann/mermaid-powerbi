@@ -9,7 +9,7 @@ import remarkBreaks from 'remark-breaks';
 import remarkDefinitionList from 'remark-definition-list';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
-import { SearchBar, SearchToggle } from './SearchBar';
+import { SearchBar } from './SearchBar';
 import { DebugPanel, useDebugLogs, clearDebugLogs, setDebugEnabled } from './DebugPanel';
 import { ContextMenu } from './ContextMenu';
 
@@ -119,7 +119,6 @@ export const Application: React.FC<ApplicationProps> = () => {
     const tooltipColumns = useAppSelector((state) => state.options.tooltipColumns);
 
     const container = React.useRef<HTMLDivElement>(null);
-    const [isSearchOpen, setIsSearchOpen] = React.useState(false);
     const [highlights, setHighlights] = React.useState<HTMLElement[]>([]);
     const [currentMatchIndex, setCurrentMatchIndex] = React.useState(0);
     const [isDebugOpen, setIsDebugOpen] = React.useState(false);
@@ -189,7 +188,6 @@ export const Application: React.FC<ApplicationProps> = () => {
     }, [highlights, currentMatchIndex]);
 
     const handleCloseSearch = React.useCallback(() => {
-        setIsSearchOpen(false);
         if (container.current) {
             clearHighlights(container.current);
         }
@@ -197,17 +195,17 @@ export const Application: React.FC<ApplicationProps> = () => {
         setCurrentMatchIndex(0);
     }, []);
 
-    // Keyboard shortcut (Ctrl+F)
+    // Keyboard shortcut (Ctrl+F) — only when search bar is enabled
     React.useEffect(() => {
+        if (!settings?.view?.useSearchBar) return;
         const handleKeyDown = (e: KeyboardEvent) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
                 e.preventDefault();
-                setIsSearchOpen(true);
             }
         };
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, []);
+    }, [settings?.view?.useSearchBar]);
 
     /**
      * Handles right-click to show the custom context menu (if enabled)
@@ -430,17 +428,12 @@ export const Application: React.FC<ApplicationProps> = () => {
                         />
                     )}
 
-                    {/* Search toggle button */}
-                    {!isSearchOpen && (
-                        <SearchToggle onClick={() => setIsSearchOpen(true)} />
-                    )}
-                    
-                    {/* Search bar */}
-                    {isSearchOpen && (
+                    {/* Search bar (controlled by useSearchBar setting) */}
+                    {settings?.view?.useSearchBar && (
                         <SearchBar
                             onSearch={handleSearch}
                             onNavigate={handleNavigate}
-                            onClose={handleCloseSearch}
+                            onClear={handleCloseSearch}
                             matchCount={highlights.length}
                             currentMatch={currentMatchIndex}
                         />
@@ -468,7 +461,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                         data-color-mode={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}
                         onClick={onLinkClick}
                         style={{
-                            height: isSearchOpen ? 'calc(100% - 44px)' : '100%',
+                            height: settings?.view?.useSearchBar ? 'calc(100% - 44px)' : '100%',
                             overflowY: 'auto',
                             '--md-font-family': settings?.font?.fontFamily || 'DIN',
                             '--md-heading-base-size': `${settings?.font?.headingFontSize || 14}pt`,

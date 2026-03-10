@@ -25,7 +25,7 @@ This visual allows you to embed rich documentation and diagrams in your Power BI
 1. Add a **column or measure** containing Markdown text to the *"Markdown Content"* field
 2. Alternatively, add **multiple measures** (up to 10) — each measure is rendered as a separate section
 3. Use the **zoom controls** (+/−) for detailed diagram viewing
-4. Use **Ctrl+F** to search within the document
+4. Enable **"Use search bar"** in View Settings and use **Ctrl+F** to search within the document
 
 > 💡 **Tip:** When using a column, multiple rows are displayed as separate sections. When using multiple measures, each measure becomes its own section.
 
@@ -314,6 +314,7 @@ Uh - And now guess only once how this file has been generated...
 | **Color mode** | Enum | `Light` | Switch between light and dark theme for the visual. Affects Markdown rendering, Mermaid diagrams, and all UI components. |
 | **Copy markdown menu** | Boolean | `false` | Show a custom right-click menu with options to copy the markdown content of a single section or the entire visual to the clipboard. When disabled (default), right-click shows the standard Power BI context menu. |
 | **Deduplicate values** | Boolean | `false` | Remove duplicate values per column before rendering. When enabled, each column is treated independently and only distinct values are shown. This is useful when mixing measures and columns in the same visual — without deduplication, measure values are repeated for every row of the column. |
+| **Use search bar** | Boolean | `false` | Show a search bar to find and highlight text within the rendered markdown content. When enabled, a search bar with a magnifying glass icon and text input is permanently displayed above the content. Use Enter/Shift+Enter to navigate between matches, Escape to clear. |
 
 ### Mermaid Settings
 

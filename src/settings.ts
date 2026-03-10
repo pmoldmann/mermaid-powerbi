@@ -28,6 +28,7 @@ export class ViewSettings {
     public colorMode: string = "light";
     public enableCopyMenu: boolean = false;
     public deduplicateValues: boolean = false;
+    public useSearchBar: boolean = false;
 }
 
 export class MermaidSettings {
