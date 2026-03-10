@@ -141,7 +141,11 @@ export function applyMeasureFormat(
     displayName?: string,
     listDelimiter?: string,
     definitionHeadingLevel?: string,
-    listHeadingLevel?: string
+    listHeadingLevel?: string,
+    blockquoteAddHeader?: boolean,
+    blockquoteHeaderFormat?: string,
+    codeBlockAddHeader?: boolean,
+    codeBlockHeaderFormat?: string
 ): string {
     switch (formatFunction) {
         case 'heading_h1':
@@ -150,8 +154,14 @@ export function applyMeasureFormat(
             return `## ${content}`;
         case 'heading_h3':
             return `### ${content}`;
-        case 'code_block':
-            return `\`\`\`${codeLanguage}\n${content}\n\`\`\``;
+        case 'code_block': {
+            const codeBlock = `\`\`\`${codeLanguage}\n${content}\n\`\`\``;
+            if (codeBlockAddHeader !== false && displayName) {
+                const cbPrefix = headingPrefix(codeBlockHeaderFormat || 'h3');
+                return cbPrefix ? `${cbPrefix}${displayName}\n\n${codeBlock}` : codeBlock;
+            }
+            return codeBlock;
+        }
         case 'highlight':
             return `==${content}==`;
         case 'definition_list': {
@@ -164,6 +174,10 @@ export function applyMeasureFormat(
         }
         case 'blockquote': {
             const quoted = content.split('\n').map(line => `> ${line}`).join('\n');
+            if (blockquoteAddHeader !== false && displayName) {
+                const bqPrefix = headingPrefix(blockquoteHeaderFormat || 'h3');
+                return bqPrefix ? `${bqPrefix}${displayName}\n\n${quoted}\n` : `\n${quoted}\n`;
+            }
             return `\n${quoted}\n`;
         }
         case 'list_unordered': {
@@ -237,6 +251,10 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
     const defHeading = markdownFunctions?.definitionHeadingLevel || 'none';
     const listHeading = markdownFunctions?.listHeadingLevel || 'h4';
     const blankText = markdownFunctions?.blankText || '(blank)';
+    const bqAddHeader = markdownFunctions?.blockquoteAddHeader !== false;
+    const bqHeaderFormat = markdownFunctions?.blockquoteHeaderFormat || 'h3';
+    const cbAddHeader = markdownFunctions?.codeBlockAddHeader !== false;
+    const cbHeaderFormat = markdownFunctions?.codeBlockHeaderFormat || 'h3';
 
     // Try single value first (measure) - via single mapping
     if (dataView.single && dataView.single.value != null) {
@@ -333,7 +351,7 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
 
                 // For definition_list format, render null/empty values with the blank text placeholder
                 if (formatFunction === 'definition_list' && (value == null || String(value).trim() === '')) {
-                    const content = applyMeasureFormat(blankText, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading);
+                    const content = applyMeasureFormat(blankText, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading, bqAddHeader, bqHeaderFormat, cbAddHeader, cbHeaderFormat);
                     sections.push({ content, rowIndex });
                     return;
                 }
@@ -348,7 +366,7 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
                     }
                     let content = String(value);
                     // Apply per-column/measure formatting (works for both single and multiple columns)
-                    content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading);
+                    content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading, bqAddHeader, bqHeaderFormat, cbAddHeader, cbHeaderFormat);
                     sections.push({ content, rowIndex });
                 }
             });

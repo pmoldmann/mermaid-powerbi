@@ -202,6 +202,48 @@
                             { "value": "h6", "displayName": "H6" }
                         ]
                     }
+                },
+                "blockquoteAddHeader": {
+                    "displayName": "Blockquote: Add header",
+                    "description": "Adds a heading above blockquote sections using the column/measure display name for identification",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "blockquoteHeaderFormat": {
+                    "displayName": "Blockquote: Header format",
+                    "description": "Heading level (H1–H6) for the header above blockquote sections",
+                    "type": {
+                        "enumeration": [
+                            { "value": "h1", "displayName": "H1" },
+                            { "value": "h2", "displayName": "H2" },
+                            { "value": "h3", "displayName": "H3" },
+                            { "value": "h4", "displayName": "H4" },
+                            { "value": "h5", "displayName": "H5" },
+                            { "value": "h6", "displayName": "H6" }
+                        ]
+                    }
+                },
+                "codeBlockAddHeader": {
+                    "displayName": "Code Block: Add header",
+                    "description": "Adds a heading above code block sections using the column/measure display name for identification",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "codeBlockHeaderFormat": {
+                    "displayName": "Code Block: Header format",
+                    "description": "Heading level (H1–H6) for the header above code block sections",
+                    "type": {
+                        "enumeration": [
+                            { "value": "h1", "displayName": "H1" },
+                            { "value": "h2", "displayName": "H2" },
+                            { "value": "h3", "displayName": "H3" },
+                            { "value": "h4", "displayName": "H4" },
+                            { "value": "h5", "displayName": "H5" },
+                            { "value": "h6", "displayName": "H6" }
+                        ]
+                    }
                 }
             }
         },

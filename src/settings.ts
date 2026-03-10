@@ -61,6 +61,10 @@ export class MarkdownFunctionsSettings {
     public definitionHeadingLevel: string = "none";
     public blankText: string = "(blank)";
     public listHeadingLevel: string = "h4";
+    public blockquoteAddHeader: boolean = true;
+    public blockquoteHeaderFormat: string = "h3";
+    public codeBlockAddHeader: boolean = true;
+    public codeBlockHeaderFormat: string = "h3";
 }
 
 export class InteractivitySettings {

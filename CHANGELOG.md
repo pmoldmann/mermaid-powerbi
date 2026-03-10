@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.1.0] - 2026-03-10
+
+### Added
+- **Blockquote headers**: New settings in "Markdown functions" to automatically add a heading above blockquote sections. The heading uses the column/measure display name so users can identify what they see when multiple elements are stacked in a visual.
+  - **Blockquote: Add header** (default: on) — toggles the heading on or off
+  - **Blockquote: Header format** (default: H3) — sets the heading level (H1–H6)
+- **Code Block headers**: New settings in "Markdown functions" to automatically add a heading above code block sections. Same rationale as blockquote headers.
+  - **Code Block: Add header** (default: on) — toggles the heading on or off
+  - **Code Block: Header format** (default: H3) — sets the heading level (H1–H6)
+
+---
+
 ## [1.1.0.0] - 2026-03-09
 
 ### Added
