@@ -247,8 +247,52 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
     if (dataView.table && dataView.table.rows && dataView.table.rows.length > 0) {
         const markdownColIndices = getMarkdownColumnIndices(dataView);
         const sections: MarkdownSection[] = [];
-        dataView.table.rows.forEach((row, rowIndex) => {
+        const rows = dataView.table.rows;
+        const isMultiRow = rows.length > 1;
+
+        // For list columns with multiple rows, aggregate all row values into a single list
+        // (each row becomes one list item, no delimiter splitting).
+        // Collect which columns need aggregation so we can skip them in the per-row loop.
+        const aggregatedCols = new Set<number>();
+
+        if (isMultiRow) {
             markdownColIndices.forEach(colIdx => {
+                const col = dataView.table.columns[colIdx];
+                const { formatFunction } = getMeasureFormatFromColumn(col);
+
+                if (formatFunction === 'list_unordered' || formatFunction === 'list_ordered') {
+                    aggregatedCols.add(colIdx);
+
+                    // Collect all non-empty row values for this column
+                    const items: string[] = [];
+                    rows.forEach(row => {
+                        const value = row[colIdx];
+                        if (value != null && String(value).trim() !== '') {
+                            items.push(String(value).trim());
+                        }
+                    });
+
+                    if (items.length > 0) {
+                        const lPrefix = headingPrefix(listHeading || 'h4');
+                        const heading = lPrefix ? `${lPrefix}${col.displayName || 'List'}\n` : '';
+                        let itemsStr: string;
+                        if (formatFunction === 'list_unordered') {
+                            itemsStr = items.map(item => `- ${item}`).join('\n');
+                        } else {
+                            itemsStr = items.map((item, idx) => `${idx + 1}. ${item}`).join('\n');
+                        }
+                        // Use rowIndex 0 for the aggregated list section
+                        sections.push({ content: `${heading}${itemsStr}`, rowIndex: 0 });
+                    }
+                }
+            });
+        }
+
+        rows.forEach((row, rowIndex) => {
+            markdownColIndices.forEach(colIdx => {
+                // Skip columns that were aggregated into a single list section
+                if (aggregatedCols.has(colIdx)) return;
+
                 const value = row[colIdx];
                 const col = dataView.table.columns[colIdx];
                 const { formatFunction, codeLanguage, listDelimiter } = getMeasureFormatFromColumn(col);
