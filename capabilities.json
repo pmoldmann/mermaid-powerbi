@@ -4,7 +4,7 @@
             "displayName": "Markdown Content",
             "name": "markdown",
             "kind": "GroupingOrMeasure",
-            "description": "A column or measures containing Markdown text to render. Use a single column for row-based sections, or add up to 10 measures to render each as a separate section."
+            "description": "Columns or measures containing Markdown text to render. Each row or measure value is rendered as a separate section."
         },
         {
             "displayName": "Tooltips",
@@ -156,8 +156,8 @@
             }
         },
         "measureFormat": {
-            "displayName": "Measure formatting",
-            "description": "Apply markdown formatting to individual measures (only available when multiple measures are added)",
+            "displayName": "Content formatting",
+            "description": "Apply markdown formatting to individual columns or measures. For columns, each row value is formatted accordingly.",
             "properties": {
                 "formatFunction": {
                     "displayName": "Format as",

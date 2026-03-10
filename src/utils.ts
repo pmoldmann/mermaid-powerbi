@@ -186,19 +186,16 @@ export function extractMarkdownSections(dataView: DataView): MarkdownSection[] {
     // Try table mapping (primary mapping)
     if (dataView.table && dataView.table.rows && dataView.table.rows.length > 0) {
         const markdownColIndices = getMarkdownColumnIndices(dataView);
-        const hasMultipleMarkdownCols = markdownColIndices.length > 1;
         const sections: MarkdownSection[] = [];
         dataView.table.rows.forEach((row, rowIndex) => {
             markdownColIndices.forEach(colIdx => {
                 const value = row[colIdx];
                 if (value != null && String(value).trim() !== '') {
                     let content = String(value);
-                    // Apply per-measure formatting when in measure mode (multiple markdown columns)
-                    if (hasMultipleMarkdownCols) {
-                        const col = dataView.table.columns[colIdx];
-                        const { formatFunction, codeLanguage } = getMeasureFormatFromColumn(col);
-                        content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName);
-                    }
+                    // Apply per-column/measure formatting (works for both single and multiple columns)
+                    const col = dataView.table.columns[colIdx];
+                    const { formatFunction, codeLanguage } = getMeasureFormatFromColumn(col);
+                    content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName);
                     sections.push({ content, rowIndex });
                 }
             });
