@@ -164,3 +164,15 @@ The visual uses a "single" dataViewMapping - it expects one value (column or mea
 - `powerbi-visuals-api` version must match `apiVersion` in `pbiviz.json`
 - `powerbi-visuals-utils-dataviewutils` provides settings parsing utilities
 - Mermaid requires `securityLevel: "loose"` for click handlers to work
+
+## Mermaid Click Directive & Tooltips
+
+The visual supports tooltips on Mermaid diagram nodes via the `click` directive. The **recommended syntax** is:
+
+```
+click nodeId call noop() "tooltip text"
+```
+
+A global `noop()` function is defined in `Code.tsx` so that Mermaid's `call noop()` directive works without errors. After rendering, all `onclick` attributes injected by Mermaid are removed for security. The visual's own tooltip system (`processMermaidInteractivity`) parses the click directives from the source code and attaches hover listeners.
+
+Tooltip text containing parser-breaking ASCII characters must use Unicode lookalikes (e.g. `"` → `″`, `(` → `（`, `#` → `＃`). See the replacement table in `README.md`.

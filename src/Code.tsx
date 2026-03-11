@@ -59,6 +59,12 @@ export const FontSettingsContext = React.createContext<FontSettings>(defaultFont
 // Context for Markdown settings
 export const MarkdownSettingsContext = React.createContext<MarkdownSettings>(defaultMarkdownSettings);
 
+// Global noop function for Mermaid's `call noop()` click directives.
+// With securityLevel "loose", Mermaid injects onclick="noop()" on nodes.
+// We remove these attributes post-render, but define noop() as a safety net.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).noop = () => { /* intentional no-op */ };
+
 // ============================================
 // Tooltip Management for Mermaid Diagrams
 // ============================================
@@ -115,8 +121,12 @@ interface MermaidClickDirective {
 
 /**
  * Parses Mermaid click directives from the diagram code.
- * Supports: click nodeId "URL" "tooltip", click nodeId href "URL" "tooltip",
- *           click nodeId callback "tooltip", click nodeId "URL" _blank
+ * Supports:
+ *   click nodeId call noop() "tooltip"     (preferred — tooltip only)
+ *   click nodeId callback "tooltip"        (legacy — tooltip only)
+ *   click nodeId href "URL" "tooltip"      (URL + tooltip)
+ *   click nodeId "URL" "tooltip"           (URL + tooltip)
+ *   click nodeId "URL" _blank              (URL only)
  */
 function parseMermaidClickDirectives(code: string): MermaidClickDirective[] {
     const directives: MermaidClickDirective[] = [];
@@ -133,16 +143,24 @@ function parseMermaidClickDirectives(code: string): MermaidClickDirective[] {
         const nodeId = afterClick.substring(0, spaceIdx);
         let rest = afterClick.substring(spaceIdx + 1).trim();
 
-        // Detect and remove 'callback' keyword — if present, all quoted strings are tooltips (no URL)
-        const isCallback = /^callback(\s|$)/i.test(rest);
-        if (isCallback) {
-            rest = rest.replace(/^callback\s*/i, '');
-        }
+        // Detect keyword type to determine how quoted strings are interpreted
+        let isTooltipOnly = false;
+        let isHref = false;
 
-        // Detect and remove 'href' keyword — if present, first quoted string is always a URL
-        const isHref = /^href(\s|$)/i.test(rest);
-        if (isHref) {
+        // 'call functionName()' — tooltip only (e.g. call noop() "tooltip")
+        if (/^call\s+\w+(?:\(\))?(\s|$)/i.test(rest)) {
+            rest = rest.replace(/^call\s+\w+(?:\(\))?\s*/i, '');
+            isTooltipOnly = true;
+        }
+        // 'callback' — legacy tooltip-only syntax
+        else if (/^callback(\s|$)/i.test(rest)) {
+            rest = rest.replace(/^callback\s*/i, '');
+            isTooltipOnly = true;
+        }
+        // 'href' — first quoted string is a URL
+        else if (/^href(\s|$)/i.test(rest)) {
             rest = rest.replace(/^href\s*/i, '');
+            isHref = true;
         }
 
         // Remove target keywords at the end
@@ -159,19 +177,15 @@ function parseMermaidClickDirectives(code: string): MermaidClickDirective[] {
         let url: string | null = null;
         let tooltip: string | null = null;
 
-        if (isCallback) {
-            // callback directive: all quoted strings are tooltips, never URLs
+        if (isTooltipOnly) {
             tooltip = quotedStrings.length > 0 ? quotedStrings[quotedStrings.length - 1] : null;
         } else if (isHref) {
-            // href directive: first = URL, second = tooltip
             url = quotedStrings.length >= 1 ? quotedStrings[0] : null;
             tooltip = quotedStrings.length >= 2 ? quotedStrings[1] : null;
         } else if (quotedStrings.length >= 2) {
-            // Two quoted strings without keyword: first = URL, second = tooltip
             url = quotedStrings[0];
             tooltip = quotedStrings[1];
         } else if (quotedStrings.length === 1) {
-            // Single quoted string: use stricter URL detection (only real URLs, not arbitrary text with dots)
             const val = quotedStrings[0];
             if (/^https?:\/\//i.test(val) || /^(ftp|mailto):/i.test(val)) {
                 url = val;

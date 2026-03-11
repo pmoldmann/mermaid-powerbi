@@ -227,20 +227,52 @@ Define tooltips using the `click` directive with a tooltip string. The tooltip a
 ```mermaid
 flowchart LR
     A["Data Input"] --> B["Processing"] --> C["Output"]
-    click A "https://example.com" "Click to learn more about data input"
-    click B "https://example.com" "Processing step details"
-    click C "https://example.com" "View output documentation"
+    click A call noop() "Click to learn more about data input"
+    click B call noop() "Processing step details"
+    click C call noop() "View output documentation"
 ```
 ````
 
-The tooltip text is the **second quoted string** in the `click` directive. Supported syntax:
+The recommended syntax for **tooltip-only** nodes is `click nodeId call noop() "tooltip text"`. The visual provides a global `noop()` function, so Mermaid's `call` directive works without errors. This approach is the most compatible with both Power BI Desktop/Service and web browsers.
+
+Supported syntax variants:
 
 | Syntax | Description |
 |--------|-------------|
+| `click A call noop() "tooltip"` | **Recommended** — tooltip only via `call noop()` |
 | `click A "URL" "tooltip"` | Node with link and tooltip |
 | `click A href "URL" "tooltip"` | Same, using `href` keyword |
-| `click A callback "tooltip"` | Node with callback and tooltip |
-| `click A "tooltip only"` | Node with tooltip only (no link) |
+| `click A callback "tooltip"` | Legacy tooltip-only syntax |
+| `click A "tooltip only"` | Tooltip only (no link, auto-detected) |
+
+#### Tooltip Text Escaping
+
+When generating tooltip text programmatically (e.g. from DAX/Power Query expressions), certain ASCII characters break the Mermaid parser. Replace them with Unicode lookalikes:
+
+| Character | Replacement | Unicode Name |
+|-----------|-------------|--------------|
+| `"` | `″` | U+2033 Double Prime |
+| `'` | `ʼ` | U+02BC Modifier Letter Apostrophe |
+| `(` | `（` | U+FF08 Fullwidth Left Parenthesis |
+| `)` | `）` | U+FF09 Fullwidth Right Parenthesis |
+| `[` | `［` | U+FF3B Fullwidth Left Square Bracket |
+| `]` | `］` | U+FF3D Fullwidth Right Square Bracket |
+| `{` | `｛` | U+FF5B Fullwidth Left Curly Bracket |
+| `}` | `｝` | U+FF5D Fullwidth Right Curly Bracket |
+| `#` | `＃` | U+FF03 Fullwidth Number Sign |
+| `<` | `﹤` | U+FE64 Small Less-Than Sign |
+| `>` | `﹥` | U+FE65 Small Greater-Than Sign |
+| `&` | `＆` | U+FF06 Fullwidth Ampersand |
+
+Example with escaped tooltip:
+
+````markdown
+```mermaid
+graph LR
+    n1["Transform"]
+    click n1 call noop() "Table.TransformColumnTypes（Quelle,｛｛″Unit″, type text｝｝）"
+```
+````
 
 ### Safe Link Handling
 
