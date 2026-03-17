@@ -6,11 +6,11 @@ export const VISUAL_VERSION = '1.1.0.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {
-    mermaid: '11.12.3',
+    mermaid: '11.13.0',
     react: '18.2.0',
     'react-md-editor': '4.0.4 (Markdown rendering)',
     handlebars: '4.7.8',
-    dompurify: '3.2.6',
+    dompurify: '3.3.3',
 };
 
 /**
@@ -112,6 +112,11 @@ export const WelcomePage: React.FC = () => {
                 <footer className="welcome-footer">
                     <p className="author-credit">
                         Created by <strong>Paul Moldmann</strong>
+                    </p>
+                    <p>
+                        <a href="https://github.com/pmoldmann/mermaid-powerbi" target="_blank" rel="noopener noreferrer">
+                            GitHub Project
+                        </a>
                     </p>
                     <p>
                         <em>Special thanks to <strong>Ilfat Galiev</strong> who originally 

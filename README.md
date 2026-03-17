@@ -4,6 +4,8 @@
 ![Power BI](https://img.shields.io/badge/Power%20BI-Custom%20Visual-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+**GitHub:** [https://github.com/pmoldmann/mermaid-powerbi](https://github.com/pmoldmann/mermaid-powerbi)
+
 A Power BI custom visual that renders **Markdown** content with embedded **Mermaid diagrams**. Transform your text-based content into beautifully formatted documentation, flowcharts, sequence diagrams, and more — directly within your Power BI reports.
 
 ## 📄 What is this Visual?
@@ -329,11 +331,11 @@ Uh - And now guess only once how this file has been generated...
 
 | Library | Version |
 |---------|---------|
-| Mermaid | 11.12.3 |
+| Mermaid | 11.13.0 |
 | React | 18.2.0 |
 | react-md-editor | 4.0.4 (Markdown rendering) |
 | Handlebars | 4.7.8 |
-| DOMPurify | 3.2.6 |
+| DOMPurify | 3.3.3 |
 
 ---
 
