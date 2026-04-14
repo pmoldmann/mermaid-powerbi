@@ -478,8 +478,13 @@ export const Application: React.FC<ApplicationProps> = () => {
                             }}>
                                 <MermaidSettingsContext.Provider value={settings?.mermaid || {
                                     flowchartOrientation: "default",
+                                    layout: "default",
+                                    theme: "auto",
+                                    look: "default",
                                     maxEdges: 30000,
                                     securityLevel: "loose",
+                                    elkMergeEdges: "default",
+                                    elkNodePlacement: "default",
                                 }}>
                                     <MermaidDebugSettingsContext.Provider value={settings?.mermaidDebug || {
                                         showDebugPanel: false,

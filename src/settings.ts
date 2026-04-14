@@ -33,8 +33,13 @@ export class ViewSettings {
 
 export class MermaidSettings {
     public flowchartOrientation: string = "default";
+    public layout: string = "default";
+    public theme: string = "auto";
+    public look: string = "default";
     public maxEdges: number = 30000;
     public securityLevel: string = "loose";
+    public elkMergeEdges: string = "default";
+    public elkNodePlacement: string = "default";
 }
 
 export class MermaidDebugSettings {

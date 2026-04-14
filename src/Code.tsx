@@ -1,10 +1,14 @@
 import React from "react";
 import { getCodeString } from 'rehype-rewrite';
 import mermaid from "mermaid";
+import elkLayouts from "@mermaid-js/layout-elk";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
 import { MermaidSettings, MermaidDebugSettings, FontSettings, MarkdownSettings } from "./settings";
 import { useAppSelector } from './redux/hooks';
+
+// Register ELK layout engine (must happen before any mermaid.render() call)
+mermaid.registerLayoutLoaders(elkLayouts);
 
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
@@ -16,8 +20,13 @@ const ZOOM_STEP = 0.25;
 // Default Mermaid settings
 const defaultMermaidSettings: MermaidSettings = {
     flowchartOrientation: "default",
+    layout: "default",
+    theme: "auto",
+    look: "default",
     maxEdges: 30000,
     securityLevel: "loose",
+    elkMergeEdges: "default",
+    elkNodePlacement: "default",
 };
 
 // Default Mermaid debug settings
@@ -354,41 +363,63 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             previousCodeRef.current = code;
             previousSettingsRef.current = settingsKey;
             
-            mermaid.initialize({
+            // Build mermaid config conditionally so "default" settings pass nothing,
+            // allowing frontmatter/directives to take control.
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const mermaidConfig: Record<string, any> = {
                 securityLevel: mermaidSettings.securityLevel as "loose" | "strict" | "sandbox",
                 maxEdges: mermaidSettings.maxEdges,
                 htmlLabels: mermaidDebugSettings.htmlLabels,
                 markdownAutoWrap: mermaidDebugSettings.markdownAutoWrap,
-                theme: colorMode === 'dark' ? 'dark' : 'default',
                 fontFamily: fontSettings.fontFamily || 'DIN',
                 fontSize: fontSettings.mermaidFontSize || 14,
                 secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'suppressErrorRendering'],
-                pie: {
-                    useMaxWidth: false,
-                },
+                pie: { useMaxWidth: false },
                 flowchart: {
                     useMaxWidth: false,
                     htmlLabels: mermaidDebugSettings.htmlLabels,
                 },
-                sequence: {
-                    useMaxWidth: false,
-                },
-                gantt: {
-                    useMaxWidth: false,
-                },
-                journey: {
-                    useMaxWidth: false,
-                },
-                class: {
-                    useMaxWidth: false,
-                },
-                state: {
-                    useMaxWidth: false,
-                },
-                er: {
-                    useMaxWidth: false,
-                },
-            });
+                sequence: { useMaxWidth: false },
+                gantt: { useMaxWidth: false },
+                journey: { useMaxWidth: false },
+                class: { useMaxWidth: false },
+                state: { useMaxWidth: false },
+                er: { useMaxWidth: false },
+            };
+
+            // Layout: only set when not "default"
+            if (mermaidSettings.layout && mermaidSettings.layout !== 'default') {
+                mermaidConfig.layout = mermaidSettings.layout;
+            }
+
+            // Theme: "auto" = light/dark based on colorMode; "none" = don't set (frontmatter controls); otherwise explicit
+            if (mermaidSettings.theme === 'auto' || !mermaidSettings.theme) {
+                mermaidConfig.theme = colorMode === 'dark' ? 'dark' : 'default';
+            } else if (mermaidSettings.theme !== 'none') {
+                mermaidConfig.theme = mermaidSettings.theme;
+            }
+
+            // Look: only set when not "default"
+            if (mermaidSettings.look && mermaidSettings.look !== 'default') {
+                mermaidConfig.look = mermaidSettings.look;
+            }
+
+            // ELK-specific options: only when layout is "elk" and values are not "default"
+            if (mermaidSettings.layout === 'elk') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const elkConfig: Record<string, any> = {};
+                if (mermaidSettings.elkMergeEdges && mermaidSettings.elkMergeEdges !== 'default') {
+                    elkConfig.mergeEdges = mermaidSettings.elkMergeEdges === 'true';
+                }
+                if (mermaidSettings.elkNodePlacement && mermaidSettings.elkNodePlacement !== 'default') {
+                    elkConfig.nodePlacementStrategy = mermaidSettings.elkNodePlacement;
+                }
+                if (Object.keys(elkConfig).length > 0) {
+                    mermaidConfig.elk = elkConfig;
+                }
+            }
+
+            mermaid.initialize(mermaidConfig);
             
             mermaid
                 .render(demoid.current, code)

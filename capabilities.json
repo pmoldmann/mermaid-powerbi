@@ -75,6 +75,43 @@
                         "numeric": true
                     }
                 },
+                "layout": {
+                    "displayName": "Layout algorithm",
+                    "description": "Layout algorithm for diagram rendering. 'Default' lets the diagram code or frontmatter decide.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "default", "displayName": "Default (from diagram)" },
+                            { "value": "dagre", "displayName": "Dagre" },
+                            { "value": "elk", "displayName": "ELK" }
+                        ]
+                    }
+                },
+                "theme": {
+                    "displayName": "Theme",
+                    "description": "Color theme for diagrams. 'Auto' selects light/dark based on color mode. 'Default (from diagram)' lets frontmatter or directives decide.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "auto", "displayName": "Auto (light/dark mode)" },
+                            { "value": "none", "displayName": "Default (from diagram)" },
+                            { "value": "default", "displayName": "Default" },
+                            { "value": "dark", "displayName": "Dark" },
+                            { "value": "forest", "displayName": "Forest" },
+                            { "value": "neutral", "displayName": "Neutral" },
+                            { "value": "base", "displayName": "Base" }
+                        ]
+                    }
+                },
+                "look": {
+                    "displayName": "Look",
+                    "description": "Visual style of diagrams. 'Default' lets the diagram code or frontmatter decide.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "default", "displayName": "Default (from diagram)" },
+                            { "value": "classic", "displayName": "Classic" },
+                            { "value": "handDrawn", "displayName": "Hand-drawn" }
+                        ]
+                    }
+                },
                 "securityLevel": {
                     "displayName": "Security level",
                     "description": "Security level for Mermaid rendering (loose, strict, sandbox)",
@@ -83,6 +120,30 @@
                             { "value": "loose", "displayName": "Loose" },
                             { "value": "strict", "displayName": "Strict" },
                             { "value": "sandbox", "displayName": "Sandbox" }
+                        ]
+                    }
+                },
+                "elkMergeEdges": {
+                    "displayName": "ELK: Merge edges",
+                    "description": "Combine parallel edges in ELK layout. Only applies when layout is 'ELK'.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "default", "displayName": "Default (from diagram)" },
+                            { "value": "true", "displayName": "True" },
+                            { "value": "false", "displayName": "False" }
+                        ]
+                    }
+                },
+                "elkNodePlacement": {
+                    "displayName": "ELK: Node placement",
+                    "description": "Node placement strategy for ELK layout. Only applies when layout is 'ELK'.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "default", "displayName": "Default (from diagram)" },
+                            { "value": "SIMPLE", "displayName": "Simple" },
+                            { "value": "NETWORK_SIMPLEX", "displayName": "Network Simplex" },
+                            { "value": "LINEAR_SEGMENTS", "displayName": "Linear Segments" },
+                            { "value": "BRANDES_KOEPF", "displayName": "Brandes Koepf" }
                         ]
                     }
                 }

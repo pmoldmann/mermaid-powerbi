@@ -142,8 +142,13 @@ const sanitizeSchema = {
 // Default Mermaid settings for demo
 const defaultMermaidSettings = {
     flowchartOrientation: 'default' as const,
+    layout: 'default' as const,
+    theme: 'auto' as const,
+    look: 'default' as const,
     maxEdges: 30000,
     securityLevel: 'loose' as const,
+    elkMergeEdges: 'default' as const,
+    elkNodePlacement: 'default' as const,
 };
 
 // Default Mermaid debug settings for demo

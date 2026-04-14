@@ -1276,6 +1276,14 @@
   resolved "https://registry.npmjs.org/@leichtgewicht/ip-codec/-/ip-codec-2.0.5.tgz"
   integrity sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==
 
+"@mermaid-js/layout-elk@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@mermaid-js/layout-elk/-/layout-elk-0.2.1.tgz#9909c3457aacb058c5191b46fe62407510675366"
+  integrity sha512-MX9jwhMyd5zDcFsYcl3duDUkKhjVRUCGEQrdCeNV5hCIR6+3FuDDbRbFmvVbAu15K1+juzsYGG+K8MDvCY1Amg==
+  dependencies:
+    d3 "^7.9.0"
+    elkjs "^0.9.3"
+
 "@mermaid-js/parser@^1.0.0":
   version "1.0.0"
   resolved "https://registry.npmjs.org/@mermaid-js/parser/-/parser-1.0.0.tgz"
@@ -3421,6 +3429,11 @@ electron-to-chromium@^1.5.263:
   version "1.5.302"
   resolved "https://registry.npmjs.org/electron-to-chromium/-/electron-to-chromium-1.5.302.tgz"
   integrity sha512-sM6HAN2LyK82IyPBpznDRqlTQAtuSaO+ShzFiWTvoMJLHyZ+Y39r8VMfHzwbU8MVBzQ4Wdn85+wlZl2TLGIlwg==
+
+elkjs@^0.9.3:
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/elkjs/-/elkjs-0.9.3.tgz#16711f8ceb09f1b12b99e971b138a8384a529161"
+  integrity sha512-f/ZeWvW/BCXbhGEf1Ujp29EASo/lk1FDnETgNKwJrsVvGZhUWCZyg3xLJjAsxfOmt8KjswHmI5EwCQcPMpOYhQ==
 
 emojis-list@^3.0.0:
   version "3.0.0"
