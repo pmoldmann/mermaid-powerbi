@@ -341,6 +341,10 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const [isPanning, setIsPanning] = React.useState(false);
     const [panStart, setPanStart] = React.useState({ x: 0, y: 0 });
     const [panOffset, setPanOffset] = React.useState({ x: 0, y: 0 });
+    const zoomRef = React.useRef(zoom);
+    zoomRef.current = zoom;
+    const panOffsetRef = React.useRef(panOffset);
+    panOffsetRef.current = panOffset;
     const [isFullscreen, setIsFullscreen] = React.useState(false);
     const wrapperRef = React.useRef<HTMLDivElement>(null);
     const previousCodeRef = React.useRef<string | null>(null);
@@ -478,7 +482,23 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
         if (e.ctrlKey) {
             e.preventDefault();
             const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
-            setZoom(z => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, z + delta)));
+            const oldZoom = zoomRef.current;
+            const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, oldZoom + delta));
+            if (newZoom === oldZoom) return;
+
+            // Mouse position relative to the zoom container
+            const rect = e.currentTarget.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            // Adjust pan so the content point under the cursor stays fixed
+            const oldPan = panOffsetRef.current;
+            const ratio = newZoom / oldZoom;
+            setPanOffset({
+                x: mouseX - ratio * (mouseX - oldPan.x),
+                y: mouseY - ratio * (mouseY - oldPan.y),
+            });
+            setZoom(newZoom);
         }
     }, []);
 
