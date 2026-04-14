@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "ignoreDeprecations": "6.0",
         "allowJs": false,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
@@ -11,18 +12,20 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "lib": [
-            "es2015",
+            "es2017",
             "dom"
         ],
         "jsx": "react",
         "baseUrl": "./",
         "paths": {
-        }
+        },
+        "strict": false,
+        "noUncheckedSideEffectImports": false
     },
     "files": [
         "src/visual.ts",
     ],
     "include": [
-        "src/svg.d.ts"
+        "src/global.d.ts"
     ]
 }

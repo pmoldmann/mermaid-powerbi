@@ -8,6 +8,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0.0] - 2026-04-14
+
+### Added
+- **Extended Mermaid rendering configuration**: New settings for finer control over Mermaid diagram rendering:
+  - **Layout algorithm** — choose between the default Dagre layout and ELK (layered) for more compact or structured diagrams
+  - **Theme** — select Mermaid's built-in themes (Default, Dark, Forest, Neutral, Base) or "Auto" to follow the visual's color mode
+  - **Look** — switch between "Default" (classic) and "Hand-drawn" (sketch-style) rendering
+  - **ELK: Merge edges** — toggle edge merging in ELK layout (reduces visual clutter in complex diagrams)
+  - **ELK: Node placement** — configure node placement strategy in ELK layout (Simple, Network Simplex, Linear Segments, Brandes-Köpf)
+
+### Changed
+- **Library upgrades**: Updated all dependencies to latest versions:
+  - React 18.2.0 → **19.2.5** (major upgrade)
+  - Redux Toolkit 1.9.7 → **2.11.2** (major upgrade)
+  - react-redux 8.1.3 → **9.2.0** (major upgrade)
+  - Mermaid 11.12.3 → **11.14.0**
+  - DOMPurify 3.2.6 → **3.4.0**
+  - Handlebars 4.7.8 → **4.7.9**
+  - react-md-editor 4.0.4 → **4.1.0**
+  - TypeScript 5.3.2 → **6.0.2** (major upgrade)
+  - ESLint 8.54.0 → **10.2.0** (major upgrade)
+  - webpack-cli 5.1.4 → **7.0.2** (major upgrade)
+  - Babel 7.23.3 → **7.29.x** (major upgrade)
+  - sass-loader 13.3.2 → **16.0.7**, css-loader 6.8.1 → **7.1.4**, and more
+
+### Fixed
+- **Zoom in Mermaid diagrams**: Fixed zoom controls not working correctly on Mermaid diagrams
+
+---
+
 ## [1.1.1.0] - 2026-03-10
 
 ### Added

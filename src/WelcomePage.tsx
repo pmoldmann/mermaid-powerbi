@@ -2,15 +2,15 @@ import React from 'react';
 import { DemoSection } from './DemoSection';
 
 // Visual version - update this for App Store releases
-export const VISUAL_VERSION = '1.1.0.0';
+export const VISUAL_VERSION = '1.2.0.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {
-    mermaid: '11.13.0',
-    react: '18.2.0',
-    'react-md-editor': '4.0.4 (Markdown rendering)',
-    handlebars: '4.7.8',
-    dompurify: '3.3.3',
+    mermaid: '11.14.0',
+    react: '19.2.5',
+    'react-md-editor': '4.1.0 (Markdown rendering)',
+    handlebars: '4.7.9',
+    dompurify: '3.4.0',
 };
 
 /**

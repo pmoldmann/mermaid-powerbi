@@ -1,6 +1,6 @@
 # Markdown / Mermaid Renderer for Power BI
 
-![Version](https://img.shields.io/badge/version-1.1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.2.0.0-blue)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Custom%20Visual-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -331,11 +331,11 @@ Uh - And now guess only once how this file has been generated...
 
 | Library | Version |
 |---------|---------|
-| Mermaid | 11.13.0 |
-| React | 18.2.0 |
-| react-md-editor | 4.0.4 (Markdown rendering) |
-| Handlebars | 4.7.8 |
-| DOMPurify | 3.3.3 |
+| Mermaid | 11.14.0 |
+| React | 19.2.5 |
+| react-md-editor | 4.1.0 (Markdown rendering) |
+| Handlebars | 4.7.9 |
+| DOMPurify | 3.4.0 |
 
 ---
 
