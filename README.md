@@ -354,9 +354,32 @@ Uh - And now guess only once how this file has been generated...
 
 | Setting | Type | Default | Description |
 |---------|------|---------|-------------|
-| **Flowchart orientation** | Enum | `Default (from diagram)` | Override the orientation of flowchart diagrams. Choose between Top to Bottom, Bottom to Top, Left to Right, or Right to Left. 'Default' uses the orientation defined in the diagram code. |
-| **Max edges** | Number | `30000` | Maximum number of edges allowed in a diagram |
-| **Security level** | Enum | `Loose` | Security level for Mermaid rendering: `Loose`, `Strict`, or `Sandbox`. Loose is required for click handlers. |
+| **Layout algorithm** | Enum | `Default (from diagram)` | Layout engine used to position nodes and edges. Choose `Dagre` (Mermaid's built-in engine) or `ELK` (Eclipse Layout Kernel — better results for large or complex diagrams). `Default` lets the diagram code or frontmatter decide. |
+| **ELK: Node placement** | Enum | `Default (from diagram)` | Node placement strategy when using the ELK layout engine. Options: Simple, Network Simplex, Linear Segments, Brandes Koepf. Has no effect unless Layout is set to `ELK`. |
+| **ELK: Merge edges** | Enum | `Default (from diagram)` | Combine parallel edges when using the ELK layout engine. Has no effect unless Layout is set to `ELK`. |
+| **Theme** | Enum | `Auto` | Color theme for diagrams. `Auto` selects light or dark automatically based on the Color mode setting. `Default (from diagram)` defers to any `%%{init: {...}}%%` frontmatter or `%%theme` directives in the diagram code. Other options: `Default`, `Dark`, `Forest`, `Neutral`, `Base`. |
+| **Look** | Enum | `Default (from diagram)` | Visual style of diagrams. `Classic` uses the traditional Mermaid style; `Hand-drawn` renders a sketch-like appearance. `Default` lets the diagram code or frontmatter decide. |
+| **Flowchart orientation** | Enum | `Default (from diagram)` | Override the orientation of flowchart diagrams. Choose between Top to Bottom, Bottom to Top, Left to Right, or Right to Left. `Default` uses the orientation defined in the diagram code. |
+| **Max edges** | Number | `30000` | Maximum number of edges allowed in a diagram. |
+| **Security level** | Enum | `Loose` | Security level for Mermaid rendering: `Loose`, `Strict`, or `Sandbox`. Loose is required for click handlers and tooltips. |
+
+### 💡 Getting More Out of Complex Diagrams
+
+For large or intricate diagrams — such as flowcharts with many nodes, dense ER diagrams, or deep hierarchies — the default **Dagre** layout engine can produce cluttered results with crossing edges. Switching the **Layout algorithm** to **ELK** (Eclipse Layout Kernel) often yields significantly cleaner layouts in these cases.
+
+Beyond the layout engine, the visual settings give you several levers to indirectly control how a diagram looks — without changing the diagram code itself:
+
+| Goal | Setting to change |
+|------|------------------|
+| Cleaner edge routing in complex diagrams | Layout → `ELK` |
+| Reduce overlapping edges | ELK: Merge edges → `True` |
+| More compact or evenly spaced nodes | ELK: Node placement → `Network Simplex` or `Brandes Koepf` |
+| Match the report's dark/light theme | Theme → `Auto` |
+| A softer, less technical look | Look → `Hand-drawn` |
+| Change diagram direction without editing code | Flowchart orientation → `LR` / `TB` etc. |
+| Scale text in all diagrams at once | Font → Mermaid font size |
+
+> 💡 **Tip:** ELK is particularly effective for `flowchart` and `graph` diagrams. For sequence diagrams and Gantt charts, the layout engine setting has no effect — they use their own fixed rendering.
 
 ### Mermaid Debug Settings
 
@@ -484,6 +507,11 @@ All properties that can be themed, organized by object group:
 | `font` | `headingFontSize` | number | size in pt | `14` |
 | `font` | `bodyFontSize` | number | size in pt | `9` |
 | `font` | `mermaidFontSize` | number | size in pt | `14` |
+| `mermaid` | `layout` | enum | `"default"`, `"dagre"`, `"elk"` | `"default"` |
+| `mermaid` | `elkNodePlacement` | enum | `"default"`, `"SIMPLE"`, `"NETWORK_SIMPLEX"`, `"LINEAR_SEGMENTS"`, `"BRANDES_KOEPF"` | `"default"` |
+| `mermaid` | `elkMergeEdges` | enum | `"default"`, `"true"`, `"false"` | `"default"` |
+| `mermaid` | `theme` | enum | `"auto"`, `"none"`, `"default"`, `"dark"`, `"forest"`, `"neutral"`, `"base"` | `"auto"` |
+| `mermaid` | `look` | enum | `"default"`, `"classic"`, `"handDrawn"` | `"default"` |
 | `mermaid` | `flowchartOrientation` | enum | `"default"`, `"TB"`, `"BT"`, `"LR"`, `"RL"` | `"default"` |
 | `mermaid` | `maxEdges` | number | any positive integer | `30000` |
 | `mermaid` | `securityLevel` | enum | `"loose"`, `"strict"`, `"sandbox"` | `"loose"` |
@@ -527,6 +555,11 @@ Copy this complete template into a `.json` file. Remove or adjust any properties
                     "mermaidFontSize": 14
                 }],
                 "mermaid": [{
+                    "layout": "default",
+                    "elkNodePlacement": "default",
+                    "elkMergeEdges": "default",
+                    "theme": "auto",
+                    "look": "default",
                     "flowchartOrientation": "default",
                     "maxEdges": 30000,
                     "securityLevel": "loose"
