@@ -8,7 +8,7 @@
         "sourceMap": true,
         "outDir": "./.tmp/build/",
         "moduleResolution": "node",
-        "declaration": true,
+        "declaration": false,
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "lib": [
@@ -20,7 +20,8 @@
         "paths": {
         },
         "strict": false,
-        "noUncheckedSideEffectImports": false
+        "noUncheckedSideEffectImports": false,
+        "skipLibCheck": true
     },
     "files": [
         "src/visual.ts",

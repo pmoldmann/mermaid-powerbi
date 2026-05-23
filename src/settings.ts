@@ -29,6 +29,7 @@ export class ViewSettings {
     public enableCopyMenu: boolean = false;
     public deduplicateValues: boolean = false;
     public useSearchBar: boolean = false;
+    public allowCustomStyles: boolean = false;
 }
 
 export class MermaidSettings {
@@ -39,7 +40,7 @@ export class MermaidSettings {
     public look: string = "default";
     public flowchartOrientation: string = "default";
     public maxEdges: number = 30000;
-    public securityLevel: string = "loose";
+    public securityLevel: string = "strict";
 }
 
 export class MermaidDebugSettings {

@@ -15,6 +15,7 @@ import DataView = powerbiVisualsApi.DataView;
 import VisualObjectInstanceEnumerationObject = powerbiVisualsApi.VisualObjectInstanceEnumerationObject;
 import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
+import IVisualEventService = powerbiVisualsApi.extensibility.IVisualEventService;
 
 import { VisualSettings } from "./settings";
 
@@ -29,12 +30,14 @@ export class Visual implements IVisual {
     private settings: VisualSettings;
     private host: IVisualHost;
     private selectionManager: ISelectionManager;
+    private events: IVisualEventService;
     private root: Root;
 
     constructor(options: VisualConstructorOptions) {
         this.target = options.element;
         this.host = options.host;
         this.settings = VisualSettings.getDefault() as VisualSettings;
+        this.events = options.host.eventService;
 
         // Create selection manager for cross-filtering and context menu
         this.selectionManager = this.host.createSelectionManager();
@@ -74,6 +77,8 @@ export class Visual implements IVisual {
     }
 
     public update(options: VisualUpdateOptions) {
+        this.events.renderingStarted(options);
+        try {
         const dataView = options && options.dataViews && options.dataViews[0];
         // supportsEmptyDataView ensures Power BI always provides a dataView
         // (with metadata.objects) even when no data roles are filled.
@@ -109,6 +114,10 @@ export class Visual implements IVisual {
             // Single/measure mode or no data — extract sections but no selectionIds
             const sections = dataView ? extractMarkdownSections(dataView, this.settings.markdownFunctions, this.settings.view?.deduplicateValues) : [];
             store.dispatch(setRowData({ sections, selectionIds: [], tooltipColumns: [] }));
+        }
+        this.events.renderingFinished(options);
+        } catch (error) {
+            this.events.renderingFailed(options, String(error));
         }
     }
 

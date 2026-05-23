@@ -8,6 +8,7 @@
     "start": "webpack-dev-server --config view-webpack.config.js",
     "audit": "yarn audit",
     "lint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
+    "eslint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
     "lintfix": "npx eslint . --ext .js,.jsx,.ts,.tsx --fix"
   },
   "dependencies": {

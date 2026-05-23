@@ -1,5 +1,6 @@
 import React from 'react';
 import { DemoSection } from './DemoSection';
+import { useAppSelector } from './redux/hooks';
 
 // Visual version - update this for App Store releases
 export const VISUAL_VERSION = '1.2.0.0';
@@ -52,6 +53,14 @@ export const VisualIcon: React.FC<{ size?: number }> = ({ size = 80 }) => (
  * Welcome page component displayed when no markdown content is provided
  */
 export const WelcomePage: React.FC = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const host = useAppSelector((state) => state.options.host) as any;
+
+    const openUrl = React.useCallback((url: string) => {
+        if (host && typeof host.launchUrl === 'function') {
+            host.launchUrl(url);
+        }
+    }, [host]);
     return (
         <div className="welcome-page">
             <div className="welcome-header">
@@ -114,9 +123,15 @@ export const WelcomePage: React.FC = () => {
                         Created by <strong>Paul Moldmann</strong>
                     </p>
                     <p>
-                        <a href="https://github.com/pmoldmann/mermaid-powerbi" target="_blank" rel="noopener noreferrer">
+                        <span
+                            onClick={() => openUrl('https://github.com/pmoldmann/mermaid-powerbi')}
+                            style={{ cursor: 'pointer', textDecoration: 'underline', color: 'inherit' }}
+                            role="link"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && openUrl('https://github.com/pmoldmann/mermaid-powerbi')}
+                        >
                             GitHub Project
-                        </a>
+                        </span>
                     </p>
                     <p>
                         <em>Special thanks to <strong>Ilfat Galiev</strong> who originally 

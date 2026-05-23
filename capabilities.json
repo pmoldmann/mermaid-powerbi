@@ -48,6 +48,13 @@
                     "type": {
                         "bool": true
                     }
+                },
+                "allowCustomStyles": {
+                    "displayName": "Allow custom styles",
+                    "description": "Allow markdown code blocks with language 'style' to inject CSS into the visual. Disabled by default for security.",
+                    "type": {
+                        "bool": true
+                    }
                 }
             }
         },

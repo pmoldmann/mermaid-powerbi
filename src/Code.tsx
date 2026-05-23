@@ -2,6 +2,7 @@ import React from "react";
 import { getCodeString } from 'rehype-rewrite';
 import mermaid from "mermaid";
 import elkLayouts from "@mermaid-js/layout-elk";
+import DOMPurify from "dompurify";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
 import { MermaidSettings, MermaidDebugSettings, FontSettings, MarkdownSettings } from "./settings";
@@ -24,7 +25,7 @@ const defaultMermaidSettings: MermaidSettings = {
     theme: "auto",
     look: "default",
     maxEdges: 30000,
-    securityLevel: "loose",
+    securityLevel: "strict",
     elkMergeEdges: "default",
     elkNodePlacement: "default",
 };
@@ -71,8 +72,7 @@ export const MarkdownSettingsContext = React.createContext<MarkdownSettings>(def
 // Global noop function for Mermaid's `call noop()` click directives.
 // With securityLevel "loose", Mermaid injects onclick="noop()" on nodes.
 // We remove these attributes post-render, but define noop() as a safety net.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(window as any).noop = () => { /* intentional no-op */ };
+// The function is set transiently around mermaid.render() and deleted afterwards.
 
 // ============================================
 // Tooltip Management for Mermaid Diagrams
@@ -425,11 +425,20 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
 
             mermaid.initialize(mermaidConfig);
             
+            // Set noop transiently for Mermaid's `call noop()` click directives
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (window as any).noop = () => { /* intentional no-op */ };
             mermaid
                 .render(demoid.current, code)
                 .then(({ svg, bindFunctions }) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    delete (window as any).noop;
+                    // Sanitize SVG before injecting into DOM
                     // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
-                    container.innerHTML = svg;
+                    container.innerHTML = DOMPurify.sanitize(svg, {
+                        USE_PROFILES: { svg: true, svgFilters: true },
+                        ADD_TAGS: ['use'],
+                    });
                     
                     // Ensure SVG has max-width constraint for responsiveness
                     const svgElement = container.querySelector('svg');
@@ -453,6 +462,8 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     processMermaidInteractivity(container, code, host);
                 })
                 .catch((error) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    delete (window as any).noop;
                     debugLog('error', 'Mermaid rendering error', String(error));
                     container.textContent = code;
                 });
@@ -600,6 +611,7 @@ export const Code = (props: any) => {
     // Get settings from context (must be at top level)
     const mermaidSettings = React.useContext(MermaidSettingsContext);
     const mermaidDebugSettings = React.useContext(MermaidDebugSettingsContext);
+    const allowCustomStyles = useAppSelector((state) => state.options.settings?.view?.allowCustomStyles ?? false);
     
     const children = props?.children || [];
     const className = props?.className;
@@ -676,7 +688,7 @@ export const Code = (props: any) => {
     }
 
     if (isStyling) {
-        if (code.trim() === "") {
+        if (code.trim() === "" || !allowCustomStyles) {
             return null;
         }
         return (
