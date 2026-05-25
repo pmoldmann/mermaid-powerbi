@@ -216,10 +216,8 @@ Handlebars.registerHelper('useAxis', function (
 ) {
     const axis = axes.get(id);
     if (axis) {
-        // eslint-disable-next-line powerbi-visuals/no-http-string
         const group: SVGGElement = document.createElementNS('http://www.w3.org/2000/svg', 'g')
         axis(select(group));
-        // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
         return decodeURI(group.innerHTML)
     }
 })

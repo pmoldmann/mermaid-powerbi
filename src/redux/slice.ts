@@ -11,13 +11,13 @@ import { IVisualSettings, VisualSettings } from "../settings";
 import { extractMarkdownContent, extractMarkdownSections, MarkdownSection, TooltipColumnData } from "../utils";
 
 export interface VisualState {
-    host: IVisualHost;
+    host: IVisualHost | undefined;
     settings: IVisualSettings;
-    dataView: DataView;
+    dataView: DataView | null;
     viewport: IViewport;
     markdownContent: string;
     markdownSections: MarkdownSection[];
-    selectionManager: ISelectionManager;
+    selectionManager: ISelectionManager | undefined;
     selectionIds: ISelectionId[];
     tooltipColumns: TooltipColumnData[];
 }

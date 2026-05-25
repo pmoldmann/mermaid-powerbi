@@ -1,0 +1,93 @@
+-- =============================================================================
+-- Measure Documentation: All measures in the data model as Markdown
+-- =============================================================================
+-- Usage:
+--   1. Replace "YourTable" with an existing table name in your model
+--   2. Execute this statement in the DAX Query View
+--   3. Display the resulting Markdown in the Mermaid Power BI Visual
+--   4. Optional: Right-click the MEASURE → "Add to model"
+--
+-- Notes:
+--   - DEFINE FUNCTION only exists in the query context and is NOT
+--     persisted to the model. When saving the measure, the function
+--     is automatically inlined or must be replaced manually.
+--   - INFO.VIEW.MEASURES() requires Power BI Desktop (April 2024+)
+-- =============================================================================
+
+DEFINE
+
+    -- =========================================================================
+    -- Helper function: Creates a Markdown code-fence block
+    -- Parameters:
+    --   CodeContent  = the source code (e.g. DAX expression)
+    --   CodeLanguage = language tag for syntax highlighting (e.g. "dax")
+    -- Returns an empty string if CodeContent is blank.
+    -- =========================================================================
+    FUNCTION CodeFence = 
+		( CodeContent : STRING VAL, CodeLanguage : STRING VAL) =>
+        VAR _fence = "```"
+        VAR _nl = UNICHAR ( 10 )
+        RETURN
+            IF (
+                ISBLANK ( CodeContent ),
+                "",
+                _fence & CodeLanguage & _nl & CodeContent & _nl & _fence
+            )
+
+    -- =========================================================================
+    -- Main measure: Documents all measures alphabetically as Markdown
+    -- ⚠️ Replace "Measure" with a table name in your model!
+    -- =========================================================================
+    MEASURE 'Measure'[Measure Dokumentation] =
+        VAR _nl = UNICHAR ( 10 )
+        VAR _nl2 = _nl & _nl
+        VAR _measures = INFO.VIEW.MEASURES ()
+        VAR _result =
+            CONCATENATEX (
+                _measures,
+                -- H2 header: measure name
+                VAR _header = "## " & [Name]
+                -- Blockquote: description
+                VAR _blockquote =
+                    "> "
+                        & IF (
+                            ISBLANK ( [Description] ),
+                            "_no description present_",
+                            [Description]
+                        )
+                -- Unordered list: measure metadata
+                VAR _list =
+                    "- Table : " & [Table] & _nl
+                        & "- Display Folder : "
+                        & IF ( ISBLANK ( [DisplayFolder] ), "–", [DisplayFolder] )
+                        & _nl
+                        & "- Data Type : " & [DataType] & _nl
+                        & "- Is Hidden : " & IF ( [IsHidden], "True", "False" )
+                -- H3 + code fence: DAX expression
+                VAR _exprHeading = "### Expression"
+                VAR _exprBlock = CodeFence ( [Expression], "dax" )
+                -- H3 + code fence: format string (only if present)
+                VAR _formatHeading = "### Format String"
+                VAR _formatBlock =
+                    CodeFence ( [FormatStringDefinition], "dax" )
+                RETURN
+                    _header & _nl2
+                        & _blockquote & _nl2
+                        & _list & _nl2
+                        & _exprHeading & _nl2
+                        & _exprBlock
+                        & IF (
+                            NOT ISBLANK ( [FormatStringDefinition] ),
+                            _nl2 & _formatHeading & _nl2 & _formatBlock,
+                            ""
+                        ),
+                -- Separator between measures
+                _nl2 & "---" & _nl2,
+                -- Alphabetical sort by name
+                [Name], ASC
+            )
+        RETURN
+            _result
+
+EVALUATE
+{ [Measure Dokumentation] }

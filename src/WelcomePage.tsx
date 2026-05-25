@@ -1,6 +1,8 @@
 import React from 'react';
 import { DemoSection } from './DemoSection';
 import { useAppSelector } from './redux/hooks';
+import powerbiVisualsApi from "powerbi-visuals-api";
+import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 
 // Visual version - update this for App Store releases
 export const VISUAL_VERSION = '1.2.0.0';
@@ -53,8 +55,7 @@ export const VisualIcon: React.FC<{ size?: number }> = ({ size = 80 }) => (
  * Welcome page component displayed when no markdown content is provided
  */
 export const WelcomePage: React.FC = () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const host = useAppSelector((state) => state.options.host) as any;
+    const host = useAppSelector((state) => state.options.host) as IVisualHost | undefined;
 
     const openUrl = React.useCallback((url: string) => {
         if (host && typeof host.launchUrl === 'function') {

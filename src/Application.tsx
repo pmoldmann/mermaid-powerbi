@@ -16,8 +16,8 @@ import { ContextMenu } from './ContextMenu';
 import powerbiVisualsApi from "powerbi-visuals-api";
 import ITooltipService = powerbiVisualsApi.extensibility.ITooltipService;
 import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
+import ISelectionId = powerbiVisualsApi.visuals.ISelectionId;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import "mermaid";
 
 // Register DAX and Power Query (M) as custom languages for syntax highlighting in code blocks
@@ -131,7 +131,7 @@ export const Application: React.FC<ApplicationProps> = () => {
         x: number;
         y: number;
         sectionIdx: number | null;
-        selectionId: any;
+        selectionId: ISelectionId | null;
     }>({ visible: false, x: 0, y: 0, sectionIdx: null, selectionId: null });
 
     const showDebugPanel = settings?.mermaidDebug?.showDebugPanel === true;

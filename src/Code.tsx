@@ -1,5 +1,6 @@
 import React from "react";
 import { getCodeString } from 'rehype-rewrite';
+import type { Element as HastElement } from 'hast';
 import mermaid from "mermaid";
 import elkLayouts from "@mermaid-js/layout-elk";
 import DOMPurify from "dompurify";
@@ -247,7 +248,6 @@ function openExternalLink(url: string, host: unknown): void {
         pbiHost.launchUrl(url);
     } else {
         // Fallback for development/testing
-        // eslint-disable-next-line no-restricted-globals
         if (confirm(`Do you want to open this external link in your browser?\n\n${url}`)) {
             window.open(url, '_blank', 'noopener,noreferrer');
         }
@@ -604,10 +604,19 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
 };
 
 /**
+ * Props for the Code component, matching the shape provided by rehype-react
+ * for custom code block renderers.
+ */
+interface CodeProps extends React.HTMLAttributes<HTMLElement> {
+    node?: HastElement;
+    inline?: boolean;
+}
+
+/**
  * Code component that handles rendering of code blocks.
  * Supports special handling for Mermaid diagrams and inline styles.
  */
-export const Code = (props: any) => {
+export const Code = (props: CodeProps) => {
     // Get settings from context (must be at top level)
     const mermaidSettings = React.useContext(MermaidSettingsContext);
     const mermaidDebugSettings = React.useContext(MermaidDebugSettingsContext);

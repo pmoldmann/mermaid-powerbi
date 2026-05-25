@@ -9,7 +9,7 @@ export interface ErrorBoundaryProps extends React.PropsWithChildren {
 }
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-    constructor(props) {
+    constructor(props: ErrorBoundaryProps) {
       super(props);
       this.state = { hasError: false, error: null };
     }
@@ -19,9 +19,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
       return { hasError: true, error };
     }
   
-    componentDidCatch(error, errorInfo) {
-      // You can also log the error to an error reporting service
-      console.error(error, errorInfo);
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+      // Intentionally not logged to avoid polluting the browser console in production
+      void error;
+      void errorInfo;
     }
   
     render() {
@@ -30,7 +31,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
             <>
                 <h1>Something went wrong.</h1>
                 <div>
-                    {this.state.error as string}
+                    {String(this.state.error)}
                 </div>
             </>
         );
