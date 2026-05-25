@@ -14,7 +14,6 @@ import { DebugPanel, useDebugLogs, clearDebugLogs, setDebugEnabled } from './Deb
 import { ContextMenu } from './ContextMenu';
 
 import powerbiVisualsApi from "powerbi-visuals-api";
-import ITooltipService = powerbiVisualsApi.extensibility.ITooltipService;
 import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
 import ISelectionId = powerbiVisualsApi.visuals.ISelectionId;
 
@@ -347,7 +346,7 @@ export const Application: React.FC<ApplicationProps> = () => {
         // Don't cross-filter if there are no selectionIds (measure mode)
         if (!selectionIds || selectionIds.length === 0 || !selectionManager) return;
         // Don't cross-filter if host doesn't allow interactions
-        if (host && (host as any).allowInteractions === false) return;
+        if (host && (host as unknown as { allowInteractions?: boolean }).allowInteractions === false) return;
 
         // Don't cross-filter if user clicked a link
         const target = event.target as HTMLElement;

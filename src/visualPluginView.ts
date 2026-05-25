@@ -3,8 +3,8 @@ import powerbiVisualsApi from "powerbi-visuals-api";
 import IVisualPlugin = powerbiVisualsApi.visuals.plugins.IVisualPlugin;
 import VisualConstructorOptions = powerbiVisualsApi.extensibility.visual.VisualConstructorOptions;
 import DialogConstructorOptions = powerbiVisualsApi.extensibility.visual.DialogConstructorOptions;
-var powerbiKey: any = "powerbi";
-var powerbi: any = window[powerbiKey];
+const powerbiKey = "powerbi";
+const powerbi = (window as unknown as Record<string, unknown>)[powerbiKey];
 var markdownMermaidRenderer: IVisualPlugin = {
     name: 'markdownMermaidRenderer',
     displayName: 'Markdown / Mermaid Renderer',
@@ -17,7 +17,8 @@ var markdownMermaidRenderer: IVisualPlugin = {
         throw 'Visual instance not found';
     },
     createModalDialog: (dialogId: string, options: DialogConstructorOptions, initialState: object) => {
-        const dialogRegistry = (<any>globalThis).dialogRegistry;
+        type DialogCtor = new (options: DialogConstructorOptions, initialState: object) => void;
+        const dialogRegistry = (globalThis as unknown as { dialogRegistry: Record<string, DialogCtor> }).dialogRegistry;
         if (dialogId in dialogRegistry) {
             new dialogRegistry[dialogId](options, initialState);
         }

@@ -225,7 +225,8 @@ Handlebars.registerHelper('useAxis', function (
 Handlebars.registerHelper('setupAxis', function (
     id: string,
     method: string,
-    ...args: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...args: any[]
 ) {
     const axis = axes.get(id);
     if (axis) {
@@ -241,7 +242,8 @@ Handlebars.registerHelper('setupAxis', function (
 Handlebars.registerHelper('getScale', function (
     id: string,
     method: string,
-    ...args: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...args: any[]
 ) {
     const scale = scales.get(id);
     if (scale) {
@@ -253,7 +255,8 @@ Handlebars.registerHelper('getScale', function (
 Handlebars.registerHelper('setupScale', function (
     id: string,
     method: string,
-    ...args: any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ...args: any[]
 ) {
     const scale = scales.get(id);
     if (scale) {
@@ -305,6 +308,7 @@ Handlebars.registerHelper('val', function (
 
 Handlebars.registerHelper('math', function (
     method: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...args: any[]
 ) {
     args.pop()

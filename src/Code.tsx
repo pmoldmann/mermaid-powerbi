@@ -430,7 +430,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             (window as any).noop = () => { /* intentional no-op */ };
             mermaid
                 .render(demoid.current, code)
-                .then(({ svg, bindFunctions }) => {
+                .then(({ svg }) => {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     delete (window as any).noop;
                     // Sanitize SVG before injecting into DOM

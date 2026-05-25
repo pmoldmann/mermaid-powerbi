@@ -5,8 +5,7 @@ export interface ErrorBoundaryState {
     error: unknown;
 }
 
-export interface ErrorBoundaryProps extends React.PropsWithChildren {
-}
+export type ErrorBoundaryProps = React.PropsWithChildren;
 
 export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
     constructor(props: ErrorBoundaryProps) {
