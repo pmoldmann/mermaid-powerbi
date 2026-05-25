@@ -2,7 +2,7 @@
 
 ![Version](https://img.shields.io/badge/version-1.2.0.0-blue)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Custom%20Visual-yellow)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 
 **GitHub:** [https://github.com/pmoldmann/mermaid-powerbi](https://github.com/pmoldmann/mermaid-powerbi)
 
@@ -956,4 +956,4 @@ All `innerHTML` usage involves either:
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+GNU General Public License v3.0 — see [LICENSE](LICENSE) for details.
