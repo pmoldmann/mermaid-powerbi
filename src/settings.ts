@@ -8,6 +8,7 @@ export interface IVisualSettings {
     view: ViewSettings;
     mermaid: MermaidSettings;
     mermaidDebug: MermaidDebugSettings;
+    mermaidThemeVars: MermaidThemeVariablesSettings;
     font: FontSettings;
     markdown: MarkdownSettings;
     markdownFunctions: MarkdownFunctionsSettings;
@@ -18,6 +19,7 @@ export class VisualSettings extends DataViewObjectsParser implements IVisualSett
     public view: ViewSettings = new ViewSettings();
     public mermaid: MermaidSettings = new MermaidSettings();
     public mermaidDebug: MermaidDebugSettings = new MermaidDebugSettings();
+    public mermaidThemeVars: MermaidThemeVariablesSettings = new MermaidThemeVariablesSettings();
     public font: FontSettings = new FontSettings();
     public markdown: MarkdownSettings = new MarkdownSettings();
     public markdownFunctions: MarkdownFunctionsSettings = new MarkdownFunctionsSettings();
@@ -75,4 +77,15 @@ export class MarkdownFunctionsSettings {
 
 export class InteractivitySettings {
     public enableCrossFilter: boolean = false;
+}
+
+export class MermaidThemeVariablesSettings {
+    public primaryColor: { solid: { color: string } } = { solid: { color: "" } };
+    public primaryTextColor: { solid: { color: string } } = { solid: { color: "" } };
+    public primaryBorderColor: { solid: { color: string } } = { solid: { color: "" } };
+    public secondaryColor: { solid: { color: string } } = { solid: { color: "" } };
+    public tertiaryColor: { solid: { color: string } } = { solid: { color: "" } };
+    public mainBkg: { solid: { color: string } } = { solid: { color: "" } };
+    public lineColor: { solid: { color: string } } = { solid: { color: "" } };
+    public edgeLabelBackground: { solid: { color: string } } = { solid: { color: "" } };
 }

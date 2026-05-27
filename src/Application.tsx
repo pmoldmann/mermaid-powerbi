@@ -4,7 +4,7 @@ import { useAppSelector } from './redux/hooks';
 import MDEditor from '@uiw/react-md-editor';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
-import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext } from './Code';
+import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext, MermaidThemeVarsContext } from './Code';
 import remarkBreaks from 'remark-breaks';
 import remarkDefinitionList from 'remark-definition-list';
 import { ErrorBoundary } from './Error';
@@ -485,6 +485,16 @@ export const Application: React.FC<ApplicationProps> = () => {
                                     elkMergeEdges: "default",
                                     elkNodePlacement: "default",
                                 }}>
+                                    <MermaidThemeVarsContext.Provider value={settings?.mermaidThemeVars || {
+                                        primaryColor: { solid: { color: "" } },
+                                        primaryTextColor: { solid: { color: "" } },
+                                        primaryBorderColor: { solid: { color: "" } },
+                                        secondaryColor: { solid: { color: "" } },
+                                        tertiaryColor: { solid: { color: "" } },
+                                        mainBkg: { solid: { color: "" } },
+                                        lineColor: { solid: { color: "" } },
+                                        edgeLabelBackground: { solid: { color: "" } },
+                                    }}>
                                     <MermaidDebugSettingsContext.Provider value={settings?.mermaidDebug || {
                                         showDebugPanel: false,
                                         markdownAutoWrap: true,
@@ -534,6 +544,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                         )}
                                     </MarkdownSettingsContext.Provider>
                                     </MermaidDebugSettingsContext.Provider>
+                                </MermaidThemeVarsContext.Provider>
                                 </MermaidSettingsContext.Provider>
                             </FontSettingsContext.Provider>
                         </ColorModeContext.Provider>

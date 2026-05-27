@@ -6,7 +6,7 @@ import elkLayouts from "@mermaid-js/layout-elk";
 import DOMPurify from "dompurify";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
-import { MermaidSettings, MermaidDebugSettings, FontSettings, MarkdownSettings } from "./settings";
+import { MermaidSettings, MermaidDebugSettings, FontSettings, MarkdownSettings, MermaidThemeVariablesSettings } from "./settings";
 import { useAppSelector } from './redux/hooks';
 
 // Register ELK layout engine (must happen before any mermaid.render() call)
@@ -54,6 +54,18 @@ const defaultMarkdownSettings: MarkdownSettings = {
     codeBlockWordWrap: true
 };
 
+// Default Mermaid theme variable settings
+const defaultMermaidThemeVarsSettings: MermaidThemeVariablesSettings = {
+    primaryColor: { solid: { color: "" } },
+    primaryTextColor: { solid: { color: "" } },
+    primaryBorderColor: { solid: { color: "" } },
+    secondaryColor: { solid: { color: "" } },
+    tertiaryColor: { solid: { color: "" } },
+    mainBkg: { solid: { color: "" } },
+    lineColor: { solid: { color: "" } },
+    edgeLabelBackground: { solid: { color: "" } },
+};
+
 // Context for color mode (light/dark)
 export const ColorModeContext = React.createContext<string>('light');
 
@@ -68,6 +80,9 @@ export const FontSettingsContext = React.createContext<FontSettings>(defaultFont
 
 // Context for Markdown settings
 export const MarkdownSettingsContext = React.createContext<MarkdownSettings>(defaultMarkdownSettings);
+
+// Context for Mermaid theme variable overrides
+export const MermaidThemeVarsContext = React.createContext<MermaidThemeVariablesSettings>(defaultMermaidThemeVarsSettings);
 
 // Global noop function for Mermaid's `call noop()` click directives.
 // With securityLevel "loose", Mermaid injects onclick="noop()" on nodes.
@@ -333,6 +348,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const mermaidDebugSettings = React.useContext(MermaidDebugSettingsContext);
     const fontSettings = React.useContext(FontSettingsContext);
     const colorMode = React.useContext(ColorModeContext);
+    const mermaidThemeVars = React.useContext(MermaidThemeVarsContext);
     const host = useAppSelector((state) => state.options.host);
     const demoid = React.useRef(`dome${randomid()}`);
     const [container, setContainer] = React.useState<HTMLElement | null>(null);
@@ -349,7 +365,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const previousCodeRef = React.useRef<string | null>(null);
 
     // Create a settings key to detect settings changes
-    const settingsKey = JSON.stringify(mermaidSettings) + JSON.stringify(mermaidDebugSettings) + JSON.stringify(fontSettings) + colorMode;
+    const settingsKey = JSON.stringify(mermaidSettings) + JSON.stringify(mermaidDebugSettings) + JSON.stringify(fontSettings) + colorMode + JSON.stringify(mermaidThemeVars);
     const previousSettingsRef = React.useRef<string | null>(null);
 
     React.useEffect(() => {
@@ -405,6 +421,28 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             // Look: only set when not "default"
             if (mermaidSettings.look && mermaidSettings.look !== 'default') {
                 mermaidConfig.look = mermaidSettings.look;
+            }
+
+            // themeVariables: only pass entries where the user has set a non-empty color
+            const themeVariables: Record<string, string> = {};
+            const themeVarMap: [keyof MermaidThemeVariablesSettings, string][] = [
+                ['primaryColor', 'primaryColor'],
+                ['primaryTextColor', 'primaryTextColor'],
+                ['primaryBorderColor', 'primaryBorderColor'],
+                ['secondaryColor', 'secondaryColor'],
+                ['tertiaryColor', 'tertiaryColor'],
+                ['mainBkg', 'mainBkg'],
+                ['lineColor', 'lineColor'],
+                ['edgeLabelBackground', 'edgeLabelBackground'],
+            ];
+            for (const [settingKey, mermaidKey] of themeVarMap) {
+                const color = mermaidThemeVars?.[settingKey]?.solid?.color;
+                if (color && color.trim() !== '') {
+                    themeVariables[mermaidKey] = color;
+                }
+            }
+            if (Object.keys(themeVariables).length > 0) {
+                mermaidConfig.themeVariables = themeVariables;
             }
 
             // ELK-specific options: only when layout is "elk" and values are not "default"
@@ -471,7 +509,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     container.textContent = code;
                 });
         }
-    }, [container, code, mermaidSettings, mermaidDebugSettings, fontSettings, settingsKey, colorMode]);
+    }, [container, code, mermaidSettings, mermaidDebugSettings, fontSettings, settingsKey, colorMode, mermaidThemeVars]);
 
     const refElement = React.useCallback((node: HTMLElement | null) => {
         if (node !== null) {
