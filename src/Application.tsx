@@ -487,7 +487,6 @@ export const Application: React.FC<ApplicationProps> = () => {
                                 }}>
                                     <MermaidDebugSettingsContext.Provider value={settings?.mermaidDebug || {
                                         showDebugPanel: false,
-                                        htmlLabels: true,
                                         markdownAutoWrap: true,
                                         convertBrToNewline: true,
                                         autoBacktickLabels: true,

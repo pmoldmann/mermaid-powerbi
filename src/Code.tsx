@@ -34,7 +34,6 @@ const defaultMermaidSettings: MermaidSettings = {
 // Default Mermaid debug settings
 const defaultMermaidDebugSettings: MermaidDebugSettings = {
     showDebugPanel: false,
-    htmlLabels: true,
     markdownAutoWrap: true,
     convertBrToNewline: true,
     autoBacktickLabels: true,
@@ -373,7 +372,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             const mermaidConfig: Record<string, any> = {
                 securityLevel: mermaidSettings.securityLevel as "loose" | "strict" | "sandbox",
                 maxEdges: mermaidSettings.maxEdges,
-                htmlLabels: mermaidDebugSettings.htmlLabels,
+                htmlLabels: false,
                 markdownAutoWrap: mermaidDebugSettings.markdownAutoWrap,
                 fontFamily: fontSettings.fontFamily || 'DIN',
                 fontSize: fontSettings.mermaidFontSize || 14,
@@ -381,7 +380,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 pie: { useMaxWidth: false },
                 flowchart: {
                     useMaxWidth: false,
-                    htmlLabels: mermaidDebugSettings.htmlLabels,
+                    htmlLabels: false,
                 },
                 sequence: { useMaxWidth: false },
                 gantt: { useMaxWidth: false },
@@ -433,7 +432,11 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 .then(({ svg }) => {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     delete (window as any).noop;
-                    // Sanitize SVG before injecting into DOM
+                    // Sanitize SVG before injecting into DOM.
+                    // NOTE: DOMPurify intentionally blocks <foreignObject> (svgDisallowed +
+                    // DEFAULT_FORBID_CONTENTS), so htmlLabels must be false to avoid empty
+                    // node boxes. With htmlLabels: false, Mermaid uses SVG <text> elements
+                    // which are preserved by the SVG profile.
                     // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
                     container.innerHTML = DOMPurify.sanitize(svg, {
                         USE_PROFILES: { svg: true, svgFilters: true },

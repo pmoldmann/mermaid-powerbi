@@ -167,13 +167,6 @@
                         "bool": true
                     }
                 },
-                "htmlLabels": {
-                    "displayName": "HTML labels",
-                    "description": "Enable HTML rendering in node labels (needed for line breaks)",
-                    "type": {
-                        "bool": true
-                    }
-                },
                 "markdownAutoWrap": {
                     "displayName": "Markdown auto wrap",
                     "description": "Enable automatic line wrapping in markdown labels",

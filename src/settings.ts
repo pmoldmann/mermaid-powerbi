@@ -45,7 +45,6 @@ export class MermaidSettings {
 
 export class MermaidDebugSettings {
     public showDebugPanel: boolean = false;
-    public htmlLabels: boolean = true;
     public markdownAutoWrap: boolean = true;
     public convertBrToNewline: boolean = true;
     public autoBacktickLabels: boolean = true;
