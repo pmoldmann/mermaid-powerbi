@@ -478,7 +478,6 @@ export const Application: React.FC<ApplicationProps> = () => {
                                 <MermaidSettingsContext.Provider value={settings?.mermaid || {
                                     flowchartOrientation: "default",
                                     layout: "default",
-                                    theme: "auto",
                                     look: "default",
                                     maxEdges: 30000,
                                     securityLevel: "loose",
@@ -486,6 +485,8 @@ export const Application: React.FC<ApplicationProps> = () => {
                                     elkNodePlacement: "default",
                                 }}>
                                     <MermaidThemeVarsContext.Provider value={settings?.mermaidThemeVars || {
+                                        baseTheme: "auto",
+                                        enableThemeColors: false,
                                         primaryColor: { solid: { color: "" } },
                                         primaryTextColor: { solid: { color: "" } },
                                         primaryBorderColor: { solid: { color: "" } },

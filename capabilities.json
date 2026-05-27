@@ -97,21 +97,6 @@
                         ]
                     }
                 },
-                "theme": {
-                    "displayName": "Theme",
-                    "description": "Color theme for diagrams. 'Auto' selects light/dark based on color mode. 'Default (from diagram)' lets frontmatter or directives decide.",
-                    "type": {
-                        "enumeration": [
-                            { "value": "auto", "displayName": "Auto (light/dark mode)" },
-                            { "value": "none", "displayName": "Default (from diagram)" },
-                            { "value": "default", "displayName": "Default" },
-                            { "value": "dark", "displayName": "Dark" },
-                            { "value": "forest", "displayName": "Forest" },
-                            { "value": "neutral", "displayName": "Neutral" },
-                            { "value": "base", "displayName": "Base" }
-                        ]
-                    }
-                },
                 "look": {
                     "displayName": "Look",
                     "description": "Visual style of diagrams. 'Default' lets the diagram code or frontmatter decide.",
@@ -218,9 +203,29 @@
             }
         },
         "mermaidThemeVars": {
-            "displayName": "Mermaid theme colors",
-            "description": "Override individual Mermaid theme color variables. Works best with the 'Base' theme.",
+            "displayName": "Mermaid theme settings",
+            "description": "Theme selection and optional color customization for Mermaid diagrams.",
             "properties": {
+                "baseTheme": {
+                    "displayName": "Theme",
+                    "description": "Color theme for diagrams. 'Auto' selects light/dark based on color mode. 'Default (from diagram)' lets frontmatter or directives decide.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "auto", "displayName": "Auto (light/dark mode)" },
+                            { "value": "none", "displayName": "Default (from diagram)" },
+                            { "value": "default", "displayName": "Default" },
+                            { "value": "dark", "displayName": "Dark" },
+                            { "value": "forest", "displayName": "Forest" },
+                            { "value": "neutral", "displayName": "Neutral" },
+                            { "value": "base", "displayName": "Base" }
+                        ]
+                    }
+                },
+                "enableThemeColors": {
+                    "displayName": "Customize theme colors",
+                    "description": "Enable to override individual theme colors. Works best with the 'Base' theme.",
+                    "type": { "bool": true }
+                },
                 "primaryColor": {
                     "displayName": "Primary color",
                     "description": "Background color of nodes and primary diagram elements",

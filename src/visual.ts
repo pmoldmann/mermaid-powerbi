@@ -17,7 +17,7 @@ import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import IVisualEventService = powerbiVisualsApi.extensibility.IVisualEventService;
 
-import { VisualSettings } from "./settings";
+import { MermaidThemeVariablesSettings, VisualSettings } from "./settings";
 
 import { Provider } from 'react-redux';
 import { store } from "./redux/store";
@@ -155,6 +155,31 @@ export class Visual implements IVisual {
                 });
             }
             return { instances };
+        }
+        // mermaidThemeVars: conditional properties — show colors only when custom colors are enabled
+        if (options.objectName === 'mermaidThemeVars') {
+            const themeVars: MermaidThemeVariablesSettings = this.settings?.mermaidThemeVars ?? new MermaidThemeVariablesSettings();
+            const baseTheme = typeof themeVars.baseTheme === 'string' && themeVars.baseTheme.trim() !== ''
+                ? themeVars.baseTheme
+                : 'auto';
+            const enableThemeColors = typeof themeVars.enableThemeColors === 'boolean'
+                ? themeVars.enableThemeColors
+                : false;
+            const props: Record<string, unknown> = {
+                baseTheme,
+                enableThemeColors,
+            };
+            if (enableThemeColors) {
+                props.primaryColor = themeVars.primaryColor;
+                props.primaryTextColor = themeVars.primaryTextColor;
+                props.primaryBorderColor = themeVars.primaryBorderColor;
+                props.secondaryColor = themeVars.secondaryColor;
+                props.tertiaryColor = themeVars.tertiaryColor;
+                props.mainBkg = themeVars.mainBkg;
+                props.lineColor = themeVars.lineColor;
+                props.edgeLabelBackground = themeVars.edgeLabelBackground;
+            }
+            return [{ objectName: 'mermaidThemeVars', selector: null, properties: props }];
         }
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
     }

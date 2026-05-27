@@ -23,7 +23,6 @@ const ZOOM_STEP = 0.25;
 const defaultMermaidSettings: MermaidSettings = {
     flowchartOrientation: "default",
     layout: "default",
-    theme: "auto",
     look: "default",
     maxEdges: 30000,
     securityLevel: "strict",
@@ -56,6 +55,8 @@ const defaultMarkdownSettings: MarkdownSettings = {
 
 // Default Mermaid theme variable settings
 const defaultMermaidThemeVarsSettings: MermaidThemeVariablesSettings = {
+    baseTheme: "auto",
+    enableThemeColors: false,
     primaryColor: { solid: { color: "" } },
     primaryTextColor: { solid: { color: "" } },
     primaryBorderColor: { solid: { color: "" } },
@@ -411,11 +412,12 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 mermaidConfig.layout = mermaidSettings.layout;
             }
 
-            // Theme: "auto" = light/dark based on colorMode; "none" = don't set (frontmatter controls); otherwise explicit
-            if (mermaidSettings.theme === 'auto' || !mermaidSettings.theme) {
+            // Theme: read from mermaidThemeVars. "auto" = light/dark based on colorMode; "none" = don't set (frontmatter controls); otherwise explicit
+            const theme = mermaidThemeVars.baseTheme;
+            if (theme === 'auto' || !theme) {
                 mermaidConfig.theme = colorMode === 'dark' ? 'dark' : 'default';
-            } else if (mermaidSettings.theme !== 'none') {
-                mermaidConfig.theme = mermaidSettings.theme;
+            } else if (theme !== 'none') {
+                mermaidConfig.theme = theme;
             }
 
             // Look: only set when not "default"
@@ -423,26 +425,31 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 mermaidConfig.look = mermaidSettings.look;
             }
 
-            // themeVariables: only pass entries where the user has set a non-empty color
+            // themeVariables: only pass entries where the user has set a non-empty color, and only when custom colors are enabled
             const themeVariables: Record<string, string> = {};
-            const themeVarMap: [keyof MermaidThemeVariablesSettings, string][] = [
-                ['primaryColor', 'primaryColor'],
-                ['primaryTextColor', 'primaryTextColor'],
-                ['primaryBorderColor', 'primaryBorderColor'],
-                ['secondaryColor', 'secondaryColor'],
-                ['tertiaryColor', 'tertiaryColor'],
-                ['mainBkg', 'mainBkg'],
-                ['lineColor', 'lineColor'],
-                ['edgeLabelBackground', 'edgeLabelBackground'],
-            ];
-            for (const [settingKey, mermaidKey] of themeVarMap) {
-                const color = mermaidThemeVars?.[settingKey]?.solid?.color;
-                if (color && color.trim() !== '') {
-                    themeVariables[mermaidKey] = color;
+            if (mermaidThemeVars.enableThemeColors) {
+                const themeVarMap: [string, string][] = [
+                    ['primaryColor', 'primaryColor'],
+                    ['primaryTextColor', 'primaryTextColor'],
+                    ['primaryBorderColor', 'primaryBorderColor'],
+                    ['secondaryColor', 'secondaryColor'],
+                    ['tertiaryColor', 'tertiaryColor'],
+                    ['mainBkg', 'mainBkg'],
+                    ['lineColor', 'lineColor'],
+                    ['edgeLabelBackground', 'edgeLabelBackground'],
+                ];
+                for (const [settingKey, mermaidKey] of themeVarMap) {
+                    const rawValue = mermaidThemeVars[settingKey as keyof MermaidThemeVariablesSettings] as unknown;
+                    const color = typeof rawValue === 'string'
+                        ? rawValue
+                        : (rawValue as { solid?: { color?: string } })?.solid?.color;
+                    if (color && color.trim() !== '') {
+                        themeVariables[mermaidKey] = color;
+                    }
                 }
-            }
-            if (Object.keys(themeVariables).length > 0) {
-                mermaidConfig.themeVariables = themeVariables;
+                if (Object.keys(themeVariables).length > 0) {
+                    mermaidConfig.themeVariables = themeVariables;
+                }
             }
 
             // ELK-specific options: only when layout is "elk" and values are not "default"

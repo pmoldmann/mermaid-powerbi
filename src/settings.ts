@@ -38,7 +38,6 @@ export class MermaidSettings {
     public layout: string = "default";
     public elkNodePlacement: string = "default";
     public elkMergeEdges: string = "default";
-    public theme: string = "auto";
     public look: string = "default";
     public flowchartOrientation: string = "default";
     public maxEdges: number = 30000;
@@ -80,6 +79,8 @@ export class InteractivitySettings {
 }
 
 export class MermaidThemeVariablesSettings {
+    public baseTheme: string = "auto";
+    public enableThemeColors: boolean = false;
     public primaryColor: { solid: { color: string } } = { solid: { color: "" } };
     public primaryTextColor: { solid: { color: string } } = { solid: { color: "" } };
     public primaryBorderColor: { solid: { color: string } } = { solid: { color: "" } };
