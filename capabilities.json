@@ -448,6 +448,8 @@
     "supportsHighlight": true,
     "supportsLandingPage": true,
     "supportsEmptyDataView": true,
+    "supportsKeyboardFocus": true,
+    "supportsMultiVisualSelection": true,
     "sorting": {
         "default": {}
     },

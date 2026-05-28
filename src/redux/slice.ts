@@ -20,6 +20,7 @@ export interface VisualState {
     selectionManager: ISelectionManager | undefined;
     selectionIds: ISelectionId[];
     tooltipColumns: TooltipColumnData[];
+    isHighContrast: boolean;
 }
 
 export interface RowDataPayload {
@@ -40,7 +41,8 @@ const initialState: VisualState = {
     markdownSections: [],
     selectionManager: undefined,
     selectionIds: [],
-    tooltipColumns: []
+    tooltipColumns: [],
+    isHighContrast: false,
 }
 
 export const slice = createSlice({
@@ -69,11 +71,14 @@ export const slice = createSlice({
         },
         setSettings: (state, action: PayloadAction<IVisualSettings>) => {
             state.settings = action.payload;
-        }
+        },
+        setHighContrast: (state, action: PayloadAction<boolean>) => {
+            state.isHighContrast = action.payload;
+        },
     },
 })
 
 // Action creators are generated for each case reducer function
-export const { setHost, setSelectionManager, setDataView, setRowData, setSettings, setViewport } = slice.actions
+export const { setHost, setSelectionManager, setDataView, setRowData, setSettings, setViewport, setHighContrast } = slice.actions
 
 export default slice.reducer

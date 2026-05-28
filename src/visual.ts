@@ -21,7 +21,7 @@ import { MermaidThemeVariablesSettings, VisualSettings } from "./settings";
 
 import { Provider } from 'react-redux';
 import { store } from "./redux/store";
-import { setDataView, setHost, setRowData, setSelectionManager, setSettings, setViewport } from './redux/slice';
+import { setDataView, setHost, setRowData, setSelectionManager, setSettings, setViewport, setHighContrast } from './redux/slice';
 import { deepClone, extractMarkdownSections, extractTooltipColumns, getMarkdownColumnIndices } from './utils';
 
 
@@ -86,6 +86,7 @@ export class Visual implements IVisual {
             this.settings = Visual.parseSettings(dataView);
         }
         store.dispatch(setSettings(this.settings));
+        store.dispatch(setHighContrast((this.host.colorPalette as { isHighContrast?: boolean })?.isHighContrast ?? false));
         // Always dispatch dataView - null/undefined will clear the content and show welcome page
         store.dispatch(setDataView(dataView ? deepClone(dataView) : null));
         store.dispatch(setViewport(deepClone(options.viewport)));
