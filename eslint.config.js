@@ -43,7 +43,7 @@ module.exports = [
         rules: {
             // Enable @typescript-eslint rules referenced in eslint-disable comments in source files
             '@typescript-eslint/no-unused-vars': 'warn',
-            '@typescript-eslint/no-empty-interface': 'warn',
+            '@typescript-eslint/no-empty-object-type': 'warn',
             '@typescript-eslint/no-explicit-any': 'warn',
             '@typescript-eslint/no-var-requires': 'warn',
         },

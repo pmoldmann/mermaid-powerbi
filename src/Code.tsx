@@ -252,7 +252,6 @@ function findMermaidNode(container: HTMLElement, nodeId: string): Element | null
  * Power BI's host.launchUrl() shows a native confirmation dialog before opening in an external browser.
  */
 function openExternalLink(url: string, host: unknown): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pbiHost = host as any;
     if (pbiHost && typeof pbiHost.launchUrl === 'function') {
         // Power BI host.launchUrl() shows a native confirmation dialog
@@ -381,7 +380,6 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             
             // Build mermaid config conditionally so "default" settings pass nothing,
             // allowing frontmatter/directives to take control.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const mermaidConfig: Record<string, any> = {
                 securityLevel: mermaidSettings.securityLevel as "loose" | "strict" | "sandbox",
                 maxEdges: mermaidSettings.maxEdges,
@@ -447,7 +445,6 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
 
             // ELK-specific options: only when layout is "elk" and values are not "default"
             if (mermaidSettings.layout === 'elk') {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const elkConfig: Record<string, any> = {};
                 if (mermaidSettings.elkMergeEdges && mermaidSettings.elkMergeEdges !== 'default') {
                     elkConfig.mergeEdges = mermaidSettings.elkMergeEdges === 'true';
@@ -463,12 +460,10 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             mermaid.initialize(mermaidConfig);
             
             // Set noop transiently for Mermaid's `call noop()` click directives
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (window as any).noop = () => { /* intentional no-op */ };
             mermaid
                 .render(demoid.current, code)
                 .then(({ svg }) => {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     delete (window as any).noop;
                     // Sanitize SVG before injecting into DOM.
                     // NOTE: DOMPurify intentionally blocks <foreignObject> (svgDisallowed +
@@ -523,7 +518,6 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     processMermaidInteractivity(container, code, host);
                 })
                 .catch((error) => {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     delete (window as any).noop;
                     debugLog('error', 'Mermaid rendering error', String(error));
                     container.textContent = code;

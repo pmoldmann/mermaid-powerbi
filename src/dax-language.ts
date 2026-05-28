@@ -11,14 +11,11 @@
 
 // refractor is an ESM-only module; use require for compatibility with
 // the project's "moduleResolution": "node" tsconfig setting.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { refractor } = require('refractor') as { refractor: RefractorInstance };
 
 // Built-in language definitions from refractor
 // Using the package exports pattern: refractor/<name> maps to refractor/lang/<name>.js
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const dax = require('refractor/dax') as ({ default?: LanguageSyntax } & LanguageSyntax);
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const powerquery = require('refractor/powerquery') as ({ default?: LanguageSyntax } & LanguageSyntax);
 
 interface RefractorInstance {

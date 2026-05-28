@@ -7,7 +7,6 @@
         "target": "es6",
         "sourceMap": true,
         "outDir": "./.tmp/build/",
-        "rootDir": "./src",
         "moduleResolution": "node",
         "declaration": false,
         "allowSyntheticDefaultImports": true,
@@ -25,7 +24,7 @@
         "skipLibCheck": true
     },
     "files": [
-        "src/visual.ts",
+        "src/visual.ts"
     ],
     "include": [
         "src/global.d.ts"
