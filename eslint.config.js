@@ -20,6 +20,7 @@ module.exports = [
             'traceOptions.ts',
             'src/license.ts',
             'src/LicenseRequired.tsx',
+            'src/visualPluginView.ts',
             'karma.conf.ts',
             'visuals-license-engine/**',
         ],

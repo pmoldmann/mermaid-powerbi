@@ -478,13 +478,13 @@ export const Application: React.FC<ApplicationProps> = () => {
                                 <MermaidSettingsContext.Provider value={settings?.mermaid || {
                                     flowchartOrientation: "default",
                                     layout: "default",
-                                    look: "default",
                                     maxEdges: 30000,
                                     securityLevel: "loose",
                                     elkMergeEdges: "default",
                                     elkNodePlacement: "default",
                                 }}>
                                     <MermaidThemeVarsContext.Provider value={settings?.mermaidThemeVars || {
+                                        look: "default",
                                         baseTheme: "auto",
                                         enableThemeColors: false,
                                         primaryColor: { solid: { color: "" } },

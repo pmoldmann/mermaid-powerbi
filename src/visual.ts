@@ -165,7 +165,11 @@ export class Visual implements IVisual {
             const enableThemeColors = typeof themeVars.enableThemeColors === 'boolean'
                 ? themeVars.enableThemeColors
                 : false;
+            const look = typeof themeVars.look === 'string' && themeVars.look.trim() !== ''
+                ? themeVars.look
+                : 'default';
             const props: Record<string, unknown> = {
+                look,
                 baseTheme,
                 enableThemeColors,
             };
