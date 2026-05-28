@@ -53,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Zoom in Mermaid diagrams**: Fixed zoom controls not working correctly on Mermaid diagrams
 - Setting "Mermaid Font Size" did not have any effect. 
 - "Dark Mode" now draws a black canvas.
+- fixed "highlight" markdown function (did not work before).
 ---
 
 ## [1.1.1.0] - 2026-03-10

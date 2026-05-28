@@ -7,6 +7,7 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext, MermaidThemeVarsContext } from './Code';
 import remarkBreaks from 'remark-breaks';
 import remarkDefinitionList from 'remark-definition-list';
+import { findAndReplace } from 'mdast-util-find-and-replace';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar } from './SearchBar';
@@ -22,11 +23,26 @@ import "mermaid";
 // Register DAX and Power Query (M) as custom languages for syntax highlighting in code blocks
 import './dax-language';
 
+// Remark plugin that converts ==text== into <mark> elements
+function remarkMark() {
+    return function (tree: Parameters<typeof findAndReplace>[0]) {
+        findAndReplace(tree, [
+            [
+                /==([^=\n]+)==/g,
+                (_match: string, $1: string) => ({
+                    type: 'html' as const,
+                    value: `<mark>${$1}</mark>`,
+                }),
+            ],
+        ]);
+    };
+}
+
 // Custom schema that preserves br tags (needed for Mermaid diagrams with line breaks)
 // Also allow br inside code elements and className on spans (needed for syntax highlighting tokens)
 const sanitizeSchema = {
     ...defaultSchema,
-    tagNames: [...(defaultSchema.tagNames || []), 'br'],
+    tagNames: [...(defaultSchema.tagNames || []), 'br', 'mark'],
     ancestors: {
         ...defaultSchema.ancestors,
         br: ['code', 'pre', 'span', 'div', 'p', 'li', 'td', 'th'],
@@ -522,7 +538,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                                             <MDEditor.Markdown
                                                                 components={{ code: Code }}
                                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks, remarkDefinitionList] : [remarkDefinitionList]}
+                                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks, remarkDefinitionList, remarkMark] : [remarkDefinitionList, remarkMark]}
                                                                 source={section.content}
                                                             />
                                                         </div>
@@ -535,7 +551,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                             <MDEditor.Markdown
                                                 components={{ code: Code }}
                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks, remarkDefinitionList] : [remarkDefinitionList]}
+                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks, remarkDefinitionList, remarkMark] : [remarkDefinitionList, remarkMark]}
                                                 source={markdownContent}
                                             />
                                         )}
