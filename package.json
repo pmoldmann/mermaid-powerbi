@@ -6,7 +6,7 @@
     "package": "webpack --config view-webpack.config",
     "sass": "npx rebuild node-sass",
     "start": "webpack-dev-server --config view-webpack.config.js",
-    "audit": "yarn audit",
+    "audit": "npm audit",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lintfix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
@@ -40,7 +40,9 @@
     "remark-definition-list": "2.0.0",
     "schema-utils": "^4.2.0"
   },
-  "resolutions": {},
+  "overrides": {
+    "uuid": ">=11.1.1"
+  },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "^10.0.1",
@@ -79,6 +81,6 @@
     "webpack": "^5.106.1",
     "webpack-bundle-analyzer": "5.3.0",
     "webpack-cli": "7.0.2",
-    "webpack-dev-server": "5.2.3"
+    "webpack-dev-server": "5.2.4"
   }
 }
