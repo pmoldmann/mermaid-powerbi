@@ -46,6 +46,15 @@ module.exports = [
             '@typescript-eslint/no-empty-object-type': 'warn',
             '@typescript-eslint/no-explicit-any': 'warn',
             '@typescript-eslint/no-var-requires': 'warn',
+            // Empty interface is intentional for extensible React prop types
+            '@typescript-eslint/no-empty-object-type': ['warn', { allowInterfaces: 'always' }],
+        },
+    },
+    // dax-language.ts uses require() intentionally (ESM-only refractor module)
+    {
+        files: ['src/dax-language.ts'],
+        rules: {
+            '@typescript-eslint/no-var-requires': 'off',
         },
     },
 ];

@@ -15,6 +15,8 @@ mermaid.registerLayoutLoaders(elkLayouts);
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
 
+type WindowWithNoop = Window & typeof globalThis & { noop?: () => void };
+
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
 const ZOOM_STEP = 0.25;
@@ -252,7 +254,7 @@ function findMermaidNode(container: HTMLElement, nodeId: string): Element | null
  * Power BI's host.launchUrl() shows a native confirmation dialog before opening in an external browser.
  */
 function openExternalLink(url: string, host: unknown): void {
-    const pbiHost = host as any;
+    const pbiHost = host as { launchUrl?: (url: string) => void } | null;
     if (pbiHost && typeof pbiHost.launchUrl === 'function') {
         // Power BI host.launchUrl() shows a native confirmation dialog
         pbiHost.launchUrl(url);
@@ -380,7 +382,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             
             // Build mermaid config conditionally so "default" settings pass nothing,
             // allowing frontmatter/directives to take control.
-            const mermaidConfig: Record<string, any> = {
+            const mermaidConfig: Record<string, unknown> = {
                 securityLevel: mermaidSettings.securityLevel as "loose" | "strict" | "sandbox",
                 maxEdges: mermaidSettings.maxEdges,
                 htmlLabels: false,
@@ -445,7 +447,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
 
             // ELK-specific options: only when layout is "elk" and values are not "default"
             if (mermaidSettings.layout === 'elk') {
-                const elkConfig: Record<string, any> = {};
+                const elkConfig: Record<string, unknown> = {};
                 if (mermaidSettings.elkMergeEdges && mermaidSettings.elkMergeEdges !== 'default') {
                     elkConfig.mergeEdges = mermaidSettings.elkMergeEdges === 'true';
                 }
@@ -457,14 +459,14 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 }
             }
 
-            mermaid.initialize(mermaidConfig);
+            mermaid.initialize(mermaidConfig as Parameters<typeof mermaid.initialize>[0]);
             
             // Set noop transiently for Mermaid's `call noop()` click directives
-            (window as any).noop = () => { /* intentional no-op */ };
+            (window as WindowWithNoop).noop = () => { /* intentional no-op */ };
             mermaid
                 .render(demoid.current, code)
                 .then(({ svg }) => {
-                    delete (window as any).noop;
+                    delete (window as WindowWithNoop).noop;
                     // Sanitize SVG before injecting into DOM.
                     // NOTE: DOMPurify intentionally blocks <foreignObject> (svgDisallowed +
                     // DEFAULT_FORBID_CONTENTS), so htmlLabels must be false to avoid empty
@@ -518,7 +520,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     processMermaidInteractivity(container, code, host);
                 })
                 .catch((error) => {
-                    delete (window as any).noop;
+                    delete (window as WindowWithNoop).noop;
                     debugLog('error', 'Mermaid rendering error', String(error));
                     container.textContent = code;
                 });

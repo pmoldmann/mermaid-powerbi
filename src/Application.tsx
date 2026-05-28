@@ -55,9 +55,6 @@ const sanitizeSchema = {
     },
 };
 
-export interface ApplicationProps {
-}
-
 /**
  * Highlights text matches in the DOM
  */
@@ -122,7 +119,7 @@ const clearHighlights = (container: HTMLElement) => {
  * Main application component that renders Markdown content from Power BI data.
  * Supports Mermaid diagrams embedded in markdown code blocks.
  */
-export const Application: React.FC<ApplicationProps> = () => {
+export const Application: React.FC = () => {
     const host = useAppSelector((state) => state.options.host);
     const settings = useAppSelector((state) => state.options.settings);
     const viewport = useAppSelector((state) => state.options.viewport);

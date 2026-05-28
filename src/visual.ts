@@ -18,6 +18,7 @@ import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import IVisualEventService = powerbiVisualsApi.extensibility.IVisualEventService;
 
 import { MermaidThemeVariablesSettings, VisualSettings } from "./settings";
+import { buildFormattingModel } from "./FormattingModel";
 
 import { Provider } from 'react-redux';
 import { store } from "./redux/store";
@@ -183,6 +184,10 @@ export class Visual implements IVisual {
             return [{ objectName: 'mermaidThemeVars', selector: null, properties: props }];
         }
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
+    }
+
+    public getFormattingModel(): powerbiVisualsApi.visuals.FormattingModel {
+        return buildFormattingModel(this.settings, store.getState().options.dataView);
     }
 }
 
