@@ -11,6 +11,13 @@ import EnumMemberValue = powerbiVisualsApi.EnumMemberValue;
 
 import { IVisualSettings } from "./settings";
 
+import ILocalizationManager = powerbiVisualsApi.extensibility.ILocalizationManager;
+
+function loc(mgr: ILocalizationManager | undefined, key: string, fallback: string): string {
+    if (!mgr) return fallback;
+    return mgr.getDisplayName(key) || fallback;
+}
+
 // ---------------------------------------------------------------------------
 // Descriptor helpers
 // ---------------------------------------------------------------------------
@@ -99,13 +106,14 @@ function singleGroup(uid: string, slices: SimpleVisualFormattingSlice[]): Format
 // Main builder
 // ---------------------------------------------------------------------------
 
-export function buildFormattingModel(settings: IVisualSettings, dataView: DataView | null): FormattingModel {
+export function buildFormattingModel(settings: IVisualSettings, dataView: DataView | null, localizationManager?: ILocalizationManager): FormattingModel {
     const cards: FormattingCard[] = [];
+    const l = (key: string, fallback: string) => loc(localizationManager, key, fallback);
 
     // ---- 1. View settings ------------------------------------------------
     cards.push({
         uid: 'view',
-        displayName: 'View settings',
+        displayName: l('view_DisplayName', 'View settings'),
         groups: [singleGroup('view-group', [
             dropdown('view', 'colorMode', settings.view.colorMode),
             toggle('view', 'enableCopyMenu', settings.view.enableCopyMenu),
@@ -118,7 +126,7 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     // ---- 2. Mermaid settings ---------------------------------------------
     cards.push({
         uid: 'mermaid',
-        displayName: 'Mermaid settings',
+        displayName: l('mermaid_DisplayName', 'Mermaid settings'),
         groups: [singleGroup('mermaid-group', [
             dropdown('mermaid', 'layout', settings.mermaid.layout),
             dropdown('mermaid', 'elkNodePlacement', settings.mermaid.elkNodePlacement),
@@ -146,14 +154,14 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     }
     cards.push({
         uid: 'mermaidThemeVars',
-        displayName: 'Mermaid theme settings',
+        displayName: l('mermaidThemeVars_DisplayName', 'Mermaid theme settings'),
         groups: [singleGroup('mermaidThemeVars-group', themeSlices)]
     });
 
     // ---- 4. Mermaid debug ------------------------------------------------
     cards.push({
         uid: 'mermaidDebug',
-        displayName: 'Mermaid debug settings',
+        displayName: l('mermaidDebug_DisplayName', 'Mermaid debug settings'),
         groups: [singleGroup('mermaidDebug-group', [
             toggle('mermaidDebug', 'showDebugPanel', settings.mermaidDebug.showDebugPanel),
             toggle('mermaidDebug', 'markdownAutoWrap', settings.mermaidDebug.markdownAutoWrap),
@@ -166,7 +174,7 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     // ---- 5. Markdown settings --------------------------------------------
     cards.push({
         uid: 'markdown',
-        displayName: 'Markdown settings',
+        displayName: l('markdown_DisplayName', 'Markdown settings'),
         groups: [singleGroup('markdown-group', [
             toggle('markdown', 'enableLineBreaks', settings.markdown.enableLineBreaks),
             toggle('markdown', 'codeBlockWordWrap', settings.markdown.codeBlockWordWrap),
@@ -176,7 +184,7 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     // ---- 6. Interactivity ------------------------------------------------
     cards.push({
         uid: 'interactivity',
-        displayName: 'Interactivity',
+        displayName: l('interactivity_DisplayName', 'Interactivity'),
         groups: [singleGroup('interactivity-group', [
             toggle('interactivity', 'enableCrossFilter', settings.interactivity.enableCrossFilter),
         ])]
@@ -185,7 +193,7 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     // ---- 7. Markdown functions -------------------------------------------
     cards.push({
         uid: 'markdownFunctions',
-        displayName: 'Markdown functions',
+        displayName: l('markdownFunctions_DisplayName', 'Markdown functions'),
         groups: [singleGroup('markdownFunctions-group', [
             dropdown('markdownFunctions', 'definitionHeadingLevel', settings.markdownFunctions.definitionHeadingLevel),
             textInput('markdownFunctions', 'blankText', settings.markdownFunctions.blankText, '(blank)'),
@@ -200,7 +208,7 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     // ---- 8. Font settings ------------------------------------------------
     cards.push({
         uid: 'font',
-        displayName: 'Font settings',
+        displayName: l('font_DisplayName', 'Font settings'),
         groups: [singleGroup('font-group', [
             fontPicker('font', 'fontFamily', settings.font.fontFamily),
             numUpDown('font', 'headingFontSize', settings.font.headingFontSize),
@@ -264,7 +272,7 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
             });
             cards.push({
                 uid: 'measureFormat',
-                displayName: 'Content formatting',
+                displayName: l('measureFormat_DisplayName', 'Content formatting'),
                 groups: measureGroups
             });
         }

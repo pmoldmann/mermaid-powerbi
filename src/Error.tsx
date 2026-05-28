@@ -1,4 +1,15 @@
 import * as React from "react";
+import { useLocalize } from './useLocalize';
+
+const ErrorDisplay: React.FC<{ error: unknown }> = ({ error }) => {
+    const title = useLocalize('UI_ErrorTitle', 'Something went wrong.');
+    return (
+        <>
+            <h1>{title}</h1>
+            <div>{String(error)}</div>
+        </>
+    );
+};
 
 export interface ErrorBoundaryState {
     hasError: boolean;
@@ -26,14 +37,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   
     render() {
       if (this.state.hasError) {
-        return (
-            <>
-                <h1>Something went wrong.</h1>
-                <div>
-                    {String(this.state.error)}
-                </div>
-            </>
-        );
+        return <ErrorDisplay error={this.state.error} />;
       }
   
       return this.props.children; 

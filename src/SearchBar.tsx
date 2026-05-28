@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocalize } from './useLocalize';
 
 export interface SearchBarProps {
     onSearch: (query: string) => void;
@@ -58,6 +59,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
     const [query, setQuery] = React.useState('');
     const inputRef = React.useRef<HTMLInputElement>(null);
+    const placeholder = useLocalize('UI_SearchPlaceholder', 'Search...');
+    const noResults = useLocalize('UI_SearchNoResults', '0 results');
+    const prevTitle = useLocalize('UI_SearchPrev', 'Previous (Shift+Enter)');
+    const nextTitle = useLocalize('UI_SearchNext', 'Next (Enter)');
 
     React.useEffect(() => {
         inputRef.current?.focus();
@@ -89,7 +94,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                 ref={inputRef}
                 type="text"
                 className="search-bar-input"
-                placeholder="Search..."
+                placeholder={placeholder}
                 value={query}
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
@@ -97,13 +102,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             {query && (
                 <>
                     <span className="search-bar-count">
-                        {matchCount > 0 ? `${currentMatch}/${matchCount}` : '0 results'}
+                        {matchCount > 0 ? `${currentMatch}/${matchCount}` : noResults}
                     </span>
                     <button
                         className="search-bar-nav"
                         onClick={() => onNavigate('prev')}
                         disabled={matchCount === 0}
-                        title="Previous (Shift+Enter)"
+                        title={prevTitle}
                     >
                         <ChevronIcon direction="up" />
                     </button>
@@ -111,7 +116,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                         className="search-bar-nav"
                         onClick={() => onNavigate('next')}
                         disabled={matchCount === 0}
-                        title="Next (Enter)"
+                        title={nextTitle}
                     >
                         <ChevronIcon direction="down" />
                     </button>

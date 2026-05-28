@@ -16,13 +16,14 @@ import VisualObjectInstanceEnumerationObject = powerbiVisualsApi.VisualObjectIns
 import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import IVisualEventService = powerbiVisualsApi.extensibility.IVisualEventService;
+import ILocalizationManager = powerbiVisualsApi.extensibility.ILocalizationManager;
 
 import { MermaidThemeVariablesSettings, VisualSettings } from "./settings";
 import { buildFormattingModel } from "./FormattingModel";
 
 import { Provider } from 'react-redux';
 import { store } from "./redux/store";
-import { setDataView, setHost, setRowData, setSelectionManager, setSettings, setViewport, setHighContrast } from './redux/slice';
+import { setDataView, setHost, setRowData, setSelectionManager, setSettings, setViewport, setHighContrast, setLocalizationManager } from './redux/slice';
 import { deepClone, extractMarkdownSections, extractTooltipColumns, getMarkdownColumnIndices } from './utils';
 
 
@@ -32,6 +33,7 @@ export class Visual implements IVisual {
     private host: IVisualHost;
     private selectionManager: ISelectionManager;
     private events: IVisualEventService;
+    private localizationManager: ILocalizationManager;
     private root: Root;
 
     constructor(options: VisualConstructorOptions) {
@@ -42,6 +44,7 @@ export class Visual implements IVisual {
 
         // Create selection manager for cross-filtering and context menu
         this.selectionManager = this.host.createSelectionManager();
+        this.localizationManager = this.host.createLocalizationManager();
 
         window.open = (url?: string | URL) => {
             if (typeof url === "string") {
@@ -52,6 +55,7 @@ export class Visual implements IVisual {
 
         store.dispatch(setHost(options.host));
         store.dispatch(setSelectionManager(this.selectionManager));
+        store.dispatch(setLocalizationManager(this.localizationManager));
 
         // Prevent the browser default context menu on the visual element.
         // The React-based handleContextMenu in Application.tsx decides whether
@@ -187,7 +191,7 @@ export class Visual implements IVisual {
     }
 
     public getFormattingModel(): powerbiVisualsApi.visuals.FormattingModel {
-        return buildFormattingModel(this.settings, store.getState().options.dataView);
+        return buildFormattingModel(this.settings, store.getState().options.dataView, this.localizationManager);
     }
 }
 

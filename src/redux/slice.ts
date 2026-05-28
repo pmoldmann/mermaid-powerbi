@@ -4,6 +4,7 @@ import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 import IViewport = powerbiVisualsApi.IViewport;
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import ISelectionId = powerbiVisualsApi.visuals.ISelectionId;
+import ILocalizationManager = powerbiVisualsApi.extensibility.ILocalizationManager;
 
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
@@ -21,6 +22,7 @@ export interface VisualState {
     selectionIds: ISelectionId[];
     tooltipColumns: TooltipColumnData[];
     isHighContrast: boolean;
+    localizationManager: ILocalizationManager | undefined;
 }
 
 export interface RowDataPayload {
@@ -43,6 +45,7 @@ const initialState: VisualState = {
     selectionIds: [],
     tooltipColumns: [],
     isHighContrast: false,
+    localizationManager: undefined,
 }
 
 export const slice = createSlice({
@@ -75,10 +78,13 @@ export const slice = createSlice({
         setHighContrast: (state, action: PayloadAction<boolean>) => {
             state.isHighContrast = action.payload;
         },
+        setLocalizationManager: (state, action: PayloadAction<ILocalizationManager>) => {
+            state.localizationManager = action.payload;
+        },
     },
 })
 
 // Action creators are generated for each case reducer function
-export const { setHost, setSelectionManager, setDataView, setRowData, setSettings, setViewport, setHighContrast } = slice.actions
+export const { setHost, setSelectionManager, setDataView, setRowData, setSettings, setViewport, setHighContrast, setLocalizationManager } = slice.actions
 
 export default slice.reducer

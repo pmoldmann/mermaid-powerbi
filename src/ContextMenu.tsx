@@ -1,4 +1,5 @@
 import React from 'react';
+import { useLocalize } from './useLocalize';
 
 export interface ContextMenuProps {
     /** Whether the context menu is visible */
@@ -61,6 +62,10 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
 }) => {
     const menuRef = React.useRef<HTMLDivElement>(null);
     const [copyFeedback, setCopyFeedback] = React.useState<string | null>(null);
+    const copiedLabel = useLocalize('UI_Copied', 'Copied!');
+    const copySectionLabel = useLocalize('UI_CopySection', 'Copy section markdown');
+    const copyAllLabel = useLocalize('UI_CopyAll', 'Copy all markdown');
+    const pbiMenuLabel = useLocalize('UI_PbiMenu', 'More options…');
 
     // Close menu when clicking outside
     React.useEffect(() => {
@@ -149,18 +154,18 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                     {sectionMarkdown && (
                         <button
                             className="context-menu-item"
-                            onClick={() => handleCopy(sectionMarkdown, 'Copied!')}
+                            onClick={() => handleCopy(sectionMarkdown, copiedLabel)}
                         >
                             <span className="context-menu-icon">📋</span>
-                            Copy section markdown
+                            {copySectionLabel}
                         </button>
                     )}
                     <button
                         className="context-menu-item"
-                        onClick={() => handleCopy(fullMarkdown, 'Copied!')}
+                        onClick={() => handleCopy(fullMarkdown, copiedLabel)}
                     >
                         <span className="context-menu-icon">📄</span>
-                        Copy all markdown
+                        {copyAllLabel}
                     </button>
                     {onShowPbiMenu && (
                         <>
@@ -173,7 +178,7 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                                 }}
                             >
                                 <span className="context-menu-icon">⋯</span>
-                                More options…
+                                {pbiMenuLabel}
                             </button>
                         </>
                     )}
