@@ -9,11 +9,11 @@ export const VISUAL_VERSION = '1.2.0.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {
-    mermaid: '11.14.0',
-    react: '19.2.5',
-    'react-md-editor': '4.1.0 (Markdown rendering)',
+    mermaid: '11.15.0',
+    react: '19.2.6',
+    'react-md-editor': '4.1.1 (Markdown rendering)',
     handlebars: '4.7.9',
-    dompurify: '3.4.0',
+    dompurify: '3.4.7',
 };
 
 /**

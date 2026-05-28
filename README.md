@@ -331,11 +331,11 @@ Uh - And now guess only once how this file has been generated...
 
 | Library | Version |
 |---------|---------|
-| Mermaid | 11.14.0 |
-| React | 19.2.5 |
-| react-md-editor | 4.1.0 (Markdown rendering) |
+| Mermaid | 11.15.0 |
+| React | 19.2.6 |
+| react-md-editor | 4.1.1 (Markdown rendering) |
 | Handlebars | 4.7.9 |
-| DOMPurify | 3.4.0 |
+| DOMPurify | 3.4.7 |
 
 ---
 
@@ -357,8 +357,6 @@ Uh - And now guess only once how this file has been generated...
 | **Layout algorithm** | Enum | `Default (from diagram)` | Layout engine used to position nodes and edges. Choose `Dagre` (Mermaid's built-in engine) or `ELK` (Eclipse Layout Kernel — better results for large or complex diagrams). `Default` lets the diagram code or frontmatter decide. |
 | **ELK: Node placement** | Enum | `Default (from diagram)` | Node placement strategy when using the ELK layout engine. Options: Simple, Network Simplex, Linear Segments, Brandes Koepf. Has no effect unless Layout is set to `ELK`. |
 | **ELK: Merge edges** | Enum | `Default (from diagram)` | Combine parallel edges when using the ELK layout engine. Has no effect unless Layout is set to `ELK`. |
-| **Theme** | Enum | `Auto` | Color theme for diagrams. `Auto` selects light or dark automatically based on the Color mode setting. `Default (from diagram)` defers to any `%%{init: {...}}%%` frontmatter or `%%theme` directives in the diagram code. Other options: `Default`, `Dark`, `Forest`, `Neutral`, `Base`. |
-| **Look** | Enum | `Default (from diagram)` | Visual style of diagrams. `Classic` uses the traditional Mermaid style; `Hand-drawn` renders a sketch-like appearance. `Default` lets the diagram code or frontmatter decide. |
 | **Flowchart orientation** | Enum | `Default (from diagram)` | Override the orientation of flowchart diagrams. Choose between Top to Bottom, Bottom to Top, Left to Right, or Right to Left. `Default` uses the orientation defined in the diagram code. |
 | **Max edges** | Number | `30000` | Maximum number of edges allowed in a diagram. |
 | **Security level** | Enum | `Loose` | Security level for Mermaid rendering: `Loose`, `Strict`, or `Sandbox`. Loose is required for click handlers and tooltips. |
@@ -374,12 +372,34 @@ Beyond the layout engine, the visual settings give you several levers to indirec
 | Cleaner edge routing in complex diagrams | Layout → `ELK` |
 | Reduce overlapping edges | ELK: Merge edges → `True` |
 | More compact or evenly spaced nodes | ELK: Node placement → `Network Simplex` or `Brandes Koepf` |
-| Match the report's dark/light theme | Theme → `Auto` |
-| A softer, less technical look | Look → `Hand-drawn` |
+| Match the report's dark/light theme | Mermaid theme settings → Theme → `Auto` |
+| A softer, less technical look | Mermaid theme settings → Look → `Hand-drawn` |
+| Custom colors on diagrams | Mermaid theme settings → Theme `Base` + Customize theme colors |
 | Change diagram direction without editing code | Flowchart orientation → `LR` / `TB` etc. |
 | Scale text in all diagrams at once | Font → Mermaid font size |
 
 > 💡 **Tip:** ELK is particularly effective for `flowchart` and `graph` diagrams. For sequence diagrams and Gantt charts, the layout engine setting has no effect — they use their own fixed rendering.
+
+### Mermaid Theme Settings
+
+Controls the visual appearance (look and color theme) of all Mermaid diagrams in the visual.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| **Theme** | Enum | `Auto` | Color theme for diagrams. `Auto` selects light or dark automatically based on the Color mode setting. `Default (from diagram)` defers to any `%%{init: {...}}%%` frontmatter or `%%theme` directives in the diagram code. Other options: `Default`, `Dark`, `Forest`, `Neutral`, `Base`. |
+| **Look** | Enum | `Default (from diagram)` | Visual style of diagrams. `Classic` uses the traditional Mermaid style; `Hand-drawn` renders a sketch-like appearance. `Default` lets the diagram code or frontmatter decide. |
+| **Customize theme colors** | Boolean | `false` | Enables color picker overrides for individual theme variables. **Only effective when Theme is set to `Base`** — the Base theme is designed to be fully customizable via theme variables. With other themes the color pickers are visible but have no effect. |
+| **Primary color** | Color | *(none)* | Background color of nodes and primary diagram elements (e.g. flowchart boxes, sequence participants). Corresponds to Mermaid's `primaryColor` theme variable. |
+| **Background** | Color | *(none)* | Base background color of the diagram canvas. Corresponds to Mermaid's `background` theme variable. |
+| **Note background** | Color | *(none)* | Background color of note boxes in sequence and other diagrams. Corresponds to Mermaid's `noteBkgColor` theme variable. |
+| **Note text color** | Color | *(none)* | Text color inside note boxes. Corresponds to Mermaid's `noteTextColor` theme variable. |
+
+> ⚠️ **Important:** Color overrides (`Customize theme colors`) only produce visible results when **Theme is set to `Base`**. The Base theme exposes Mermaid's theme variable system — other themes (Default, Dark, Forest, Neutral) have hard-coded color palettes that are not affected by these settings.
+
+**Recommended workflow for custom colors:**
+1. Set **Theme** → `Base`
+2. Enable **Customize theme colors**
+3. Pick colors for the variables you want to override (leave others blank to use Base theme defaults)
 
 ### Mermaid Debug Settings
 

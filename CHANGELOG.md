@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.2.0.0] - 2026-04-14
+## [1.2.0.0] - 2026-05-28
 
 ### Added
 - **Extended Mermaid rendering configuration**: New settings for finer control over Mermaid diagram rendering:
@@ -17,25 +17,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Look** — switch between "Default" (classic) and "Hand-drawn" (sketch-style) rendering
   - **ELK: Merge edges** — toggle edge merging in ELK layout (reduces visual clutter in complex diagrams)
   - **ELK: Node placement** — configure node placement strategy in ELK layout (Simple, Network Simplex, Linear Segments, Brandes-Köpf)
+- **Mermaid theme color customization**: New color picker settings in "Mermaid theme settings". When **Theme** is set to `Base` and **Customize theme colors** is enabled, four individual colors can be overridden via Power BI color pickers:
+  - **Primary color** — background of nodes and primary diagram elements
+  - **Background** — base diagram canvas background
+  - **Note background** — background of note boxes in sequence diagrams
+  - **Note text color** — text color inside note boxes
+  These settings only take effect with the `Base` theme, which exposes Mermaid's full theme variable system.
+
+### Security
+- **Mermaid 11.15.0** — fixes four CVEs directly relevant to this visual:
+  - CVE-2026-41148 / CVE-2026-41149: Prevent CSS injection via `classDef` statements (replaced raw CSS injection with CSSOM)
+  - CVE-2026-41159: Block CSS scope escape via `stylis`
+  - CVE-2026-41150: Add iteration limit to Gantt `excludes` to prevent infinite loops
+- **DOMPurify 3.4.7** — includes CVE fix from 3.4.5 (publicly known XSS bypass) plus hardening of Shadow DOM and URI validation edge cases
 
 ### Changed
 - **Library upgrades**: Updated all dependencies to latest versions:
-  - React 18.2.0 → **19.2.5** (major upgrade)
-  - Redux Toolkit 1.9.7 → **2.11.2** (major upgrade)
-  - react-redux 8.1.3 → **9.2.0** (major upgrade)
-  - Mermaid 11.12.3 → **11.14.0**
-  - DOMPurify 3.2.6 → **3.4.0**
+  - React 18.2.0 → **19.2.6** (major upgrade)
+  - Redux Toolkit 1.9.7 → **2.12.0** (major upgrade)
+  - react-redux 8.1.3 → **9.3.0** (major upgrade)
+  - Mermaid 11.12.3 → **11.15.0**
+  - DOMPurify 3.2.6 → **3.4.7**
   - Handlebars 4.7.8 → **4.7.9**
-  - react-md-editor 4.0.4 → **4.1.0**
-  - TypeScript 5.3.2 → **6.0.2** (major upgrade)
+  - react-md-editor 4.0.4 → **4.1.1**
+  - TypeScript 5.3.2 → **6.0.3** (major upgrade)
   - ESLint 8.54.0 → **10.2.0** (major upgrade)
   - webpack-cli 5.1.4 → **7.0.2** (major upgrade)
-  - Babel 7.23.3 → **7.29.x** (major upgrade)
+  - Babel 7.23.3 → **7.29.7** (major upgrade)
+  - @typescript-eslint 8.58.2 → **8.60.0**
+  - sass 1.99.0 → **1.100.0**
+  - powerbi-visuals-webpack-plugin 5.0.1 → **5.0.2**
   - sass-loader 13.3.2 → **16.0.7**, css-loader 6.8.1 → **7.1.4**, and more
 
 ### Fixed
 - **Zoom in Mermaid diagrams**: Fixed zoom controls not working correctly on Mermaid diagrams
-
+- Setting "Mermaid Font Size" did not have any effect. 
+- "Dark Mode" now draws a black canvas.
 ---
 
 ## [1.1.1.0] - 2026-03-10
