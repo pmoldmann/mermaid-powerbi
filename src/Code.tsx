@@ -492,6 +492,26 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                         } else {
                             svgElement.classList.remove('mermaid-preserve-linebreaks');
                         }
+
+                        // Canvas background: Mermaid's 'background' themeVariable only hints at
+                        // the background for color derivations — it does not paint the SVG canvas.
+                        // Apply it explicitly as CSS. Fall back to Mermaid's dark theme default
+                        // (#1f2020) when the dark theme is active, so diagrams look correct in
+                        // dark mode even without a user-set color.
+                        let canvasBg = '';
+                        if (mermaidThemeVars.enableThemeColors) {
+                            const rawBg = mermaidThemeVars.background as unknown;
+                            const userBg = typeof rawBg === 'string'
+                                ? rawBg
+                                : (rawBg as { solid?: { color?: string } })?.solid?.color;
+                            if (userBg && userBg.trim() !== '') {
+                                canvasBg = userBg;
+                            }
+                        }
+                        if (!canvasBg && mermaidConfig.theme === 'dark') {
+                            canvasBg = '#1f2020';
+                        }
+                        svgElement.style.backgroundColor = canvasBg;
                     }
                     
                     // Process tooltips and link interception instead of calling
