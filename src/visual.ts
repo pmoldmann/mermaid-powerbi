@@ -171,13 +171,9 @@ export class Visual implements IVisual {
             };
             if (enableThemeColors) {
                 props.primaryColor = themeVars.primaryColor;
-                props.primaryTextColor = themeVars.primaryTextColor;
-                props.primaryBorderColor = themeVars.primaryBorderColor;
-                props.secondaryColor = themeVars.secondaryColor;
-                props.tertiaryColor = themeVars.tertiaryColor;
-                props.mainBkg = themeVars.mainBkg;
-                props.lineColor = themeVars.lineColor;
-                props.edgeLabelBackground = themeVars.edgeLabelBackground;
+                props.background = themeVars.background;
+                props.noteBkgColor = themeVars.noteBkgColor;
+                props.noteTextColor = themeVars.noteTextColor;
             }
             return [{ objectName: 'mermaidThemeVars', selector: null, properties: props }];
         }

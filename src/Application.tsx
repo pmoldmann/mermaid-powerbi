@@ -488,13 +488,9 @@ export const Application: React.FC<ApplicationProps> = () => {
                                         baseTheme: "auto",
                                         enableThemeColors: false,
                                         primaryColor: { solid: { color: "" } },
-                                        primaryTextColor: { solid: { color: "" } },
-                                        primaryBorderColor: { solid: { color: "" } },
-                                        secondaryColor: { solid: { color: "" } },
-                                        tertiaryColor: { solid: { color: "" } },
-                                        mainBkg: { solid: { color: "" } },
-                                        lineColor: { solid: { color: "" } },
-                                        edgeLabelBackground: { solid: { color: "" } },
+                                        background: { solid: { color: "" } },
+                                        noteBkgColor: { solid: { color: "" } },
+                                        noteTextColor: { solid: { color: "" } },
                                     }}>
                                     <MermaidDebugSettingsContext.Provider value={settings?.mermaidDebug || {
                                         showDebugPanel: false,

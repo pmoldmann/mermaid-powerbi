@@ -82,11 +82,7 @@ export class MermaidThemeVariablesSettings {
     public baseTheme: string = "auto";
     public enableThemeColors: boolean = false;
     public primaryColor: { solid: { color: string } } = { solid: { color: "" } };
-    public primaryTextColor: { solid: { color: string } } = { solid: { color: "" } };
-    public primaryBorderColor: { solid: { color: string } } = { solid: { color: "" } };
-    public secondaryColor: { solid: { color: string } } = { solid: { color: "" } };
-    public tertiaryColor: { solid: { color: string } } = { solid: { color: "" } };
-    public mainBkg: { solid: { color: string } } = { solid: { color: "" } };
-    public lineColor: { solid: { color: string } } = { solid: { color: "" } };
-    public edgeLabelBackground: { solid: { color: string } } = { solid: { color: "" } };
+    public background: { solid: { color: string } } = { solid: { color: "" } };
+    public noteBkgColor: { solid: { color: string } } = { solid: { color: "" } };
+    public noteTextColor: { solid: { color: string } } = { solid: { color: "" } };
 }

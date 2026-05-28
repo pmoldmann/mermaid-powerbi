@@ -58,13 +58,9 @@ const defaultMermaidThemeVarsSettings: MermaidThemeVariablesSettings = {
     baseTheme: "auto",
     enableThemeColors: false,
     primaryColor: { solid: { color: "" } },
-    primaryTextColor: { solid: { color: "" } },
-    primaryBorderColor: { solid: { color: "" } },
-    secondaryColor: { solid: { color: "" } },
-    tertiaryColor: { solid: { color: "" } },
-    mainBkg: { solid: { color: "" } },
-    lineColor: { solid: { color: "" } },
-    edgeLabelBackground: { solid: { color: "" } },
+    background: { solid: { color: "" } },
+    noteBkgColor: { solid: { color: "" } },
+    noteTextColor: { solid: { color: "" } },
 };
 
 // Context for color mode (light/dark)
@@ -430,13 +426,9 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             if (mermaidThemeVars.enableThemeColors) {
                 const themeVarMap: [string, string][] = [
                     ['primaryColor', 'primaryColor'],
-                    ['primaryTextColor', 'primaryTextColor'],
-                    ['primaryBorderColor', 'primaryBorderColor'],
-                    ['secondaryColor', 'secondaryColor'],
-                    ['tertiaryColor', 'tertiaryColor'],
-                    ['mainBkg', 'mainBkg'],
-                    ['lineColor', 'lineColor'],
-                    ['edgeLabelBackground', 'edgeLabelBackground'],
+                    ['background', 'background'],
+                    ['noteBkgColor', 'noteBkgColor'],
+                    ['noteTextColor', 'noteTextColor'],
                 ];
                 for (const [settingKey, mermaidKey] of themeVarMap) {
                     const rawValue = mermaidThemeVars[settingKey as keyof MermaidThemeVariablesSettings] as unknown;

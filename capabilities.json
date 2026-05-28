@@ -231,39 +231,19 @@
                     "description": "Background color of nodes and primary diagram elements",
                     "type": { "fill": { "solid": { "color": true } } }
                 },
-                "primaryTextColor": {
-                    "displayName": "Primary text color",
-                    "description": "Text color on primary nodes",
+                "background": {
+                    "displayName": "Background",
+                    "description": "Base diagram background color.",
                     "type": { "fill": { "solid": { "color": true } } }
                 },
-                "primaryBorderColor": {
-                    "displayName": "Primary border color",
-                    "description": "Border color of primary nodes",
+                "noteBkgColor": {
+                    "displayName": "Note background",
+                    "description": "Background color of note boxes.",
                     "type": { "fill": { "solid": { "color": true } } }
                 },
-                "secondaryColor": {
-                    "displayName": "Secondary color",
-                    "description": "Background color of secondary diagram elements",
-                    "type": { "fill": { "solid": { "color": true } } }
-                },
-                "tertiaryColor": {
-                    "displayName": "Tertiary color",
-                    "description": "Background color of tertiary diagram elements",
-                    "type": { "fill": { "solid": { "color": true } } }
-                },
-                "mainBkg": {
-                    "displayName": "Main background",
-                    "description": "Main background color for diagram nodes",
-                    "type": { "fill": { "solid": { "color": true } } }
-                },
-                "lineColor": {
-                    "displayName": "Line color",
-                    "description": "Color of edges and connectors",
-                    "type": { "fill": { "solid": { "color": true } } }
-                },
-                "edgeLabelBackground": {
-                    "displayName": "Edge label background",
-                    "description": "Background color behind edge labels",
+                "noteTextColor": {
+                    "displayName": "Note text color",
+                    "description": "Text color inside note boxes.",
                     "type": { "fill": { "solid": { "color": true } } }
                 }
             }
