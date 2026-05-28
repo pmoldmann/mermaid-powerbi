@@ -473,7 +473,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                 fontFamily: 'DIN',
                                 headingFontSize: 14,
                                 bodyFontSize: 9,
-                                mermaidFontSize: 14
+                                mermaidFontSize: 10
                             }}>
                                 <MermaidSettingsContext.Provider value={settings?.mermaid || {
                                     flowchartOrientation: "default",

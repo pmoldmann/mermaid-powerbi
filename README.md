@@ -506,7 +506,7 @@ All properties that can be themed, organized by object group:
 | `font` | `fontFamily` | string | any font name | `"DIN"` |
 | `font` | `headingFontSize` | number | size in pt | `14` |
 | `font` | `bodyFontSize` | number | size in pt | `9` |
-| `font` | `mermaidFontSize` | number | size in pt | `14` |
+| `font` | `mermaidFontSize` | number | size in pt | `10` |
 | `mermaid` | `layout` | enum | `"default"`, `"dagre"`, `"elk"` | `"default"` |
 | `mermaid` | `elkNodePlacement` | enum | `"default"`, `"SIMPLE"`, `"NETWORK_SIMPLEX"`, `"LINEAR_SEGMENTS"`, `"BRANDES_KOEPF"` | `"default"` |
 | `mermaid` | `elkMergeEdges` | enum | `"default"`, `"true"`, `"false"` | `"default"` |
@@ -552,7 +552,7 @@ Copy this complete template into a `.json` file. Remove or adjust any properties
                     "fontFamily": "DIN",
                     "headingFontSize": 14,
                     "bodyFontSize": 9,
-                    "mermaidFontSize": 14
+                    "mermaidFontSize": 10
                 }],
                 "mermaid": [{
                     "layout": "default",

@@ -23,7 +23,6 @@ const ZOOM_STEP = 0.25;
 const defaultMermaidSettings: MermaidSettings = {
     flowchartOrientation: "default",
     layout: "default",
-    look: "default",
     maxEdges: 30000,
     securityLevel: "strict",
     elkMergeEdges: "default",
@@ -44,7 +43,7 @@ const defaultFontSettings: FontSettings = {
     fontFamily: "DIN",
     headingFontSize: 14,
     bodyFontSize: 9,
-    mermaidFontSize: 14
+    mermaidFontSize: 10
 };
 
 // Default Markdown settings
@@ -55,6 +54,7 @@ const defaultMarkdownSettings: MarkdownSettings = {
 
 // Default Mermaid theme variable settings
 const defaultMermaidThemeVarsSettings: MermaidThemeVariablesSettings = {
+    look: "default",
     baseTheme: "auto",
     enableThemeColors: false,
     primaryColor: { solid: { color: "" } },
@@ -388,7 +388,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 htmlLabels: false,
                 markdownAutoWrap: mermaidDebugSettings.markdownAutoWrap,
                 fontFamily: fontSettings.fontFamily || 'DIN',
-                fontSize: fontSettings.mermaidFontSize || 14,
+                fontSize: fontSettings.mermaidFontSize || 10,
                 secure: ['secure', 'securityLevel', 'startOnLoad', 'maxTextSize', 'suppressErrorRendering'],
                 pie: { useMaxWidth: false },
                 flowchart: {
@@ -417,12 +417,15 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             }
 
             // Look: only set when not "default"
-            if (mermaidSettings.look && mermaidSettings.look !== 'default') {
-                mermaidConfig.look = mermaidSettings.look;
+            if (mermaidThemeVars.look && mermaidThemeVars.look !== 'default') {
+                mermaidConfig.look = mermaidThemeVars.look;
             }
 
-            // themeVariables: only pass entries where the user has set a non-empty color, and only when custom colors are enabled
-            const themeVariables: Record<string, string> = {};
+            // themeVariables: fontSize is always set (in pt, consistent with heading/body font sizes);
+            // custom colors are added when enabled
+            const themeVariables: Record<string, string> = {
+                fontSize: `${fontSettings.mermaidFontSize || 10}pt`,
+            };
             if (mermaidThemeVars.enableThemeColors) {
                 const themeVarMap: [string, string][] = [
                     ['primaryColor', 'primaryColor'],
@@ -439,10 +442,8 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                         themeVariables[mermaidKey] = color;
                     }
                 }
-                if (Object.keys(themeVariables).length > 0) {
-                    mermaidConfig.themeVariables = themeVariables;
-                }
             }
+            mermaidConfig.themeVariables = themeVariables;
 
             // ELK-specific options: only when layout is "elk" and values are not "default"
             if (mermaidSettings.layout === 'elk') {

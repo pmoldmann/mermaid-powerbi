@@ -97,17 +97,6 @@
                         ]
                     }
                 },
-                "look": {
-                    "displayName": "Look",
-                    "description": "Visual style of diagrams. 'Default' lets the diagram code or frontmatter decide.",
-                    "type": {
-                        "enumeration": [
-                            { "value": "default", "displayName": "Default (from diagram)" },
-                            { "value": "classic", "displayName": "Classic" },
-                            { "value": "handDrawn", "displayName": "Hand-drawn" }
-                        ]
-                    }
-                },
                 "flowchartOrientation": {
                     "displayName": "Flowchart orientation",
                     "description": "Override the orientation of flowchart diagrams. 'Default' uses the orientation defined in the diagram code.",
@@ -138,6 +127,63 @@
                             { "value": "sandbox", "displayName": "Sandbox" }
                         ]
                     }
+                }
+            }
+        },
+        "mermaidThemeVars": {
+            "displayName": "Mermaid theme settings",
+            "description": "Theme selection and optional color customization for Mermaid diagrams.",
+            "properties": {
+                "look": {
+                    "displayName": "Look",
+                    "description": "Visual style of diagrams. 'Default' lets the diagram code or frontmatter decide.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "default", "displayName": "Default (from diagram)" },
+                            { "value": "classic", "displayName": "Classic" },
+                            { "value": "handDrawn", "displayName": "Hand-drawn" }
+                        ]
+                    }
+                },
+                "baseTheme": {
+                    "displayName": "Theme",
+                    "description": "Color theme for diagrams. 'Auto' selects light/dark based on color mode. 'Default (from diagram)' lets frontmatter or directives decide.",
+                    "type": {
+                        "enumeration": [
+                            { "value": "auto", "displayName": "Auto (light/dark mode)" },
+                            { "value": "none", "displayName": "Default (from diagram)" },
+                            { "value": "default", "displayName": "Default" },
+                            { "value": "dark", "displayName": "Dark" },
+                            { "value": "forest", "displayName": "Forest" },
+                            { "value": "neutral", "displayName": "Neutral" },
+                            { "value": "base", "displayName": "Base" }
+                        ]
+                    }
+                },
+                "enableThemeColors": {
+                    "displayName": "Customize theme colors",
+                    "description": "Enable to override individual theme colors. Works best with the 'Base' theme.",
+                    "type": { "bool": true }
+                },
+                "primaryColor": {
+                    "displayName": "Primary color",
+                    "description": "Background color of nodes and primary diagram elements",
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "background": {
+                    "displayName": "Background",
+                    "description": "Base diagram background color.",
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "noteBkgColor": {
+                    "displayName": "Note background",
+                    "description": "Background color of note boxes.",
+                    "type": { "fill": { "solid": { "color": true } } }
+                },
+                "noteTextColor": {
+                    "displayName": "Note text color",
+                    "description": "Text color inside note boxes.",
+                    "type": { "fill": { "solid": { "color": true } } }
                 }
             }
         },
@@ -199,52 +245,6 @@
                     "type": {
                         "bool": true
                     }
-                }
-            }
-        },
-        "mermaidThemeVars": {
-            "displayName": "Mermaid theme settings",
-            "description": "Theme selection and optional color customization for Mermaid diagrams.",
-            "properties": {
-                "baseTheme": {
-                    "displayName": "Theme",
-                    "description": "Color theme for diagrams. 'Auto' selects light/dark based on color mode. 'Default (from diagram)' lets frontmatter or directives decide.",
-                    "type": {
-                        "enumeration": [
-                            { "value": "auto", "displayName": "Auto (light/dark mode)" },
-                            { "value": "none", "displayName": "Default (from diagram)" },
-                            { "value": "default", "displayName": "Default" },
-                            { "value": "dark", "displayName": "Dark" },
-                            { "value": "forest", "displayName": "Forest" },
-                            { "value": "neutral", "displayName": "Neutral" },
-                            { "value": "base", "displayName": "Base" }
-                        ]
-                    }
-                },
-                "enableThemeColors": {
-                    "displayName": "Customize theme colors",
-                    "description": "Enable to override individual theme colors. Works best with the 'Base' theme.",
-                    "type": { "bool": true }
-                },
-                "primaryColor": {
-                    "displayName": "Primary color",
-                    "description": "Background color of nodes and primary diagram elements",
-                    "type": { "fill": { "solid": { "color": true } } }
-                },
-                "background": {
-                    "displayName": "Background",
-                    "description": "Base diagram background color.",
-                    "type": { "fill": { "solid": { "color": true } } }
-                },
-                "noteBkgColor": {
-                    "displayName": "Note background",
-                    "description": "Background color of note boxes.",
-                    "type": { "fill": { "solid": { "color": true } } }
-                },
-                "noteTextColor": {
-                    "displayName": "Note text color",
-                    "description": "Text color inside note boxes.",
-                    "type": { "fill": { "solid": { "color": true } } }
                 }
             }
         },

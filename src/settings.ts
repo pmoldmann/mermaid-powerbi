@@ -38,7 +38,6 @@ export class MermaidSettings {
     public layout: string = "default";
     public elkNodePlacement: string = "default";
     public elkMergeEdges: string = "default";
-    public look: string = "default";
     public flowchartOrientation: string = "default";
     public maxEdges: number = 30000;
     public securityLevel: string = "strict";
@@ -56,7 +55,7 @@ export class FontSettings {
     public fontFamily: string = "DIN";
     public headingFontSize: number = 14;
     public bodyFontSize: number = 9;
-    public mermaidFontSize: number = 14;
+    public mermaidFontSize: number = 10;
 }
 
 export class MarkdownSettings {
@@ -79,6 +78,7 @@ export class InteractivitySettings {
 }
 
 export class MermaidThemeVariablesSettings {
+    public look: string = "default";
     public baseTheme: string = "auto";
     public enableThemeColors: boolean = false;
     public primaryColor: { solid: { color: string } } = { solid: { color: "" } };
