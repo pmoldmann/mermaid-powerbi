@@ -55,10 +55,6 @@ const sanitizeSchema = {
     },
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ApplicationProps {
-}
-
 /**
  * Highlights text matches in the DOM
  */
@@ -123,7 +119,7 @@ const clearHighlights = (container: HTMLElement) => {
  * Main application component that renders Markdown content from Power BI data.
  * Supports Mermaid diagrams embedded in markdown code blocks.
  */
-export const Application: React.FC<ApplicationProps> = () => {
+export const Application: React.FC = () => {
     const host = useAppSelector((state) => state.options.host);
     const settings = useAppSelector((state) => state.options.settings);
     const viewport = useAppSelector((state) => state.options.viewport);
@@ -132,6 +128,24 @@ export const Application: React.FC<ApplicationProps> = () => {
     const selectionIds = useAppSelector((state) => state.options.selectionIds);
     const selectionManager = useAppSelector((state) => state.options.selectionManager);
     const tooltipColumns = useAppSelector((state) => state.options.tooltipColumns);
+    const isHighContrast = useAppSelector((state) => state.options.isHighContrast);
+
+    // When Power BI high contrast mode is active, force Mermaid to 'neutral' theme
+    const mermaidThemeVarsOverride = React.useMemo(() => {
+        const base = settings?.mermaidThemeVars || {
+            look: 'default',
+            baseTheme: 'auto',
+            enableThemeColors: false,
+            primaryColor: { solid: { color: '' } },
+            background: { solid: { color: '' } },
+            noteBkgColor: { solid: { color: '' } },
+            noteTextColor: { solid: { color: '' } },
+        };
+        if (isHighContrast) {
+            return { ...base, baseTheme: 'neutral', enableThemeColors: false };
+        }
+        return base;
+    }, [settings?.mermaidThemeVars, isHighContrast]);
 
     const container = React.useRef<HTMLDivElement>(null);
     const [highlights, setHighlights] = React.useState<HTMLElement[]>([]);
@@ -472,7 +486,7 @@ export const Application: React.FC<ApplicationProps> = () => {
 
                     <div
                         ref={container}
-                        className={`markdown-content${settings?.markdown?.codeBlockWordWrap !== false ? ' code-word-wrap' : ''}${crossFilterEnabled ? ' cross-filter-enabled' : ''}`}
+                        className={`markdown-content${isHighContrast ? ' high-contrast' : ''}${settings?.markdown?.codeBlockWordWrap !== false ? ' code-word-wrap' : ''}${crossFilterEnabled ? ' cross-filter-enabled' : ''}`}
                         data-color-mode={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}
                         onClick={onLinkClick}
                         style={{
@@ -499,15 +513,7 @@ export const Application: React.FC<ApplicationProps> = () => {
                                     elkMergeEdges: "default",
                                     elkNodePlacement: "default",
                                 }}>
-                                    <MermaidThemeVarsContext.Provider value={settings?.mermaidThemeVars || {
-                                        look: "default",
-                                        baseTheme: "auto",
-                                        enableThemeColors: false,
-                                        primaryColor: { solid: { color: "" } },
-                                        background: { solid: { color: "" } },
-                                        noteBkgColor: { solid: { color: "" } },
-                                        noteTextColor: { solid: { color: "" } },
-                                    }}>
+                                    <MermaidThemeVarsContext.Provider value={mermaidThemeVarsOverride}>
                                     <MermaidDebugSettingsContext.Provider value={settings?.mermaidDebug || {
                                         showDebugPanel: false,
                                         markdownAutoWrap: true,

@@ -8,12 +8,15 @@ import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
 import { MermaidSettings, MermaidDebugSettings, FontSettings, MarkdownSettings, MermaidThemeVariablesSettings } from "./settings";
 import { useAppSelector } from './redux/hooks';
+import { useLocalize } from './useLocalize';
 
 // Register ELK layout engine (must happen before any mermaid.render() call)
 mermaid.registerLayoutLoaders(elkLayouts);
 
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
+
+type WindowWithNoop = Window & typeof globalThis & { noop?: () => void };
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 4;
@@ -252,8 +255,7 @@ function findMermaidNode(container: HTMLElement, nodeId: string): Element | null
  * Power BI's host.launchUrl() shows a native confirmation dialog before opening in an external browser.
  */
 function openExternalLink(url: string, host: unknown): void {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const pbiHost = host as any;
+    const pbiHost = host as { launchUrl?: (url: string) => void } | null;
     if (pbiHost && typeof pbiHost.launchUrl === 'function') {
         // Power BI host.launchUrl() shows a native confirmation dialog
         pbiHost.launchUrl(url);
@@ -358,6 +360,11 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const panOffsetRef = React.useRef(panOffset);
     panOffsetRef.current = panOffset;
     const [isFullscreen, setIsFullscreen] = React.useState(false);
+    const zoomOutTitle = useLocalize('UI_ZoomOut', 'Zoom Out');
+    const zoomInTitle = useLocalize('UI_ZoomIn', 'Zoom In');
+    const resetZoomTitle = useLocalize('UI_ResetZoom', 'Reset Zoom');
+    const fullscreenTitle = useLocalize('UI_Fullscreen', 'Fullscreen');
+    const exitFullscreenTitle = useLocalize('UI_ExitFullscreen', 'Exit Fullscreen');
     const wrapperRef = React.useRef<HTMLDivElement>(null);
     const previousCodeRef = React.useRef<string | null>(null);
 
@@ -381,8 +388,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
             
             // Build mermaid config conditionally so "default" settings pass nothing,
             // allowing frontmatter/directives to take control.
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const mermaidConfig: Record<string, any> = {
+            const mermaidConfig: Record<string, unknown> = {
                 securityLevel: mermaidSettings.securityLevel as "loose" | "strict" | "sandbox",
                 maxEdges: mermaidSettings.maxEdges,
                 htmlLabels: false,
@@ -447,8 +453,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
 
             // ELK-specific options: only when layout is "elk" and values are not "default"
             if (mermaidSettings.layout === 'elk') {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const elkConfig: Record<string, any> = {};
+                const elkConfig: Record<string, unknown> = {};
                 if (mermaidSettings.elkMergeEdges && mermaidSettings.elkMergeEdges !== 'default') {
                     elkConfig.mergeEdges = mermaidSettings.elkMergeEdges === 'true';
                 }
@@ -460,16 +465,14 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 }
             }
 
-            mermaid.initialize(mermaidConfig);
+            mermaid.initialize(mermaidConfig as Parameters<typeof mermaid.initialize>[0]);
             
             // Set noop transiently for Mermaid's `call noop()` click directives
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            (window as any).noop = () => { /* intentional no-op */ };
+            (window as WindowWithNoop).noop = () => { /* intentional no-op */ };
             mermaid
                 .render(demoid.current, code)
                 .then(({ svg }) => {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    delete (window as any).noop;
+                    delete (window as WindowWithNoop).noop;
                     // Sanitize SVG before injecting into DOM.
                     // NOTE: DOMPurify intentionally blocks <foreignObject> (svgDisallowed +
                     // DEFAULT_FORBID_CONTENTS), so htmlLabels must be false to avoid empty
@@ -523,8 +526,7 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     processMermaidInteractivity(container, code, host);
                 })
                 .catch((error) => {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    delete (window as any).noop;
+                    delete (window as WindowWithNoop).noop;
                     debugLog('error', 'Mermaid rendering error', String(error));
                     container.textContent = code;
                 });
@@ -627,14 +629,14 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     return (
         <div className={`mermaid-zoom-wrapper${isFullscreen ? ' mermaid-fullscreen' : ''}`} ref={wrapperRef}>
             <div className="mermaid-zoom-controls">
-                <button onClick={handleZoomOut} title="Zoom Out" disabled={zoom <= MIN_ZOOM}>−</button>
+                <button onClick={handleZoomOut} title={zoomOutTitle} disabled={zoom <= MIN_ZOOM}>−</button>
                 <span className="mermaid-zoom-level">{Math.round(zoom * 100)}%</span>
-                <button onClick={handleZoomIn} title="Zoom In" disabled={zoom >= MAX_ZOOM}>+</button>
-                <button onClick={handleZoomReset} title="Reset Zoom">⟲</button>
+                <button onClick={handleZoomIn} title={zoomInTitle} disabled={zoom >= MAX_ZOOM}>+</button>
+                <button onClick={handleZoomReset} title={resetZoomTitle}>⟲</button>
                 <button
                     className="mermaid-fullscreen-btn"
                     onClick={handleToggleFullscreen}
-                    title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+                    title={isFullscreen ? exitFullscreenTitle : fullscreenTitle}
                 >
                     {isFullscreen ? '✕' : '⛶'}
                 </button>

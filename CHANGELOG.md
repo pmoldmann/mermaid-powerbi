@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1.0] - 2026-05-29
+
+### Changed
+- Prepared visual for AppSource certification
+- Added localization support for all UI strings, Format Pane labels, and capabilities
+- Added high contrast mode support
+- Added keyboard focus and multi-visual selection support
+
+### Fixed
+- Format Pane not rendering in Power BI (migration to `getFormattingModel` API)
+- 14 lint warnings resolved
+
+---
+
 ## [1.2.0.0] - 2026-05-28
 
 ### Added

@@ -9,7 +9,7 @@ var markdownMermaidRenderer: IVisualPlugin = {
     name: 'markdownMermaidRenderer',
     displayName: 'Markdown / Mermaid Renderer',
     class: 'Visual',
-    apiVersion: '5.11.0',
+    apiVersion: '5.4.0',
     create: (options?: VisualConstructorOptions) => {
         if (Visual) {
             return new Visual(options);

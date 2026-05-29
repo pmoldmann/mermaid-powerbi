@@ -1585,3 +1585,55 @@ mark.search-highlight {
         transform: scale(1);
     }
 }
+
+// ============================================
+// High Contrast Mode
+// Applied when Power BI detects OS high contrast (colorPalette.isHighContrast)
+// Uses CSS system colors so the OS high contrast theme controls the actual values.
+// ============================================
+.markdown-content.high-contrast {
+    background-color: Canvas;
+    color: CanvasText;
+
+    .wmde-markdown {
+        background-color: Canvas !important;
+        color: CanvasText !important;
+
+        h1, h2, h3, h4, h5, h6 {
+            color: CanvasText !important;
+        }
+
+        a {
+            color: LinkText !important;
+        }
+
+        a:visited {
+            color: VisitedText !important;
+        }
+
+        code, pre {
+            background-color: Canvas !important;
+            color: CanvasText !important;
+            border-color: CanvasText !important;
+        }
+
+        blockquote {
+            border-left-color: CanvasText !important;
+            color: CanvasText !important;
+        }
+
+        table, th, td {
+            border-color: CanvasText !important;
+        }
+
+        th {
+            background-color: Canvas !important;
+            color: CanvasText !important;
+        }
+
+        mark {
+            background-color: Highlight !important;
+            color: HighlightText !important;
+        }
+    }
+}

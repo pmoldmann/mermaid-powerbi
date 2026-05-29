@@ -16,12 +16,14 @@ import VisualObjectInstanceEnumerationObject = powerbiVisualsApi.VisualObjectIns
 import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import IVisualEventService = powerbiVisualsApi.extensibility.IVisualEventService;
+import ILocalizationManager = powerbiVisualsApi.extensibility.ILocalizationManager;
 
 import { MermaidThemeVariablesSettings, VisualSettings } from "./settings";
+import { buildFormattingModel } from "./FormattingModel";
 
 import { Provider } from 'react-redux';
 import { store } from "./redux/store";
-import { setDataView, setHost, setRowData, setSelectionManager, setSettings, setViewport } from './redux/slice';
+import { setDataView, setHost, setRowData, setSelectionManager, setSettings, setViewport, setHighContrast, setLocalizationManager } from './redux/slice';
 import { deepClone, extractMarkdownSections, extractTooltipColumns, getMarkdownColumnIndices } from './utils';
 
 
@@ -31,6 +33,7 @@ export class Visual implements IVisual {
     private host: IVisualHost;
     private selectionManager: ISelectionManager;
     private events: IVisualEventService;
+    private localizationManager: ILocalizationManager;
     private root: Root;
 
     constructor(options: VisualConstructorOptions) {
@@ -41,6 +44,12 @@ export class Visual implements IVisual {
 
         // Create selection manager for cross-filtering and context menu
         this.selectionManager = this.host.createSelectionManager();
+        try {
+            this.localizationManager = this.host.createLocalizationManager();
+            store.dispatch(setLocalizationManager(this.localizationManager));
+        } catch {
+            // Localization unavailable (e.g. in developer visual mode) — UI strings fall back to English
+        }
 
         window.open = (url?: string | URL) => {
             if (typeof url === "string") {
@@ -86,6 +95,7 @@ export class Visual implements IVisual {
             this.settings = Visual.parseSettings(dataView);
         }
         store.dispatch(setSettings(this.settings));
+        store.dispatch(setHighContrast((this.host.colorPalette as { isHighContrast?: boolean })?.isHighContrast ?? false));
         // Always dispatch dataView - null/undefined will clear the content and show welcome page
         store.dispatch(setDataView(dataView ? deepClone(dataView) : null));
         store.dispatch(setViewport(deepClone(options.viewport)));
@@ -182,6 +192,14 @@ export class Visual implements IVisual {
             return [{ objectName: 'mermaidThemeVars', selector: null, properties: props }];
         }
         return VisualSettings.enumerateObjectInstances(this.settings || VisualSettings.getDefault(), options);
+    }
+
+    public getFormattingModel(): powerbiVisualsApi.visuals.FormattingModel {
+        try {
+            return buildFormattingModel(this.settings, store.getState().options.dataView, this.localizationManager);
+        } catch {
+            return buildFormattingModel(this.settings, store.getState().options.dataView);
+        }
     }
 }
 
