@@ -70,7 +70,7 @@
     "mini-css-extract-plugin": "2.10.2",
     "node-fetch": "3.3.2",
     "null-loader": "4.0.1",
-    "powerbi-visuals-api": "~5.4.0",
+    "powerbi-visuals-api": "~5.11.0",
     "powerbi-visuals-webpack-plugin": "5.0.2",
     "sass": "1.100.0",
     "sass-loader": "16.0.7",
