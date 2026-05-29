@@ -6,7 +6,7 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 
 import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext, MermaidThemeVarsContext } from './Code';
 import remarkBreaks from 'remark-breaks';
-import remarkDefinitionList from 'remark-definition-list';
+import remarkDefinitionList, { defListHastHandlers } from 'remark-definition-list';
 import { findAndReplace } from 'mdast-util-find-and-replace';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
@@ -164,6 +164,33 @@ export const Application: React.FC = () => {
     }>({ visible: false, x: 0, y: 0, sectionIdx: null, selectionId: null });
 
     const showDebugPanel = settings?.mermaidDebug?.showDebugPanel === true;
+
+    // Custom <dt> renderer: applies font-size/style from definitionHeadingLevel as an
+    // inline style. dt is excluded from the body-text !important SCSS rule so that
+    // these inline styles are not overridden by the cascade.
+    const DefinitionTerm = React.useMemo(() => {
+        const level = settings?.markdownFunctions?.definitionHeadingLevel || 'none';
+        const base = settings?.font?.headingFontSize || 14;
+        const body = settings?.font?.bodyFontSize || 9;
+        const fontFamily = settings?.font?.fontFamily || 'DIN';
+        let fontSize: string;
+        switch (level) {
+            case 'h1': fontSize = `${base}pt`; break;
+            case 'h2': fontSize = `${(base * 0.85).toFixed(2)}pt`; break;
+            case 'h3': fontSize = `${(base * 0.70).toFixed(2)}pt`; break;
+            case 'h4': fontSize = `${(base * 0.60).toFixed(2)}pt`; break;
+            case 'h5': fontSize = `${(base * 0.50).toFixed(2)}pt`; break;
+            case 'h6': fontSize = `${(base * 0.45).toFixed(2)}pt`; break;
+            default:   fontSize = `${body}pt`;
+        }
+        const dtStyle: React.CSSProperties = {
+            fontSize,
+            fontStyle: level !== 'none' ? 'normal' : 'italic',
+            fontWeight: 'bold',
+            fontFamily: `"${fontFamily}", sans-serif`,
+        };
+        return ({ children }: { children?: React.ReactNode }) => <dt style={dtStyle}>{children}</dt>;
+    }, [settings?.markdownFunctions?.definitionHeadingLevel, settings?.font?.headingFontSize, settings?.font?.bodyFontSize, settings?.font?.fontFamily]);
 
     // Enable/disable debug logging based on settings
     React.useEffect(() => {
@@ -478,6 +505,12 @@ export const Application: React.FC = () => {
                                 ? markdownSections[contextMenu.sectionIdx].content
                                 : null
                         }
+                        sectionHtml={
+                            contextMenu.sectionIdx !== null
+                                ? (container.current?.querySelector<HTMLElement>(`[data-section-index="${contextMenu.sectionIdx}"] .wmde-markdown`)?.outerHTML ?? null)
+                                : null
+                        }
+                        fullHtml={container.current?.innerHTML ?? undefined}
                         fullMarkdown={markdownContent}
                         colorMode={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}
                         onClose={handleCloseContextMenu}
@@ -542,9 +575,10 @@ export const Application: React.FC = () => {
                                                             onClick={(e) => handleSectionClick(sectionIdx, e)}
                                                         >
                                                             <MDEditor.Markdown
-                                                                components={{ code: Code }}
+                                                                components={{ code: Code, dt: DefinitionTerm }}
                                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks, remarkDefinitionList, remarkMark] : [remarkDefinitionList, remarkMark]}
+                                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkDefinitionList, remarkBreaks, remarkMark] : [remarkDefinitionList, remarkMark]}
+                                                                remarkRehypeOptions={{ handlers: defListHastHandlers }}
                                                                 source={section.content}
                                                             />
                                                         </div>
@@ -553,12 +587,15 @@ export const Application: React.FC = () => {
                                                 );
                                             })
                                         ) : (
-                                            /* Single section (measure or single row) — render as before */
+                                            /* Single section (measure or single row) — use formatted section content
+                                               so that markdownFunctions settings (list heading, definition heading, etc.)
+                                               are applied. Fall back to raw markdownContent only when no sections exist. */
                                             <MDEditor.Markdown
-                                                components={{ code: Code }}
+                                                components={{ code: Code, dt: DefinitionTerm }}
                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkBreaks, remarkDefinitionList, remarkMark] : [remarkDefinitionList, remarkMark]}
-                                                source={markdownContent}
+                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkDefinitionList, remarkBreaks, remarkMark] : [remarkDefinitionList, remarkMark]}
+                                                remarkRehypeOptions={{ handlers: defListHastHandlers }}
+                                                source={markdownSections.length === 1 ? markdownSections[0].content : markdownContent}
                                             />
                                         )}
                                     </MarkdownSettingsContext.Provider>

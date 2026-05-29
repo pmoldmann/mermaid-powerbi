@@ -1,7 +1,10 @@
 import powerbiVisualsApi from "powerbi-visuals-api";
 import DataView = powerbiVisualsApi.DataView;
+import DataViewMetadataColumn = powerbiVisualsApi.DataViewMetadataColumn;
+import PrimitiveValue = powerbiVisualsApi.PrimitiveValue;
 
 import dompurify from "dompurify";
+import { valueFormatter } from "powerbi-visuals-utils-formattingutils";
 import { MarkdownFunctionsSettings } from "./settings";
 
 export const defaultDompurifyConfig = <dompurify.Config>{
@@ -107,6 +110,23 @@ export interface TooltipColumnData {
 }
 
 /**
+ * Formats a raw Power BI primitive value using the column's Power BI format string.
+ * Falls back to String() if no format string is defined or formatting fails.
+ */
+function formatColumnValue(value: PrimitiveValue, col: DataViewMetadataColumn): string {
+    if (value == null) return '';
+    if (typeof value === 'string') return value;
+    if (col.format) {
+        try {
+            return valueFormatter.create({ format: col.format }).format(value);
+        } catch {
+            // fall through to String()
+        }
+    }
+    return String(value);
+}
+
+/**
  * Returns the markdown heading prefix for a given heading level string.
  * @param level The heading level ('h1' through 'h6', or 'none')
  * @returns The markdown heading prefix (e.g. '# ') or empty string for 'none'
@@ -164,14 +184,18 @@ export function applyMeasureFormat(
         }
         case 'highlight':
             return `==${content}==`;
-        case 'definition_list': {
-            const prefix = headingPrefix(definitionHeadingLevel || 'none');
-            if (prefix) {
-                // Heading + paragraph: definition list syntax (: ) is incompatible with headings
-                return `${prefix}${displayName || 'Term'}\n\n${content}`;
-            }
-            return `${displayName || 'Term'}\n: ${content}`;
+        case 'definition_list':
+        case 'definition_list_value': {
+            const termText = displayName || 'Term';
+            // Always use DL syntax (term\n: value) — sizing is handled via
+            // data-dl-heading CSS attribute on .markdown-content, which scales
+            // dt font-size using the same multipliers as the real h1–h6 rules.
+            return `${termText}\n: ${content}`;
         }
+        case 'definition_list_header':
+            // Returns the raw value; only used when a definition_list_header column exists
+            // without a paired definition_list_value column (treated as plain text).
+            return content;
         case 'blockquote': {
             const quoted = content.split('\n').map(line => `> ${line}`).join('\n');
             if (blockquoteAddHeader !== false && displayName) {
@@ -281,6 +305,51 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
         const aggregatedCols = new Set<number>();
 
         if (isMultiRow) {
+            // --- Paired Definition List: definition_list_header + definition_list_value ---
+            // When both a header column and a value column are present, aggregate all rows
+            // into a single <dl> block. Max one of each; first found is used.
+            const dlHeaderColIdx = markdownColIndices.find(idx => {
+                const ff = getMeasureFormatFromColumn(dataView.table.columns[idx]).formatFunction;
+                return ff === 'definition_list_header';
+            }) ?? -1;
+            const dlValueColIdx = markdownColIndices.find(idx => {
+                const ff = getMeasureFormatFromColumn(dataView.table.columns[idx]).formatFunction;
+                return ff === 'definition_list_value' || ff === 'definition_list';
+            }) ?? -1;
+
+            if (dlHeaderColIdx !== -1 && dlValueColIdx !== -1) {
+                aggregatedCols.add(dlHeaderColIdx);
+                aggregatedCols.add(dlValueColIdx);
+
+                const dlEntries: string[] = [];
+                const seenPairs = deduplicateValues ? new Set<string>() : null;
+
+                const dlHeaderCol = dataView.table.columns[dlHeaderColIdx];
+                const dlValueCol = dataView.table.columns[dlValueColIdx];
+
+                rows.forEach(row => {
+                    const rawTerm = row[dlHeaderColIdx];
+                    const rawDef = row[dlValueColIdx];
+                    const termFormatted = formatColumnValue(rawTerm, dlHeaderCol).trim();
+                    const defFormatted = formatColumnValue(rawDef, dlValueCol).trim();
+                    const termStr = termFormatted === '' ? blankText : termFormatted;
+                    const defStr = defFormatted === '' ? blankText : defFormatted;
+
+                    if (seenPairs) {
+                        const pairKey = `${termStr}\x00${defStr}`;
+                        if (seenPairs.has(pairKey)) return;
+                        seenPairs.add(pairKey);
+                    }
+
+                    // Always DL syntax — dt sizing controlled via CSS data-dl-heading attribute
+                    dlEntries.push(`${termStr}\n: ${defStr}`);
+                });
+
+                if (dlEntries.length > 0) {
+                    sections.push({ content: dlEntries.join('\n\n'), rowIndex: 0 });
+                }
+            }
+
             markdownColIndices.forEach(colIdx => {
                 const col = dataView.table.columns[colIdx];
                 const { formatFunction, listDelimiter } = getMeasureFormatFromColumn(col);
@@ -349,8 +418,8 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
                 const col = dataView.table.columns[colIdx];
                 const { formatFunction, codeLanguage, listDelimiter } = getMeasureFormatFromColumn(col);
 
-                // For definition_list format, render null/empty values with the blank text placeholder
-                if (formatFunction === 'definition_list' && (value == null || String(value).trim() === '')) {
+                // For definition list value formats, render null/empty values with the blank text placeholder
+                if ((formatFunction === 'definition_list' || formatFunction === 'definition_list_value') && (value == null || String(value).trim() === '')) {
                     const content = applyMeasureFormat(blankText, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading, bqAddHeader, bqHeaderFormat, cbAddHeader, cbHeaderFormat);
                     sections.push({ content, rowIndex });
                     return;
@@ -364,9 +433,11 @@ export function extractMarkdownSections(dataView: DataView, markdownFunctions?: 
                         if (colSet.has(key)) return;
                         colSet.add(key);
                     }
-                    let content = String(value);
-                    // Apply per-column/measure formatting (works for both single and multiple columns)
-                    content = applyMeasureFormat(content, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading, bqAddHeader, bqHeaderFormat, cbAddHeader, cbHeaderFormat);
+                    // Use Power BI column format string for definition list value columns
+                    const rawContent = (formatFunction === 'definition_list' || formatFunction === 'definition_list_value')
+                        ? formatColumnValue(value, col)
+                        : String(value);
+                    let content = applyMeasureFormat(rawContent, formatFunction, codeLanguage, col.displayName, listDelimiter, defHeading, listHeading, bqAddHeader, bqHeaderFormat, cbAddHeader, cbHeaderFormat);
                     sections.push({ content, rowIndex });
                 }
             });

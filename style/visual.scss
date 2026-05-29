@@ -35,10 +35,14 @@
     }
 
     // Body text - paragraphs, tables, lists, blockquotes
-    p, li, td, th, dd, dt, blockquote, summary, figcaption {
+    p, li, td, th, dd, blockquote, summary, figcaption {
         font-size: var(--md-body-font-size, 9pt) !important;
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
+
+    // dt is intentionally excluded from the body text !important rule above.
+    // Its font-size is controlled via an inline style on a custom React <dt> component
+    // in Application.tsx (DefinitionTerm), which reads the definitionHeadingLevel setting.
 
     // ============================================
     // Custom list markers using ::before pseudo-elements
