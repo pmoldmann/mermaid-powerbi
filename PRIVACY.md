@@ -31,15 +31,16 @@ All data processing occurs **entirely locally** within the user's Power BI envir
 
 ## Third-Party Libraries
 
-This visual includes open-source libraries that are bundled and executed locally. None of these libraries make external network calls:
+This visual bundles open-source libraries that run entirely locally. None of these libraries make external network calls. The following libraries directly process user-provided data:
 
 | Library | Purpose | License |
-|---------|---------|---------|
+|---------|---------|--------|
 | [Mermaid](https://mermaid.js.org/) | Diagram rendering | MIT |
 | [react-md-editor](https://github.com/uiwjs/react-md-editor) | Markdown rendering | MIT |
-| [Handlebars.js](https://github.com/handlebars-lang/handlebars.js) | Template rendering | MIT |
-| [DOMPurify](https://github.com/cure53/DOMPurify) | HTML sanitization | Apache-2.0 |
+| [DOMPurify](https://github.com/cure53/DOMPurify) | HTML sanitization | MPL-2.0 OR Apache-2.0 |
 | [React](https://react.dev/) | UI framework | MIT |
+
+For a complete list of all bundled open-source libraries and their licenses, see [EULA.md](EULA.md).
 
 ## Children's Privacy
 
