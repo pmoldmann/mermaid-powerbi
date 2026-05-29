@@ -3,8 +3,6 @@ const path = require('path');
 // werbpack plugin
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const ExtraWatchWebpackPlugin = require('extra-watch-webpack-plugin');
-
 // visual configuration json path
 const pbivizPath = "./pbiviz.json";
 const pbivizFile = require(path.join(__dirname, pbivizPath));
@@ -65,7 +63,7 @@ const moduleRules = {
         },
         {
             test: /\.tmplt$/,
-            loader: require.resolve('raw-loader'),
+            type: 'asset/source',
         },
         {
             test: /(\.ts)x|\.ts$/,
@@ -147,12 +145,6 @@ const plugins = [
     new webpack.SourceMapDevToolPlugin({
         filename: '[name].js.map',
       }),
-    new ExtraWatchWebpackPlugin({
-        files: [
-            pbivizPath,
-            capabilitiesPath
-        ]
-    }),
     new webpack.ProvidePlugin({
         window: 'realWindow',
         define: 'fakeDefine',
@@ -178,6 +170,7 @@ const devServer = {
     devMiddleware: {
         writeToDisk: true
     },
+    watchFiles: [pbivizPath, capabilitiesPath],
 };
 
 const optimization = {

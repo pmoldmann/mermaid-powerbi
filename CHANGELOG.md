@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.2.0] - 2026-05-29
+
+### Changed
+- Replaced deprecated `extra-watch-webpack-plugin`, `null-loader`, and `raw-loader` with webpack 5 native equivalents (`devServer.watchFiles`, `asset/source` module type)
+- Resolved npm peer dependency warnings caused by outdated transitive `ajv@6.x` / `ajv-keywords@3.x` dependency chain
+- updated pbiviz api to 5.11.0
+
+---
+
 ## [1.2.1.0] - 2026-05-29
 
 ### Changed
