@@ -176,11 +176,11 @@ export const Application: React.FC = () => {
         let fontSize: string;
         switch (level) {
             case 'h1': fontSize = `${base}pt`; break;
-            case 'h2': fontSize = `${(base * 0.85).toFixed(2)}pt`; break;
-            case 'h3': fontSize = `${(base * 0.70).toFixed(2)}pt`; break;
-            case 'h4': fontSize = `${(base * 0.60).toFixed(2)}pt`; break;
-            case 'h5': fontSize = `${(base * 0.50).toFixed(2)}pt`; break;
-            case 'h6': fontSize = `${(base * 0.45).toFixed(2)}pt`; break;
+            case 'h2': fontSize = `${(base * 0.9).toFixed(2)}pt`; break;
+            case 'h3': fontSize = `${(base * 0.8).toFixed(2)}pt`; break;
+            case 'h4': fontSize = `${(base * 0.7).toFixed(2)}pt`; break;
+            case 'h5': fontSize = `${(base * 0.6).toFixed(2)}pt`; break;
+            case 'h6': fontSize = `${(base * 0.5).toFixed(2)}pt`; break;
             default:   fontSize = `${body}pt`;
         }
         const dtStyle: React.CSSProperties = {
