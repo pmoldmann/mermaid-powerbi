@@ -118,6 +118,13 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     cards.push({
         uid: 'view',
         displayName: l('view_DisplayName', 'View settings'),
+        revertToDefaultDescriptors: [
+            desc('view', 'colorMode'),
+            desc('view', 'enableCopyMenu'),
+            desc('view', 'deduplicateValues'),
+            desc('view', 'useSearchBar'),
+            desc('view', 'allowCustomStyles'),
+        ],
         groups: [singleGroup('view-group', [
             dropdown('view', 'colorMode', settings.view.colorMode),
             toggle('view', 'enableCopyMenu', settings.view.enableCopyMenu),
@@ -131,6 +138,14 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     cards.push({
         uid: 'mermaid',
         displayName: l('mermaid_DisplayName', 'Mermaid settings'),
+        revertToDefaultDescriptors: [
+            desc('mermaid', 'layout'),
+            desc('mermaid', 'elkNodePlacement'),
+            desc('mermaid', 'elkMergeEdges'),
+            desc('mermaid', 'flowchartOrientation'),
+            desc('mermaid', 'maxEdges'),
+            desc('mermaid', 'securityLevel'),
+        ],
         groups: [singleGroup('mermaid-group', [
             dropdown('mermaid', 'layout', settings.mermaid.layout),
             dropdown('mermaid', 'elkNodePlacement', settings.mermaid.elkNodePlacement),
@@ -159,6 +174,15 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     cards.push({
         uid: 'mermaidThemeVars',
         displayName: l('mermaidThemeVars_DisplayName', 'Mermaid theme settings'),
+        revertToDefaultDescriptors: [
+            desc('mermaidThemeVars', 'look'),
+            desc('mermaidThemeVars', 'baseTheme'),
+            desc('mermaidThemeVars', 'enableThemeColors'),
+            desc('mermaidThemeVars', 'primaryColor'),
+            desc('mermaidThemeVars', 'background'),
+            desc('mermaidThemeVars', 'noteBkgColor'),
+            desc('mermaidThemeVars', 'noteTextColor'),
+        ],
         groups: [singleGroup('mermaidThemeVars-group', themeSlices)]
     });
 
@@ -166,6 +190,13 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     cards.push({
         uid: 'mermaidDebug',
         displayName: l('mermaidDebug_DisplayName', 'Mermaid debug settings'),
+        revertToDefaultDescriptors: [
+            desc('mermaidDebug', 'showDebugPanel'),
+            desc('mermaidDebug', 'markdownAutoWrap'),
+            desc('mermaidDebug', 'convertBrToNewline'),
+            desc('mermaidDebug', 'autoBacktickLabels'),
+            desc('mermaidDebug', 'preserveLineBreaksCSS'),
+        ],
         groups: [singleGroup('mermaidDebug-group', [
             toggle('mermaidDebug', 'showDebugPanel', settings.mermaidDebug.showDebugPanel),
             toggle('mermaidDebug', 'markdownAutoWrap', settings.mermaidDebug.markdownAutoWrap),
@@ -179,6 +210,10 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     cards.push({
         uid: 'markdown',
         displayName: l('markdown_DisplayName', 'Markdown settings'),
+        revertToDefaultDescriptors: [
+            desc('markdown', 'enableLineBreaks'),
+            desc('markdown', 'codeBlockWordWrap'),
+        ],
         groups: [singleGroup('markdown-group', [
             toggle('markdown', 'enableLineBreaks', settings.markdown.enableLineBreaks),
             toggle('markdown', 'codeBlockWordWrap', settings.markdown.codeBlockWordWrap),
@@ -189,6 +224,9 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     cards.push({
         uid: 'interactivity',
         displayName: l('interactivity_DisplayName', 'Interactivity'),
+        revertToDefaultDescriptors: [
+            desc('interactivity', 'enableCrossFilter'),
+        ],
         groups: [singleGroup('interactivity-group', [
             toggle('interactivity', 'enableCrossFilter', settings.interactivity.enableCrossFilter),
         ])]
@@ -198,6 +236,15 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     cards.push({
         uid: 'markdownFunctions',
         displayName: l('markdownFunctions_DisplayName', 'Markdown functions'),
+        revertToDefaultDescriptors: [
+            desc('markdownFunctions', 'definitionHeadingLevel'),
+            desc('markdownFunctions', 'blankText'),
+            desc('markdownFunctions', 'listHeadingLevel'),
+            desc('markdownFunctions', 'blockquoteAddHeader'),
+            desc('markdownFunctions', 'blockquoteHeaderFormat'),
+            desc('markdownFunctions', 'codeBlockAddHeader'),
+            desc('markdownFunctions', 'codeBlockHeaderFormat'),
+        ],
         groups: [singleGroup('markdownFunctions-group', [
             dropdown('markdownFunctions', 'definitionHeadingLevel', settings.markdownFunctions.definitionHeadingLevel),
             textInput('markdownFunctions', 'blankText', settings.markdownFunctions.blankText, '(blank)'),
@@ -213,6 +260,12 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     cards.push({
         uid: 'font',
         displayName: l('font_DisplayName', 'Font settings'),
+        revertToDefaultDescriptors: [
+            desc('font', 'fontFamily'),
+            desc('font', 'headingFontSize'),
+            desc('font', 'bodyFontSize'),
+            desc('font', 'mermaidFontSize'),
+        ],
         groups: [singleGroup('font-group', [
             fontPicker('font', 'fontFamily', settings.font.fontFamily),
             numUpDown('font', 'headingFontSize', settings.font.headingFontSize),
@@ -274,9 +327,19 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
                     slices
                 };
             });
+            const measureRevertDescriptors: FormattingDescriptor[] = mdCols.reduce<FormattingDescriptor[]>((acc, col) => {
+                const selector = { metadata: col.queryName };
+                acc.push(
+                    desc('measureFormat', 'formatFunction', selector),
+                    desc('measureFormat', 'codeLanguage', selector),
+                    desc('measureFormat', 'listDelimiter', selector),
+                );
+                return acc;
+            }, []);
             cards.push({
                 uid: 'measureFormat',
                 displayName: l('measureFormat_DisplayName', 'Content formatting'),
+                revertToDefaultDescriptors: measureRevertDescriptors,
                 groups: measureGroups
             });
         }
