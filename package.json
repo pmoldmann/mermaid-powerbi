@@ -1,6 +1,6 @@
 {
   "name": "mermaid-visual",
-  "version": "1.2.0.0",
+  "version": "1.2.1.0",
   "author": "Paul Moldmann",
   "scripts": {
     "package": "webpack --config view-webpack.config",

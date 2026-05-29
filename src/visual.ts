@@ -44,7 +44,12 @@ export class Visual implements IVisual {
 
         // Create selection manager for cross-filtering and context menu
         this.selectionManager = this.host.createSelectionManager();
-        this.localizationManager = this.host.createLocalizationManager();
+        try {
+            this.localizationManager = this.host.createLocalizationManager();
+            store.dispatch(setLocalizationManager(this.localizationManager));
+        } catch {
+            // Localization unavailable (e.g. in developer visual mode) — UI strings fall back to English
+        }
 
         window.open = (url?: string | URL) => {
             if (typeof url === "string") {
@@ -55,7 +60,6 @@ export class Visual implements IVisual {
 
         store.dispatch(setHost(options.host));
         store.dispatch(setSelectionManager(this.selectionManager));
-        store.dispatch(setLocalizationManager(this.localizationManager));
 
         // Prevent the browser default context menu on the visual element.
         // The React-based handleContextMenu in Application.tsx decides whether
@@ -191,7 +195,11 @@ export class Visual implements IVisual {
     }
 
     public getFormattingModel(): powerbiVisualsApi.visuals.FormattingModel {
-        return buildFormattingModel(this.settings, store.getState().options.dataView, this.localizationManager);
+        try {
+            return buildFormattingModel(this.settings, store.getState().options.dataView, this.localizationManager);
+        } catch {
+            return buildFormattingModel(this.settings, store.getState().options.dataView);
+        }
     }
 }
 

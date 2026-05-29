@@ -14,8 +14,12 @@ import { IVisualSettings } from "./settings";
 import ILocalizationManager = powerbiVisualsApi.extensibility.ILocalizationManager;
 
 function loc(mgr: ILocalizationManager | undefined, key: string, fallback: string): string {
-    if (!mgr) return fallback;
-    return mgr.getDisplayName(key) || fallback;
+    try {
+        if (!mgr || typeof mgr.getDisplayName !== 'function') return fallback;
+        return mgr.getDisplayName(key) || fallback;
+    } catch {
+        return fallback;
+    }
 }
 
 // ---------------------------------------------------------------------------
