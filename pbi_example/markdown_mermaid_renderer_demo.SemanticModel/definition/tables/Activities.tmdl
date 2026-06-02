@@ -1,0 +1,31 @@
+table Activities
+	lineageTag: b91ccef1-3589-4ea4-a1b6-aa2d73e0b999
+
+	column 'Person Id'
+		dataType: string
+		lineageTag: cd6b45a8-0008-4443-9468-aa66d5a155bb
+		summarizeBy: none
+		sourceColumn: Person Id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Activity
+		dataType: string
+		lineageTag: 6ef03189-5387-4512-ad87-47b86c297323
+		summarizeBy: none
+		sourceColumn: Activity
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Activities = m
+		mode: import
+		source =
+				let
+				    Quelle = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i45WMlTSUXLKTyxKUXBPzE0tVorVgYg5Z6QWI3hOmdmZeelgrhGKpDGqJIgbnJ+cnFqkFBsLAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Person Id" = _t, Activity = _t])
+				in
+				    Quelle
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

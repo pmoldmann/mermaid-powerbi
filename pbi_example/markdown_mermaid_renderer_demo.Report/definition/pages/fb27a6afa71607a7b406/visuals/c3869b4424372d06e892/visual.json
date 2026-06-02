@@ -1,0 +1,150 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "c3869b4424372d06e892",
+  "position": {
+    "x": 0,
+    "y": 105.04559270516718,
+    "z": 0,
+    "height": 350.15197568389061,
+    "width": 1246.9300911854104,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "markdownMermaidRenderer_OrgStore",
+    "query": {
+      "queryState": {
+        "markdown": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "markdown content"
+                    }
+                  },
+                  "Property": "max_markdown_content"
+                }
+              },
+              "queryRef": "markdown content.max_markdown_content",
+              "nativeQueryRef": "max_markdown_content"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "view": [
+        {
+          "properties": {}
+        }
+      ],
+      "mermaidDebug": [
+        {
+          "properties": {
+            "showDebugPanel": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "measureFormat": [
+        {
+          "properties": {
+            "formatFunction": {
+              "expr": {
+                "Literal": {
+                  "Value": "'blockquote'"
+                }
+              }
+            },
+            "listDelimiter": {
+              "expr": {
+                "Literal": {
+                  "Value": "';'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "markdown content.max_markdown_content"
+          }
+        }
+      ],
+      "mermaid": [
+        {
+          "properties": {
+            "flowchartOrientation": {
+              "expr": {
+                "Literal": {
+                  "Value": "'LR'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "markdownFunctions": [
+        {
+          "properties": {
+            "listHeadingLevel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'none'"
+                }
+              }
+            },
+            "definitionHeadingLevel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'h1'"
+                }
+              }
+            },
+            "blockquoteHeaderFormat": {
+              "expr": {
+                "Literal": {
+                  "Value": "'h2'"
+                }
+              }
+            },
+            "blockquoteAddHeader": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "blankText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'fgd'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

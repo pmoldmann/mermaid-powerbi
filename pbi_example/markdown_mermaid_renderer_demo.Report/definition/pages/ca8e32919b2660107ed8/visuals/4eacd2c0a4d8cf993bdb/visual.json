@@ -1,0 +1,114 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "4eacd2c0a4d8cf993bdb",
+  "position": {
+    "x": 728.51063829787233,
+    "y": 77.81155015197568,
+    "z": 1000,
+    "height": 562.18844984802433,
+    "width": 551.48936170212767,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "markdownMermaidRenderer_OrgStore",
+    "query": {
+      "queryState": {
+        "markdown": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "markdown content"
+                    }
+                  },
+                  "Property": "markdown content"
+                }
+              },
+              "queryRef": "markdown content.markdown content",
+              "nativeQueryRef": "renderer: elk",
+              "displayName": "renderer: elk"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "measureFormat": [
+        {
+          "properties": {
+            "formatFunction": {
+              "expr": {
+                "Literal": {
+                  "Value": "'none'"
+                }
+              }
+            },
+            "codeLanguage": {
+              "expr": {
+                "Literal": {
+                  "Value": "'mermaid'"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "markdown content.markdown content"
+          }
+        }
+      ],
+      "mermaidDebug": [
+        {
+          "properties": {}
+        }
+      ],
+      "view": [
+        {
+          "properties": {
+            "colorMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'light'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "mermaid": [
+        {
+          "properties": {
+            "layout": {
+              "expr": {
+                "Literal": {
+                  "Value": "'elk'"
+                }
+              }
+            },
+            "elkNodePlacement": {
+              "expr": {
+                "Literal": {
+                  "Value": "'default'"
+                }
+              }
+            },
+            "securityLevel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'loose'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "mermaidThemeVars": [
+        {
+          "properties": {}
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

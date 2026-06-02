@@ -1,0 +1,6 @@
+// Willkommen bei der DAX-Abfrageansicht! Weitere Informationen zu DAX-Abfragen finden Sie unter https://aka.ms/dax-queries.
+// Klicken Sie mit der rechten Maustaste auf Tabellen, Spalten oder Measures im Datenausschnitt, um auf Schnellabfragen zuzugreifen, oder bitten Sie Copilot um Hilfe beim Schreiben von DAX.
+
+// Wählen Sie „Ausführen“ aus, um diese Beispiel-DAX-Abfrage zu testen.
+EVALUATE
+ INFO.PARQUETFILESTORAGES()

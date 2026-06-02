@@ -1,0 +1,93 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "c8ea9321ac3a7c4e1db0",
+  "position": {
+    "x": 9.72644376899696,
+    "y": 0,
+    "z": 0,
+    "height": 719.75683890577511,
+    "width": 1270.2735562310031,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "markdownMermaidRenderer_OrgStore",
+    "query": {
+      "queryState": {
+        "markdown": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "markdown content"
+                    }
+                  },
+                  "Property": "max_markdown_content"
+                }
+              },
+              "queryRef": "markdown content.max_markdown_content",
+              "nativeQueryRef": "max_markdown_content"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "view": [
+        {
+          "properties": {
+            "colorMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'light'"
+                }
+              }
+            },
+            "useSearchBar": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "mermaidThemeVars": [
+        {
+          "properties": {}
+        }
+      ],
+      "mermaidDebug": [
+        {
+          "properties": {
+            "showDebugPanel": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "8cd5e819075376320054",
+  "position": {
+    "x": 0,
+    "y": 40.851063829787236,
+    "z": 0,
+    "height": 372.52279635258361,
+    "width": 569.96960486322189,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "markdownMermaidRenderer_OrgStore",
+    "query": {
+      "queryState": {
+        "markdown": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "markdown content"
+                    }
+                  },
+                  "Property": "max_markdown_content"
+                }
+              },
+              "queryRef": "markdown content.max_markdown_content",
+              "nativeQueryRef": "You can create markdown lists and define delimiters between each value",
+              "displayName": "You can create markdown lists and define delimiters between each value"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "view": [
+        {
+          "properties": {
+            "colorMode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'light'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "markdown": [
+        {
+          "properties": {
+            "enableLineBreaks": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "codeBlockWordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "mermaid": [
+        {
+          "properties": {
+            "flowchartOrientation": {
+              "expr": {
+                "Literal": {
+                  "Value": "'LR'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "measureFormat": [
+        {
+          "properties": {
+            "formatFunction": {
+              "expr": {
+                "Literal": {
+                  "Value": "'code_block'"
+                }
+              }
+            },
+            "listDelimiter": {
+              "expr": {
+                "Literal": {
+                  "Value": "'; '"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "markdown content.max_markdown_content"
+          }
+        }
+      ],
+      "markdownFunctions": [
+        {
+          "properties": {
+            "definitionHeadingLevel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'h3'"
+                }
+              }
+            },
+            "listHeadingLevel": {
+              "expr": {
+                "Literal": {
+                  "Value": "'h2'"
+                }
+              }
+            },
+            "blockquoteHeaderFormat": {
+              "expr": {
+                "Literal": {
+                  "Value": "'h2'"
+                }
+              }
+            },
+            "codeBlockHeaderFormat": {
+              "expr": {
+                "Literal": {
+                  "Value": "'h3'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

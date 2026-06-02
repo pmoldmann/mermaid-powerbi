@@ -1,0 +1,15 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.1.0/schema.json",
+  "name": "46274007db9481910d66",
+  "displayName": "Cross Filter Example",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "visualInteractions": [
+    {
+      "source": "94163ae0d7600648c209",
+      "target": "dcf905596730a19e1501",
+      "type": "DataFilter"
+    }
+  ]
+}

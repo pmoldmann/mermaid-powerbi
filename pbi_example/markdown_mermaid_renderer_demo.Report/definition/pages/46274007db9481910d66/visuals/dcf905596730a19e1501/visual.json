@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.9.0/schema.json",
+  "name": "dcf905596730a19e1501",
+  "position": {
+    "x": 631.24620060790278,
+    "y": 66.139817629179333,
+    "z": 1000,
+    "height": 648.75379939209733,
+    "width": 623.46504559270522,
+    "tabOrder": 1000
+  },
+  "visual": {
+    "visualType": "markdownMermaidRenderer_OrgStore",
+    "query": {
+      "queryState": {
+        "markdown": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "markdown content"
+                    }
+                  },
+                  "Property": "max_markdown_content"
+                }
+              },
+              "queryRef": "markdown content.max_markdown_content",
+              "nativeQueryRef": "max_markdown_content"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
