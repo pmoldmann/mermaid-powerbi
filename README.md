@@ -194,19 +194,15 @@ The visual supports **LaTeX math rendering** powered by [KaTeX](https://katex.or
 
 ### Inline Math
 
-Wrap an expression in single dollar signs `$...$`:
+Wrap an expression in single dollar signs ```$...$```:
 
-```markdown
-The energy–mass equivalence $E = mc^2$ is one of the most famous equations in physics.
-```
+>The energy–mass equivalence $E = mc^2$ is one of the most famous equations in physics.
 
 ### Display Math
 
-Wrap an expression in double dollar signs `$$...$$` on its own line for a centred, block-level formula:
+Wrap an expression in double dollar signs ```$$...$$``` on its own line for a centred, block-level formula:
 
-```markdown
 $$\hat{kW}(t) = \hat{T}(\text{Tag}(t)) \cdot \frac{\overline{kW}_{\text{Slot}}}{\overline{kW}_{\text{Tag,Ref}}}$$
-```
 
 Common LaTeX constructs supported include fractions (`\frac`), roots (`\sqrt`), integrals, sums, Greek letters, subscripts, superscripts, matrices, and aligned equation environments.
 
