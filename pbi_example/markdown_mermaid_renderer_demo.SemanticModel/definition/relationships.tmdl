@@ -1,4 +1,0 @@
-relationship 0e7c91dc-8bec-bcaf-e68a-a5b7caf0e18b
-	fromColumn: Activities.'Person Id'
-	toColumn: Persons.id
-
