@@ -3,6 +3,7 @@ import { getCodeString } from 'rehype-rewrite';
 import type { Element as HastElement } from 'hast';
 import mermaid from "mermaid";
 import elkLayouts from "@mermaid-js/layout-elk";
+import katex from 'katex';
 import DOMPurify from "dompurify";
 import { ErrorBoundary } from "./Error";
 import { debugLog } from "./DebugPanel";
@@ -691,12 +692,18 @@ export const Code = (props: CodeProps) => {
     const isMermaid =
         className && /^language-mermaid/.test(className.toLocaleLowerCase());
 
+    const isMath =
+        className && /^language-math(\s|$)/.test(className.toLocaleLowerCase());
+
     const isStyling =
         className && /^language-style/.test(className.toLocaleLowerCase());
 
     let code = children
         ? getCodeString(props.node.children)
         : children[0] || "";
+
+    const isMathInline =
+        !className && typeof code === 'string' && code.startsWith('katex-inline:');
 
     // Process Mermaid code
     if (isMermaid && code) {
@@ -755,6 +762,45 @@ export const Code = (props: CodeProps) => {
         return (
             <ErrorBoundary>
                 <MermaidDiagram code={code} className={className} />
+            </ErrorBoundary>
+        );
+    }
+
+    if (isMath) {
+        let renderedHtml: string;
+        try {
+            renderedHtml = katex.renderToString(code.trim(), {
+                displayMode: true,
+                throwOnError: false,
+                output: 'html',
+            });
+        } catch {
+            renderedHtml = code;
+        }
+        return (
+            <ErrorBoundary>
+                {/* eslint-disable-next-line powerbi-visuals/no-inner-outer-html */}
+                <span className="katex-display-wrapper" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
+            </ErrorBoundary>
+        );
+    }
+
+    if (isMathInline) {
+        const formula = code.slice('katex-inline:'.length);
+        let renderedHtml: string;
+        try {
+            renderedHtml = katex.renderToString(formula, {
+                displayMode: false,
+                throwOnError: false,
+                output: 'html',
+            });
+        } catch {
+            renderedHtml = formula;
+        }
+        return (
+            <ErrorBoundary>
+                {/* eslint-disable-next-line powerbi-visuals/no-inner-outer-html */}
+                <span className="katex-inline-wrapper" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
             </ErrorBoundary>
         );
     }

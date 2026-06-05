@@ -35,9 +35,11 @@
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "react-redux": "9.3.0",
+    "rehype-katex": "^7.0.1",
     "rehype-sanitize": "^6.0.0",
     "remark-breaks": "^4.0.0",
     "remark-definition-list": "2.0.0",
+    "remark-math": "^6.0.0",
     "schema-utils": "^4.2.0"
   },
   "overrides": {

@@ -5,13 +5,14 @@ import powerbiVisualsApi from "powerbi-visuals-api";
 import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 
 // Visual version - update this for App Store releases
-export const VISUAL_VERSION = '1.2.2.0';
+export const VISUAL_VERSION = '1.3.0.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {
     mermaid: '11.15.0',
     react: '19.2.6',
     'react-md-editor': '4.1.1 (Markdown rendering)',
+    katex: '0.16.x (LaTeX math rendering)',
     handlebars: '4.7.9',
     dompurify: '3.4.7',
 };

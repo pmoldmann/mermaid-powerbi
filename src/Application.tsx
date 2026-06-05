@@ -7,6 +7,7 @@ import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext, MermaidThemeVarsContext } from './Code';
 import remarkBreaks from 'remark-breaks';
 import remarkDefinitionList, { defListHastHandlers } from 'remark-definition-list';
+import 'katex/dist/katex.min.css';
 import { findAndReplace } from 'mdast-util-find-and-replace';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
@@ -22,6 +23,51 @@ import "mermaid";
 
 // Register DAX and Power Query (M) as custom languages for syntax highlighting in code blocks
 import './dax-language';
+
+/**
+ * Converts display math ($$...$$) to fenced code blocks with language "math".
+ * This allows Code.tsx to render them with KaTeX, bypassing the unreliable
+ * remark-math / rehype-katex plugin chain inside react-markdown-preview.
+ *
+ * Handles:
+ *   - Single-line:  $$formula$$
+ *   - Multi-line:   $$\nformula\n$$
+ *
+ * Content inside existing code fences is left untouched.
+ */
+function preprocessDisplayMath(markdown: string): string {
+    const segments: string[] = [];
+    // Split on fenced code blocks to avoid processing math inside them
+    const fence = /(`{3,}|~{3,})[\s\S]*?\1/g;
+    let last = 0;
+    let m: RegExpExecArray | null;
+    while ((m = fence.exec(markdown)) !== null) {
+        segments.push(markdown.slice(last, m.index), '\x00FENCE\x00', m[0], '\x00/FENCE\x00');
+        last = fence.lastIndex;
+    }
+    segments.push(markdown.slice(last));
+
+    return segments.map(seg => {
+        // Preserve code fences and their markers
+        if (seg === '\x00FENCE\x00' || seg === '\x00/FENCE\x00') return '';
+        if (seg.startsWith('```') || seg.startsWith('~~~')) return seg;
+
+        // Multi-line display math: $$\ncontent\n$$
+        seg = seg.replace(/\$\$\n([\s\S]*?)\n\$\$/g, (_, math) =>
+            '\n\n```math\n' + math + '\n```\n\n'
+        );
+        // Single-line display math: $$content$$ (no inner newlines)
+        seg = seg.replace(/\$\$([^\n]+?)\$\$/g, (_, math) =>
+            '\n\n```math\n' + math.trim() + '\n```\n\n'
+        );
+        // Inline math: $formula$ (single $, no newlines inside, not preceded/followed by another $)
+        // Also skip inline code spans (`...`) to avoid double-processing
+        seg = seg.replace(/(?<![`$])\$([^$\n`]+?)\$(?![`$])/g, (_, math) =>
+            '`katex-inline:' + math.trim() + '`'
+        );
+        return seg;
+    }).join('');
+}
 
 // Remark plugin that converts ==text== into <mark> elements
 function remarkMark() {
@@ -49,8 +95,8 @@ const sanitizeSchema = {
     },
     attributes: {
         ...defaultSchema.attributes,
-        // Allow className on span elements for Prism syntax highlighting tokens
-        span: [...(defaultSchema.attributes?.span || []), 'className', 'class'],
+        // Allow className and style on span elements: className for Prism tokens, style for KaTeX math positioning
+        span: [...(defaultSchema.attributes?.span || []), 'className', 'class', 'style'],
         code: [...(defaultSchema.attributes?.code || []), 'className', 'class'],
     },
 };
@@ -579,7 +625,7 @@ export const Application: React.FC = () => {
                                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
                                                                 remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkDefinitionList, remarkBreaks, remarkMark] : [remarkDefinitionList, remarkMark]}
                                                                 remarkRehypeOptions={{ handlers: defListHastHandlers }}
-                                                                source={section.content}
+                                                                source={preprocessDisplayMath(section.content)}
                                                             />
                                                         </div>
                                                         {sectionIdx < markdownSections.length - 1 && <hr className="section-separator" />}
@@ -595,7 +641,7 @@ export const Application: React.FC = () => {
                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
                                                 remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkDefinitionList, remarkBreaks, remarkMark] : [remarkDefinitionList, remarkMark]}
                                                 remarkRehypeOptions={{ handlers: defListHastHandlers }}
-                                                source={markdownSections.length === 1 ? markdownSections[0].content : markdownContent}
+                                                source={preprocessDisplayMath(markdownSections.length === 1 ? markdownSections[0].content : markdownContent)}
                                             />
                                         )}
                                     </MarkdownSettingsContext.Provider>

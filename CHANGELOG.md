@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0.0] - 2026-06-05
+
+### Added
+- **LaTeX math rendering via KaTeX**: Inline and display math formulas are now rendered directly in Markdown content using [KaTeX](https://katex.org/).
+  - **Inline math** — wrap expressions in `$...$`: e.g. `$E = mc^2$`
+  - **Display math** — wrap expressions in `$$...$$` on their own line for centred, block-level output:
+    ```
+    $$\hat{kW}(t) = \hat{T}(\text{Tag}(t)) \cdot \frac{\overline{kW}_{\text{Slot}}}{\overline{kW}_{\text{Tag,Ref}}}$$
+    ```
+  - All standard KaTeX commands are supported (fractions, roots, integrals, Greek letters, matrices, aligned environments, etc.)
+  - Fonts are fully self-contained — no external network requests required
+
+---
+
 ## [1.2.2.0] - 2026-05-29
 
 ### Added
