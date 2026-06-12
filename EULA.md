@@ -37,15 +37,26 @@ All rendering of Markdown and Mermaid diagrams occurs entirely within the user's
 
 ## 6. Third-Party Libraries
 
-This visual includes the following open-source libraries:
+This visual bundles the following open-source libraries:
 
 | Library | License |
-|---------|---------|
+|---------|--------|
 | [Mermaid](https://mermaid.js.org/) | MIT |
+| [Mermaid ELK Layout](https://github.com/mermaid-js/layout-elk) | MIT |
 | [react-md-editor](https://github.com/uiwjs/react-md-editor) | MIT |
-| [Handlebars.js](https://github.com/handlebars-lang/handlebars.js) | MIT |
-| [DOMPurify](https://github.com/cure53/DOMPurify) | Apache-2.0 |
 | [React](https://react.dev/) | MIT |
+| [React DOM](https://react.dev/) | MIT |
+| [React Redux](https://react-redux.js.org/) | MIT |
+| [Redux Toolkit](https://redux-toolkit.js.org/) | MIT |
+| [DOMPurify](https://github.com/cure53/DOMPurify) | MPL-2.0 OR Apache-2.0 |
+| [Handlebars.js](https://github.com/handlebars-lang/handlebars.js) | MIT |
+| [D3.js](https://d3js.org/) (d3-array, d3-axis, d3-format, d3-scale, d3-selection, d3-time-format) | ISC |
+| [rehype-sanitize](https://github.com/rehypejs/rehype-sanitize) | MIT |
+| [remark-breaks](https://github.com/remarkjs/remark-breaks) | MIT |
+| [remark-definition-list](https://github.com/Symbitic/remark-plugins) | MIT |
+| [mdast-util-find-and-replace](https://github.com/syntax-tree/mdast-util-find-and-replace) | MIT |
+| [Ajv](https://ajv.js.org/) | MIT |
+| [powerbi-visuals-utils-dataviewutils](https://github.com/microsoft/powerbi-visuals-utils-dataviewutils) | MIT |
 
 ## 7. Open Source
 

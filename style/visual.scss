@@ -14,31 +14,35 @@
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
     h2 {
-        font-size: calc(var(--md-heading-base-size, 14pt) * 0.85) !important;
+        font-size: calc(var(--md-heading-base-size, 14pt) * 0.9) !important;
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
     h3 {
-        font-size: calc(var(--md-heading-base-size, 14pt) * 0.7) !important;
+        font-size: calc(var(--md-heading-base-size, 14pt) * 0.8) !important;
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
     h4 {
-        font-size: calc(var(--md-heading-base-size, 14pt) * 0.6) !important;
+        font-size: calc(var(--md-heading-base-size, 14pt) * 0.7) !important;
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
     h5 {
-        font-size: calc(var(--md-heading-base-size, 14pt) * 0.5) !important;
+        font-size: calc(var(--md-heading-base-size, 14pt) * 0.6) !important;
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
     h6 {
-        font-size: calc(var(--md-heading-base-size, 14pt) * 0.45) !important;
+        font-size: calc(var(--md-heading-base-size, 14pt) * 0.5) !important;
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
 
     // Body text - paragraphs, tables, lists, blockquotes
-    p, li, td, th, dd, dt, blockquote, summary, figcaption {
+    p, li, td, th, dd, blockquote, summary, figcaption {
         font-size: var(--md-body-font-size, 9pt) !important;
         font-family: var(--md-font-family, 'DIN'), sans-serif !important;
     }
+
+    // dt is intentionally excluded from the body text !important rule above.
+    // Its font-size is controlled via an inline style on a custom React <dt> component
+    // in Application.tsx (DefinitionTerm), which reads the definitionHeadingLevel setting.
 
     // ============================================
     // Custom list markers using ::before pseudo-elements

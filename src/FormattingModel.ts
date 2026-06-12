@@ -78,12 +78,20 @@ function textInput(objectName: string, propertyName: string, value: string, plac
     };
 }
 
-function colorPicker(objectName: string, propertyName: string, colorValue: string, uidOverride?: string): SimpleVisualFormattingSlice {
+// DataViewObjectsParser.getCommonValue() extracts fill values as plain strings,
+// not as { solid: { color: string } } objects. Handle both formats.
+function extractColor(colorSetting: unknown): string {
+    if (typeof colorSetting === 'string') return colorSetting;
+    const fill = colorSetting as { solid?: { color?: string } } | null | undefined;
+    return fill?.solid?.color || '';
+}
+
+function colorPicker(objectName: string, propertyName: string, colorValue: unknown, uidOverride?: string): SimpleVisualFormattingSlice {
     return {
         uid: uidOverride || `${objectName}-${propertyName}`,
         control: {
             type: 'ColorPicker',
-            properties: { descriptor: desc(objectName, propertyName), value: { value: colorValue } }
+            properties: { descriptor: desc(objectName, propertyName), value: { value: extractColor(colorValue) } }
         }
     };
 }
@@ -165,10 +173,10 @@ export function buildFormattingModel(settings: IVisualSettings, dataView: DataVi
     ];
     if (themeVars.enableThemeColors) {
         themeSlices.push(
-            colorPicker('mermaidThemeVars', 'primaryColor', themeVars.primaryColor?.solid?.color || ''),
-            colorPicker('mermaidThemeVars', 'background', themeVars.background?.solid?.color || ''),
-            colorPicker('mermaidThemeVars', 'noteBkgColor', themeVars.noteBkgColor?.solid?.color || ''),
-            colorPicker('mermaidThemeVars', 'noteTextColor', themeVars.noteTextColor?.solid?.color || ''),
+            colorPicker('mermaidThemeVars', 'primaryColor', themeVars.primaryColor),
+            colorPicker('mermaidThemeVars', 'background', themeVars.background),
+            colorPicker('mermaidThemeVars', 'noteBkgColor', themeVars.noteBkgColor),
+            colorPicker('mermaidThemeVars', 'noteTextColor', themeVars.noteTextColor),
         );
     }
     cards.push({

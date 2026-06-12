@@ -448,7 +448,8 @@
                             { "value": "heading_h3", "displayName": "Heading (H3)" },
                             { "value": "code_block", "displayName": "Code Block" },
                             { "value": "highlight", "displayName": "Highlight" },
-                            { "value": "definition_list", "displayName": "Definition List" },
+                            { "value": "definition_list_value", "displayName": "Definition List Value" },
+                            { "value": "definition_list_header", "displayName": "Definition List Header" },
                             { "value": "blockquote", "displayName": "Blockquote" },
                             { "value": "list_unordered", "displayName": "Unordered List" },
                             { "value": "list_ordered", "displayName": "Ordered List" }

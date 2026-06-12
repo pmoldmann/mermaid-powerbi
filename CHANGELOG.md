@@ -8,6 +8,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0.0] - 2026-06-05
+
+### Added
+- **LaTeX math rendering via KaTeX**: Inline and display math formulas are now rendered directly in Markdown content using [KaTeX](https://katex.org/).
+  - **Inline math** — wrap expressions in `$...$`: e.g. $E = mc^2$
+  - **Display math** — wrap expressions in ```$$...$$``` on their own line for centred, block-level output:
+    
+    $$\hat{kW}(t) = \hat{T}(\text{Tag}(t)) \cdot \frac{\overline{kW}_{\text{Slot}}}{\overline{kW}_{\text{Tag,Ref}}}$$
+    
+  - All standard KaTeX commands are supported (fractions, roots, integrals, Greek letters, matrices, aligned environments, etc.)
+  - Fonts are fully self-contained — no external network requests required
+
+---
+
+## [1.2.2.0] - 2026-05-29
+
+### Added
+- **Copy rendered HTML to clipboard**: New context menu entries "Copy section HTML" and "Copy all HTML" expose the fully rendered HTML of the visual for debugging and inspection purposes.
+- **Paired Definition List columns** ("Definition List Header" + "Definition List Value"): Two columns can now be assigned as a term/value pair. Each data row is rendered as one Definition List entry, enabling repeated sections — e.g. one entry per product, cost center, or time period — from a regular table measure.
+
+### Fixed
+- **Definition Lists were not rendered correctly**: Terms and definitions appeared unstyled without the expected list structure.
+- **Definition List term sizing had no effect**: The "Definition List Heading" size setting was ignored — all terms appeared at the same size regardless of the selected heading level.
+- **Number and currency formats not applied to Definition List values**: Measure format strings (e.g. `€ #,##0.00`) were ignored for value columns in Definition Lists.
+
+### Changed
+- Replaced deprecated `extra-watch-webpack-plugin`, `null-loader`, and `raw-loader` with webpack 5 native equivalents (`devServer.watchFiles`, `asset/source` module type)
+- Resolved npm peer dependency warnings caused by outdated transitive `ajv@6.x` / `ajv-keywords@3.x` dependency chain
+- Updated pbiviz API to 5.11.0
+- **Heading scale factors adjusted** — H2–H6 heading sizes now use a more evenly distributed scale relative to the base heading size: H2 = 90 %, H3 = 80 %, H4 = 70 %, H5 = 60 %, H6 = 50 % (previously H2 = 85 %, H3 = 70 %, H4 = 60 %, H5 = 50 %, H6 = 45 %)
+- **Default "Definition List Heading" level changed to H3** (previously "None")
+
+---
+
 ## [1.2.1.0] - 2026-05-29
 
 ### Changed

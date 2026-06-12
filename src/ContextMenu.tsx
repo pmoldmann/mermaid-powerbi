@@ -12,6 +12,10 @@ export interface ContextMenuProps {
     sectionMarkdown: string | null;
     /** Full markdown content (all sections) */
     fullMarkdown: string;
+    /** Rendered HTML of the clicked section (for debugging) */
+    sectionHtml?: string | null;
+    /** Full rendered HTML of the markdown container (for debugging) */
+    fullHtml?: string;
     /** Color mode for theming */
     colorMode: 'light' | 'dark';
     /** Callback when menu should close */
@@ -56,6 +60,8 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
     y,
     sectionMarkdown,
     fullMarkdown,
+    sectionHtml,
+    fullHtml,
     colorMode,
     onClose,
     onShowPbiMenu,
@@ -167,6 +173,24 @@ export const ContextMenu: React.FC<ContextMenuProps> = ({
                         <span className="context-menu-icon">📄</span>
                         {copyAllLabel}
                     </button>
+                    {sectionHtml && (
+                        <button
+                            className="context-menu-item"
+                            onClick={() => handleCopy(sectionHtml, copiedLabel)}
+                        >
+                            <span className="context-menu-icon">🔍</span>
+                            Copy section HTML
+                        </button>
+                    )}
+                    {fullHtml && (
+                        <button
+                            className="context-menu-item"
+                            onClick={() => handleCopy(fullHtml, copiedLabel)}
+                        >
+                            <span className="context-menu-icon">🔎</span>
+                            Copy all HTML
+                        </button>
+                    )}
                     {onShowPbiMenu && (
                         <>
                             <div className="context-menu-separator" />
