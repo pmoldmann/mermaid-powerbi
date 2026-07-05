@@ -5,6 +5,7 @@ import remarkDefinitionList from 'remark-definition-list';
 import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext } from './Code';
 import { ErrorBoundary } from './Error';
 import { useAppSelector } from './redux/hooks';
+import { SafeLink } from './SafeLink';
 
 // Demo markdown content showcasing Markdown + Mermaid capabilities
 const DEMO_MARKDOWN = `# Creating Beautiful Documentation with Markdown & Mermaid
@@ -252,6 +253,7 @@ export const DemoSection: React.FC = () => {
                                             remarkPlugins={[remarkDefinitionList]}
                                             components={{
                                                 code: Code,
+                                                a: SafeLink,
                                             }}
                                         />
                                         </MermaidDebugSettingsContext.Provider>

@@ -14,6 +14,7 @@ import { WelcomePage } from './WelcomePage';
 import { SearchBar } from './SearchBar';
 import { DebugPanel, useDebugLogs, clearDebugLogs, setDebugEnabled } from './DebugPanel';
 import { ContextMenu } from './ContextMenu';
+import { SafeLink } from './SafeLink';
 
 import powerbiVisualsApi from "powerbi-visuals-api";
 import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
@@ -621,7 +622,7 @@ export const Application: React.FC = () => {
                                                             onClick={(e) => handleSectionClick(sectionIdx, e)}
                                                         >
                                                             <MDEditor.Markdown
-                                                                components={{ code: Code, dt: DefinitionTerm }}
+                                                                components={{ code: Code, dt: DefinitionTerm, a: SafeLink }}
                                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
                                                                 remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkDefinitionList, remarkBreaks, remarkMark] : [remarkDefinitionList, remarkMark]}
                                                                 remarkRehypeOptions={{ handlers: defListHastHandlers }}
@@ -637,7 +638,7 @@ export const Application: React.FC = () => {
                                                so that markdownFunctions settings (list heading, definition heading, etc.)
                                                are applied. Fall back to raw markdownContent only when no sections exist. */
                                             <MDEditor.Markdown
-                                                components={{ code: Code, dt: DefinitionTerm }}
+                                                components={{ code: Code, dt: DefinitionTerm, a: SafeLink }}
                                                 rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
                                                 remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkDefinitionList, remarkBreaks, remarkMark] : [remarkDefinitionList, remarkMark]}
                                                 remarkRehypeOptions={{ handlers: defListHastHandlers }}

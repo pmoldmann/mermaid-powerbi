@@ -255,7 +255,7 @@ function findMermaidNode(container: HTMLElement, nodeId: string): Element | null
  * Opens an external link via Power BI host (with confirmation dialog) or fallback browser dialog.
  * Power BI's host.launchUrl() shows a native confirmation dialog before opening in an external browser.
  */
-function openExternalLink(url: string, host: unknown): void {
+export function openExternalLink(url: string, host: unknown): void {
     const pbiHost = host as { launchUrl?: (url: string) => void } | null;
     if (pbiHost && typeof pbiHost.launchUrl === 'function') {
         // Power BI host.launchUrl() shows a native confirmation dialog
