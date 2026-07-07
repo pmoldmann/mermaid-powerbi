@@ -5,7 +5,7 @@ import powerbiVisualsApi from "powerbi-visuals-api";
 import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 
 // Visual version - update this for App Store releases
-export const VISUAL_VERSION = '1.3.0.0';
+export const VISUAL_VERSION = '1.3.1.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {

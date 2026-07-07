@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1.0] - 2026-07-04
+
+### Security
+- **No `<a>` elements are rendered from data-field Markdown** (Power BI certification 1200.1.3). Previously, Markdown links, GFM autolinks and bare URLs in field data produced real `<a href="...">` anchors in the DOM. This was a concern for two reasons: relative hrefs (e.g. `href=xss`) resolve in the browser against `https://app.powerbi.com/...`, and `http`/`https` anchors could navigate directly, bypassing the host confirmation dialog.
+
+### Changed
+- Markdown links are now rendered through a dedicated `SafeLink` component (`<span>`, never `<a>`):
+  - `http`/`https`/`mailto` links remain fully clickable and open externally via Power BI's `host.launchUrl()` (native confirmation dialog) — unchanged behaviour for end users.
+  - Relative or other-protocol links are rendered as inert, non-navigable text.
+- No functionality was removed; the Mermaid diagram link handling (which already strips `href` and routes through `host.launchUrl()`) is unaffected.
+
+---
+
 ## [1.3.0.0] - 2026-06-05
 
 ### Added
