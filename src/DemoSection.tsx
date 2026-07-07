@@ -6,136 +6,46 @@ import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeCon
 import { ErrorBoundary } from './Error';
 import { useAppSelector } from './redux/hooks';
 import { SafeLink } from './SafeLink';
+import { preprocessDisplayMath, remarkMark } from './markdownPreprocess';
+import 'katex/dist/katex.min.css';
+import readmeRaw from '../README.md';
 
-// Demo markdown content showcasing Markdown + Mermaid capabilities
-const DEMO_MARKDOWN = `# Creating Beautiful Documentation with Markdown & Mermaid
+/**
+ * Prepare the project README for embedding as live demo content.
+ * Images are stripped because the visual runs in a sandbox with no external
+ * network access: Markdown badges (shields.io) would be external requests and
+ * relative screenshot/logo paths would resolve to broken images. The text,
+ * tables and Mermaid diagrams remain — which is exactly the demo material.
+ */
+const prepareReadmeForDemo = (md: string): string =>
+    md
+        // remove HTML <img> tags (e.g. embedded logo)
+        .replace(/<img\b[^>]*>/gi, '')
+        // remove Markdown image syntax (shields.io badges, screenshots)
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
+        // collapse blank lines left behind by removed images
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
 
-Documentation is the backbone of successful projects. With **Markdown** and **Mermaid**, you can create clear, visual, and maintainable documentation directly in Power BI.
+// Demo markdown content: the project's own README, rendered live in the visual.
+// DEMO_MARKDOWN is the source shown in the raw view / copied to clipboard;
+// DEMO_RENDER_SOURCE has the same display-math preprocessing the main render path
+// applies, so the embedded README (incl. its LaTeX section) renders identically.
+const DEMO_MARKDOWN = prepareReadmeForDemo(readmeRaw);
+const DEMO_RENDER_SOURCE = preprocessDisplayMath(DEMO_MARKDOWN);
 
-## Why Markdown?
-
-Markdown offers:
-- **Simplicity** — Write in plain text, get beautiful formatting
-- **Portability** — Works everywhere, no vendor lock-in
-- **Version Control** — Track changes like code
-- **Focus** — Concentrate on content, not formatting
-
-## Why Mermaid?
-
-Mermaid transforms text into diagrams. No design tools needed!
-
-### Example: Document Workflow
-
-\`\`\`mermaid
-flowchart LR
-    subgraph Create["📝 Create"]
-        A[Write Content]
-        B[Add Diagrams]
-    end
-    subgraph Review["🔍 Review"]
-        C[Peer Review]
-        D[Update]
-    end
-    subgraph Publish["🚀 Publish"]
-        E[Render in Power BI]
-    end
-    
-    A --> B --> C --> D --> E
-    D -.->|Iterate| A
-\`\`\`
-
-## Key Diagram Types
-
-### 1. Flowcharts for Processes
-
-Perfect for visualizing workflows, decision trees, and procedures.
-
-\`\`\`mermaid
-flowchart TD
-    Start([Start]) --> Input[/User Input/]
-    Input --> Validate{Valid?}
-    Validate -->|Yes| Process[Process Data]
-    Validate -->|No| Error[Show Error]
-    Error --> Input
-    Process --> Output[/Display Results/]
-    Output --> End([End])
-\`\`\`
-
-### 2. Sequence Diagrams for Interactions
-
-Show how components communicate over time.
-
-\`\`\`mermaid
-sequenceDiagram
-    participant User
-    participant PowerBI
-    participant Visual
-    participant Mermaid
-
-    User->>PowerBI: Add Markdown Data
-    PowerBI->>Visual: Update with Content
-    Visual->>Mermaid: Parse Diagrams
-    Mermaid-->>Visual: Return SVG
-    Visual-->>User: Display Result
-\`\`\`
-
-### 3. Entity Relationships for Data Models
-
-Document your data structure clearly.
-
-\`\`\`mermaid
-erDiagram
-    REPORT ||--o{ PAGE : contains
-    PAGE ||--o{ VISUAL : displays
-    VISUAL ||--o| DATA : uses
-    DATA ||--|| SOURCE : "comes from"
-    
-    REPORT {
-        string name
-        date created
-        string author
-    }
-    VISUAL {
-        string type
-        int width
-        int height
-    }
-\`\`\`
-
-## Best Practices
-
-| Practice | Benefit |
-|----------|---------|
-| Use headers consistently | Easy navigation |
-| Keep diagrams focused | Better comprehension |
-| Add context with text | Explain the "why" |
-| Use meaningful names | Self-documenting |
-
-## Getting Started
-
-1. **Create a column or measure** with your Markdown text
-2. **Add Mermaid code blocks** using \\\`\\\`\\\`mermaid syntax
-3. **Drop into this visual** and watch it render
-4. **Iterate** — Update your data, see instant results
-
-> 💡 **Pro Tip:** Store your documentation in a table and reference it dynamically. This keeps docs in sync with your data!
-
----
-
-*Start documenting better today. Your future self will thank you.*
-`;
-
-// Sanitize schema that preserves br tags and allows className on spans for syntax highlighting
+// Sanitize schema that preserves br/mark tags and allows className/style on spans
+// (className for syntax-highlighting tokens, style for KaTeX math positioning)
 const sanitizeSchema = {
     ...defaultSchema,
-    tagNames: [...(defaultSchema.tagNames || []), 'br'],
+    tagNames: [...(defaultSchema.tagNames || []), 'br', 'mark'],
     ancestors: {
         ...defaultSchema.ancestors,
         br: ['code', 'pre', 'span', 'div', 'p', 'li', 'td', 'th'],
     },
     attributes: {
         ...defaultSchema.attributes,
-        span: [...(defaultSchema.attributes?.span || []), 'className', 'class'],
+        span: [...(defaultSchema.attributes?.span || []), 'className', 'class', 'style'],
         code: [...(defaultSchema.attributes?.code || []), 'className', 'class'],
     },
 };
@@ -198,6 +108,13 @@ export const DemoSection: React.FC = () => {
     }, []);
 
     return (
+        <>
+        <p className="demo-intro">
+            📖 The demo below is this visual's own <strong>README</strong>, rendered live inside the visual.
+            It documents every feature in detail — and at the same time serves as a hands-on example of how
+            Markdown and Mermaid look once rendered here. Switch between <strong>Raw Markdown</strong> and
+            <strong> Render</strong> to see the source and the result side by side.
+        </p>
         <section className="demo-section">
             <div className="demo-header">
                 <h2>🎯 Markdown / Mermaid Demo</h2>
@@ -248,9 +165,9 @@ export const DemoSection: React.FC = () => {
                                     <MermaidSettingsContext.Provider value={defaultMermaidSettings}>
                                         <MermaidDebugSettingsContext.Provider value={defaultMermaidDebugSettings}>
                                         <MDEditor.Markdown
-                                            source={DEMO_MARKDOWN}
+                                            source={DEMO_RENDER_SOURCE}
                                             rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                            remarkPlugins={[remarkDefinitionList]}
+                                            remarkPlugins={[remarkDefinitionList, remarkMark]}
                                             components={{
                                                 code: Code,
                                                 a: SafeLink,
@@ -265,5 +182,6 @@ export const DemoSection: React.FC = () => {
                 )}
             </div>
         </section>
+        </>
     );
 };

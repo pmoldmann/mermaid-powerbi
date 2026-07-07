@@ -9,7 +9,7 @@ import ILocalizationManager = powerbiVisualsApi.extensibility.ILocalizationManag
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { IVisualSettings, VisualSettings } from "../settings";
-import { extractMarkdownContent, extractMarkdownSections, MarkdownSection, TooltipColumnData } from "../utils";
+import { extractMarkdownContent, extractMarkdownSections, detectTruncatedContent, MarkdownSection, TooltipColumnData } from "../utils";
 
 export interface VisualState {
     host: IVisualHost | undefined;
@@ -18,6 +18,7 @@ export interface VisualState {
     viewport: IViewport;
     markdownContent: string;
     markdownSections: MarkdownSection[];
+    contentTruncated: boolean;
     selectionManager: ISelectionManager | undefined;
     selectionIds: ISelectionId[];
     tooltipColumns: TooltipColumnData[];
@@ -41,6 +42,7 @@ const initialState: VisualState = {
     },
     markdownContent: '',
     markdownSections: [],
+    contentTruncated: false,
     selectionManager: undefined,
     selectionIds: [],
     tooltipColumns: [],
@@ -66,6 +68,7 @@ export const slice = createSlice({
             // Extract content or clear if dataView is null/undefined
             state.markdownContent = action.payload ? extractMarkdownContent(action.payload) : '';
             state.markdownSections = action.payload ? extractMarkdownSections(action.payload) : [];
+            state.contentTruncated = action.payload ? detectTruncatedContent(action.payload) : false;
         },
         setRowData: (state, action: PayloadAction<RowDataPayload>) => {
             state.markdownSections = action.payload.sections;

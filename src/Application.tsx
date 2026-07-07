@@ -8,7 +8,7 @@ import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeCon
 import remarkBreaks from 'remark-breaks';
 import remarkDefinitionList, { defListHastHandlers } from 'remark-definition-list';
 import 'katex/dist/katex.min.css';
-import { findAndReplace } from 'mdast-util-find-and-replace';
+import { preprocessDisplayMath, remarkMark } from './markdownPreprocess';
 import { ErrorBoundary } from './Error';
 import { WelcomePage } from './WelcomePage';
 import { SearchBar } from './SearchBar';
@@ -24,66 +24,6 @@ import "mermaid";
 
 // Register DAX and Power Query (M) as custom languages for syntax highlighting in code blocks
 import './dax-language';
-
-/**
- * Converts display math ($$...$$) to fenced code blocks with language "math".
- * This allows Code.tsx to render them with KaTeX, bypassing the unreliable
- * remark-math / rehype-katex plugin chain inside react-markdown-preview.
- *
- * Handles:
- *   - Single-line:  $$formula$$
- *   - Multi-line:   $$\nformula\n$$
- *
- * Content inside existing code fences is left untouched.
- */
-function preprocessDisplayMath(markdown: string): string {
-    const segments: string[] = [];
-    // Split on fenced code blocks to avoid processing math inside them
-    const fence = /(`{3,}|~{3,})[\s\S]*?\1/g;
-    let last = 0;
-    let m: RegExpExecArray | null;
-    while ((m = fence.exec(markdown)) !== null) {
-        segments.push(markdown.slice(last, m.index), '\x00FENCE\x00', m[0], '\x00/FENCE\x00');
-        last = fence.lastIndex;
-    }
-    segments.push(markdown.slice(last));
-
-    return segments.map(seg => {
-        // Preserve code fences and their markers
-        if (seg === '\x00FENCE\x00' || seg === '\x00/FENCE\x00') return '';
-        if (seg.startsWith('```') || seg.startsWith('~~~')) return seg;
-
-        // Multi-line display math: $$\ncontent\n$$
-        seg = seg.replace(/\$\$\n([\s\S]*?)\n\$\$/g, (_, math) =>
-            '\n\n```math\n' + math + '\n```\n\n'
-        );
-        // Single-line display math: $$content$$ (no inner newlines)
-        seg = seg.replace(/\$\$([^\n]+?)\$\$/g, (_, math) =>
-            '\n\n```math\n' + math.trim() + '\n```\n\n'
-        );
-        // Inline math: $formula$ (single $, no newlines inside, not preceded/followed by another $)
-        // Also skip inline code spans (`...`) to avoid double-processing
-        seg = seg.replace(/(?<![`$])\$([^$\n`]+?)\$(?![`$])/g, (_, math) =>
-            '`katex-inline:' + math.trim() + '`'
-        );
-        return seg;
-    }).join('');
-}
-
-// Remark plugin that converts ==text== into <mark> elements
-function remarkMark() {
-    return function (tree: Parameters<typeof findAndReplace>[0]) {
-        findAndReplace(tree, [
-            [
-                /==([^=\n]+)==/g,
-                (_match: string, $1: string) => ({
-                    type: 'html' as const,
-                    value: `<mark>${$1}</mark>`,
-                }),
-            ],
-        ]);
-    };
-}
 
 // Custom schema that preserves br tags (needed for Mermaid diagrams with line breaks)
 // Also allow br inside code elements and className on spans (needed for syntax highlighting tokens)
@@ -172,6 +112,7 @@ export const Application: React.FC = () => {
     const viewport = useAppSelector((state) => state.options.viewport);
     const markdownContent = useAppSelector((state) => state.options.markdownContent);
     const markdownSections = useAppSelector((state) => state.options.markdownSections);
+    const contentTruncated = useAppSelector((state) => state.options.contentTruncated);
     const selectionIds = useAppSelector((state) => state.options.selectionIds);
     const selectionManager = useAppSelector((state) => state.options.selectionManager);
     const tooltipColumns = useAppSelector((state) => state.options.tooltipColumns);
@@ -578,6 +519,15 @@ export const Application: React.FC = () => {
                             fontFamily: `"${settings?.font?.fontFamily || 'DIN'}", sans-serif`,
                         } as React.CSSProperties}
                     >
+                        {contentTruncated && (
+                            <div className="truncation-warning" role="alert">
+                                <span className="truncation-warning-icon" aria-hidden="true">⚠</span>
+                                <span className="truncation-warning-text">
+                                    This content reached Power BI's 32,767-character limit and is likely
+                                    truncated. Split long documents across multiple rows to render them in full.
+                                </span>
+                            </div>
+                        )}
                         <ColorModeContext.Provider value={settings?.view?.colorMode === 'dark' ? 'dark' : 'light'}>
                             <FontSettingsContext.Provider value={settings?.font || {
                                 fontFamily: 'DIN',

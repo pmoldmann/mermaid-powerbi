@@ -510,6 +510,63 @@ export function extractMarkdownContent(dataView: DataView): string {
     return sections.map(s => s.content).join('\n\n---\n\n');
 }
 
+/**
+ * Power BI's documented maximum length for a single string value passed to a
+ * custom visual (2^15 - 1). This is the theoretical ceiling.
+ */
+export const POWERBI_VALUE_CHAR_LIMIT = 32767;
+
+/**
+ * Effective threshold used to detect truncation. In practice Power BI cuts
+ * oversized values off a few characters below the theoretical ceiling, so a
+ * truncated value never quite reaches POWERBI_VALUE_CHAR_LIMIT. We warn a little
+ * under it: any single markdown value this long is either already truncated or
+ * right at the danger zone. Raise/lower this if the observed cutoff differs.
+ */
+export const TRUNCATION_WARN_THRESHOLD = 32700;
+
+/**
+ * Detects whether any single markdown value reached Power BI's per-value
+ * character limit — a strong indicator that the content was truncated by the
+ * Power BI engine before it reached the visual. Checks the raw values (not the
+ * formatted output) across the single, table and categorical mappings.
+ * @param dataView The Power BI dataView
+ * @returns true if at least one raw markdown value is at/above the threshold
+ */
+export function detectTruncatedContent(dataView: DataView): boolean {
+    if (!dataView) return false;
+
+    const reachesLimit = (value: unknown): boolean =>
+        value != null && String(value).length >= TRUNCATION_WARN_THRESHOLD;
+
+    // Single value (measure via single mapping)
+    if (dataView.single && reachesLimit(dataView.single.value)) {
+        return true;
+    }
+
+    // Table mapping — check only markdown-role columns
+    if (dataView.table?.rows?.length) {
+        const markdownColIndices = getMarkdownColumnIndices(dataView);
+        for (const row of dataView.table.rows) {
+            for (const colIdx of markdownColIndices) {
+                if (reachesLimit(row[colIdx])) return true;
+            }
+        }
+    }
+
+    // Categorical mapping — check category and value columns
+    if (dataView.categorical) {
+        for (const cat of dataView.categorical.categories ?? []) {
+            if (cat.values?.some(reachesLimit)) return true;
+        }
+        for (const val of dataView.categorical.values ?? []) {
+            if (val.values?.some(reachesLimit)) return true;
+        }
+    }
+
+    return false;
+}
+
 export function deepClone(object: unknown) {
     return JSON.parse(JSON.stringify(object))
 }
