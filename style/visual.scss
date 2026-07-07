@@ -587,6 +587,40 @@
     background-color: #0d1117;
 }
 
+// Link replacement rendered by the SafeLink component (src/SafeLink.tsx).
+// Markdown links are rendered as <span> (never <a>) for certification compliance;
+// these rules make the safe, clickable variant look and behave like a normal link.
+.md-link {
+    color: #0969da;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #0969da;
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+}
+
+[data-color-mode="dark"] .md-link {
+    color: #58a6ff;
+
+    &:focus-visible {
+        outline-color: #58a6ff;
+    }
+}
+
+// Inert (relative / non-http(s)) links: plain, non-navigable text.
+.md-link-inert {
+    color: inherit;
+    cursor: default;
+    text-decoration: none;
+}
+
 // Search Toggle Button
 .search-toggle {
     position: absolute;
