@@ -1,12 +1,21 @@
 # Markdown / Mermaid Renderer for Power BI
 
-![Version](https://img.shields.io/badge/version-1.3.1.0-blue)
+![Version](https://img.shields.io/badge/version-1.3.1.1-blue)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Custom%20Visual-yellow)
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 
 **GitHub:** [https://github.com/pmoldmann/mermaid-powerbi](https://github.com/pmoldmann/mermaid-powerbi)
 
+
 A Power BI custom visual that renders **Markdown** content with embedded **Mermaid diagrams**. Transform your text-based content into beautifully formatted documentation, flowcharts, sequence diagrams, and more — directly within your Power BI reports.
+
+## Why this visual exists
+
+**Brought to you by [SemaDoc](https://semadoc.io)** — SemaDoc auto-generates documentation for Power BI semantic models as Markdown with embedded Mermaid diagrams. This visual was built
+so that markdown documentation can be rendered directly inside Power BI, and is shared freely with the community.
+**[Take a look → semadoc.io](https://semadoc.io)**
+
+![logo](https://semadoc.io/logos/logo_semadoc_light.svg)
 
 ## 📄 What is this Visual?
 
@@ -73,6 +82,14 @@ let
 in
     Filtered
 ```
+
+## ⚠️ Content Size Limit
+
+Power BI limits every **single value** it passes to a custom visual to **32,767 characters** (2¹⁵−1). If one column cell or measure returns more than that, Power BI **truncates the text before it ever reaches this visual** — so a very long document may be cut off mid-content.
+
+To render large documents in full, **split the content across multiple rows** of a column. Each row becomes its own section (separated by a horizontal rule), and every row stays independently under the limit — the visual concatenates them automatically.
+
+> 💡 **Note:** This is a Power BI **platform** limit, not a limit of this visual — the truncation happens inside the Power BI engine before the data reaches the visual, so the removed characters cannot be recovered. When a value hits this limit, the visual shows a warning banner above the content.
 
 ## 🎨 Dark / Light Theme
 
@@ -988,7 +1005,7 @@ All `innerHTML` usage involves either:
 
 ## �👤 Author
 
-**Paul Moldmann**
+**Paul Moldmann** / semadoc.io
 
 *Special thanks to **Ilfat Galiev** who originally created this visual, which has been adapted and enhanced.*
 

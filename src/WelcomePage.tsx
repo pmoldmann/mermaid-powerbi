@@ -3,9 +3,11 @@ import { DemoSection } from './DemoSection';
 import { useAppSelector } from './redux/hooks';
 import powerbiVisualsApi from "powerbi-visuals-api";
 import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
+import semadocLogoLight from 'assets/logo_semadoc_light.svg';
+import semadocLogoHero from 'assets/logo_semadoc_hero.svg';
 
 // Visual version - update this for App Store releases
-export const VISUAL_VERSION = '1.3.1.0';
+export const VISUAL_VERSION = '1.3.1.1';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {
@@ -71,6 +73,22 @@ export const WelcomePage: React.FC = () => {
                 <span className="version-badge">v{VISUAL_VERSION}</span>
             </div>
 
+            <div
+                className="semadoc-promo"
+                role="link"
+                tabIndex={0}
+                onClick={() => openUrl('https://semadoc.io')}
+                onKeyDown={(e) => e.key === 'Enter' && openUrl('https://semadoc.io')}
+            >
+                <img src={semadocLogoLight} alt="SemaDoc" className="semadoc-logo semadoc-logo--light" />
+                <img src={semadocLogoHero} alt="SemaDoc" className="semadoc-logo semadoc-logo--dark" />
+                <p className="semadoc-promo-text">
+                    This visual renders the Markdown &amp; Mermaid that <strong>SemaDoc</strong> generates
+                    when documenting your Power BI semantic models — shared freely with the community.{' '}
+                    <span className="semadoc-link">Visit semadoc.io →</span>
+                </p>
+            </div>
+
             <div className="welcome-content">
                 <section className="welcome-section">
                     <h2>📄 What is this Visual?</h2>
@@ -122,7 +140,16 @@ export const WelcomePage: React.FC = () => {
 
                 <footer className="welcome-footer">
                     <p className="author-credit">
-                        Created by <strong>Paul Moldmann</strong>
+                        Created by <strong>Paul Moldmann</strong>{' / '}
+                        <span
+                            onClick={() => openUrl('https://semadoc.io')}
+                            style={{ cursor: 'pointer', textDecoration: 'underline', color: 'inherit' }}
+                            role="link"
+                            tabIndex={0}
+                            onKeyDown={(e) => e.key === 'Enter' && openUrl('https://semadoc.io')}
+                        >
+                            semadoc.io
+                        </span>
                     </p>
                     <p>
                         <span

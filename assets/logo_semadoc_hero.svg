@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="400" height="120">
+  <defs>
+    <linearGradient id="docGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3A6BC5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2B579A;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F2C811;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#E0B400;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Icon: Document shape -->
+  <g transform="translate(16, 12)">
+    <path d="M8,0 L52,0 L68,16 L68,88 Q68,96 60,96 L8,96 Q0,96 0,88 L0,8 Q0,0 8,0 Z" 
+          fill="url(#docGrad)" />
+    <path d="M52,0 L52,16 L68,16 Z" fill="#2B579A" opacity="0.5" />
+    
+    <!-- Star schema: connection lines (drawn first, circles on top) -->
+    <line x1="34" y1="36" x2="34" y2="16" stroke="#F2C811" stroke-width="2.5" opacity="0.7" />
+    <line x1="34" y1="36" x2="51" y2="46" stroke="#F2C811" stroke-width="2.5" opacity="0.7" />
+    <line x1="34" y1="36" x2="17" y2="46" stroke="#F2C811" stroke-width="2.5" opacity="0.7" />
+    
+    <!-- Star schema: center node (fact table) -->
+    <circle cx="34" cy="36" r="8" fill="url(#accentGrad)" />
+    
+    <!-- Star schema: outer nodes (dimensions) -->
+    <circle cx="34" cy="16" r="5" fill="url(#accentGrad)" />
+    <circle cx="51" cy="46" r="5" fill="url(#accentGrad)" />
+    <circle cx="17" cy="46" r="5" fill="url(#accentGrad)" />
+    
+    <!-- Pulse line -->
+    <path d="M10,74 L20,74 L24,66 L28,82 L32,70 L36,78 L40,74 L58,74" 
+          fill="none" stroke="#F2C811" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <!-- Wordmark: white text for dark/hero backgrounds -->
+  <g transform="translate(104, 36)">
+    <text font-family="Segoe UI, Inter, Arial, sans-serif" font-size="52" font-weight="700" fill="#ffffff" y="42">
+      Sema<tspan font-weight="400">Doc</tspan>
+    </text>
+  </g>
+
+  <!-- Tagline in accent yellow/orange -->
+  <text x="104" y="106" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="14" 
+        fill="#F2C811" letter-spacing="1.30" opacity="0.9">
+    THE DOC YOUR MODELS NEED
+  </text>
+</svg>

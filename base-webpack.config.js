@@ -66,6 +66,10 @@ const moduleRules = {
             type: 'asset/source',
         },
         {
+            test: /\.md$/,
+            type: 'asset/source',
+        },
+        {
             test: /(\.ts)x|\.ts$/,
             use: [
                 {

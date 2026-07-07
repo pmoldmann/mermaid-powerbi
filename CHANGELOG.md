@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1.1] - 2026-07-07
+
+### Added
+- **Content truncation warning** — when a single column value or measure reaches Power BI's per-value character limit (~32,767), the visual now shows a warning banner above the content, indicating that the text was likely truncated by Power BI before it reached the visual. Split long documents across multiple rows to render them in full.
+
+### Changed
+- Updated documentation.
+
+---
+
 ## [1.3.1.0] - 2026-07-04
 
 ### Security
