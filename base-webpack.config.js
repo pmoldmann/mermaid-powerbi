@@ -67,6 +67,9 @@ const moduleRules = {
         },
         {
             test: /\.md$/,
+            // Only the project's own README is imported (see src/DemoSection.tsx).
+            // Without this exclude, READMEs reached through node_modules end up in the bundle.
+            exclude: /node_modules/,
             type: 'asset/source',
         },
         {
@@ -123,12 +126,23 @@ const moduleRules = {
             ],
         },
         {
-            test: /\.(woff|ttf|ico|woff2|jpg|jpeg|png|webp|svg)$/i,
+            test: /\.(ico|woff2|jpg|jpeg|png|webp|svg)$/i,
             use: [
                 {
                     loader: 'base64-inline-loader'
                 }
             ]
+        },
+        {
+            // Legacy font formats are referenced by KaTeX's @font-face rules only as
+            // fallbacks *after* woff2. Every browser Power BI supports picks the woff2,
+            // so inlining these as base64 would add ~2 MB to the bundle for nothing.
+            // Resolve the URL but do not emit or inline the bytes.
+            test: /\.(woff|ttf|eot)$/i,
+            type: 'asset/resource',
+            generator: {
+                emit: false
+            }
         }
     ]
 };
@@ -139,16 +153,16 @@ const externals = {
     "corePowerbiObject": "Function('return this.powerbi')()",
     "realWindow": "Function('return this')()",
 };
+// Power BI downloads and evaluates visual.js on every report load, so bundle size
+// is the dominant factor in how long a report takes to open. Warn instead of staying
+// silent, so a regression shows up at build time rather than in the service.
 const performance = {
-    hints: false,
-    maxEntrypointSize: 512000,
-    maxAssetSize: 512000
+    hints: 'warning',
+    maxEntrypointSize: 3000000,
+    maxAssetSize: 3000000
 };
 
 const plugins = [
-    new webpack.SourceMapDevToolPlugin({
-        filename: '[name].js.map',
-      }),
     new webpack.ProvidePlugin({
         window: 'realWindow',
         define: 'fakeDefine',
@@ -184,8 +198,11 @@ const optimization = {
 
 module.exports = {
     optimization,
-    devtool: 'source-map',
-    mode: "development",
+    // mode and devtool are set per config: view-webpack.config.js packages for
+    // production (no source maps, NODE_ENV=production), view-webpack.dev.config.js
+    // serves the dev server. Never use an eval-based devtool - certified visuals
+    // must not contain eval().
+    mode: "production",
     module: moduleRules,
     resolve,
     externals,

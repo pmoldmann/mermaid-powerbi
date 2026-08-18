@@ -1,8 +1,12 @@
 import React from 'react';
 
 import { useAppSelector } from './redux/hooks';
-import MDEditor from '@uiw/react-md-editor';
+// "nohighlight" entry point: identical API, but without the bundled rehype-prism-plus
+// backed by refractor/all (~290 languages, ~9 MB). Highlighting is supplied explicitly
+// via ./syntaxHighlight with a hand-picked language set.
+import MDEditor from '@uiw/react-md-editor/nohighlight';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import type { PluggableList } from 'unified';
 
 import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext, FontSettingsContext, MarkdownSettingsContext, MermaidThemeVarsContext } from './Code';
 import remarkBreaks from 'remark-breaks';
@@ -20,10 +24,8 @@ import powerbiVisualsApi from "powerbi-visuals-api";
 import VisualTooltipDataItem = powerbiVisualsApi.extensibility.VisualTooltipDataItem;
 import ISelectionId = powerbiVisualsApi.visuals.ISelectionId;
 
-import "mermaid";
-
-// Register DAX and Power Query (M) as custom languages for syntax highlighting in code blocks
-import './dax-language';
+// Syntax highlighting for code fences, including DAX and Power Query (M)
+import { rehypePrism } from './syntaxHighlight';
 
 // Custom schema that preserves br tags (needed for Mermaid diagrams with line breaks)
 // Also allow br inside code elements and className on spans (needed for syntax highlighting tokens)
@@ -152,6 +154,21 @@ export const Application: React.FC = () => {
     }>({ visible: false, x: 0, y: 0, sectionIdx: null, selectionId: null });
 
     const showDebugPanel = settings?.mermaidDebug?.showDebugPanel === true;
+
+    // Plugin arrays are memoised so the unified pipeline is not recompiled on every render.
+    // rehypePrism runs after rehypeSanitize: it only re-tokenises already-sanitised text,
+    // which keeps the sanitiser last in line for anything that came from the data model.
+    const rehypePlugins = React.useMemo<PluggableList>(
+        () => [[rehypeSanitize, sanitizeSchema], rehypePrism],
+        []
+    );
+    const enableLineBreaks = settings?.markdown?.enableLineBreaks !== false;
+    const remarkPlugins = React.useMemo<PluggableList>(
+        () => enableLineBreaks
+            ? [remarkDefinitionList, remarkBreaks, remarkMark]
+            : [remarkDefinitionList, remarkMark],
+        [enableLineBreaks]
+    );
 
     // Custom <dt> renderer: applies font-size/style from definitionHeadingLevel as an
     // inline style. dt is excluded from the body-text !important SCSS rule so that
@@ -573,8 +590,8 @@ export const Application: React.FC = () => {
                                                         >
                                                             <MDEditor.Markdown
                                                                 components={{ code: Code, dt: DefinitionTerm, a: SafeLink }}
-                                                                rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkDefinitionList, remarkBreaks, remarkMark] : [remarkDefinitionList, remarkMark]}
+                                                                rehypePlugins={rehypePlugins}
+                                                                remarkPlugins={remarkPlugins}
                                                                 remarkRehypeOptions={{ handlers: defListHastHandlers }}
                                                                 source={preprocessDisplayMath(section.content)}
                                                             />
@@ -589,8 +606,8 @@ export const Application: React.FC = () => {
                                                are applied. Fall back to raw markdownContent only when no sections exist. */
                                             <MDEditor.Markdown
                                                 components={{ code: Code, dt: DefinitionTerm, a: SafeLink }}
-                                                rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                                remarkPlugins={settings?.markdown?.enableLineBreaks !== false ? [remarkDefinitionList, remarkBreaks, remarkMark] : [remarkDefinitionList, remarkMark]}
+                                                rehypePlugins={rehypePlugins}
+                                                remarkPlugins={remarkPlugins}
                                                 remarkRehypeOptions={{ handlers: defListHastHandlers }}
                                                 source={preprocessDisplayMath(markdownSections.length === 1 ? markdownSections[0].content : markdownContent)}
                                             />

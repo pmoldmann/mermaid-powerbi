@@ -29,19 +29,19 @@ const DISPLAY_NAME = pbivizFile.visual.displayName;
 const pluginLocation = './src/visualPluginView.ts';
 const statsLocation = "../../view.webpack.statistics.html";
 
+// Set by view-webpack.dev.config.js before it requires this file, so a debug build
+// never overwrites the release package in dist/.
+const isDev = process.env.PBIVIZ_DEV === 'true';
+
 module.exports = merge(base, {
-    mode: 'development',
-    devtool: 'inline-source-map',
-    devServer: {
-        static: {
-            directory: path.join(__dirname, '.tmp', 'drop'),
-            publicPath: '/assets'
-        },
-        devMiddleware: {
-            writeToDisk: true
-        },
-        hot: false
-    },
+    // Production build: enables tree shaking and sets NODE_ENV=production, which makes
+    // React, micromark and mdast resolve their production entry points instead of the
+    // much larger (and slower) development ones.
+    mode: 'production',
+    // No source maps in the packaged visual. An inline source map is embedded as base64
+    // *inside* visual.js and shipped to every report viewer - that alone grew the bundle
+    // to ~38 MB. Use `npm run start` or `npm run package:dev` when you need to debug.
+    devtool: false,
     entry: {
         "visual": pluginLocation
     },
@@ -94,7 +94,7 @@ module.exports = merge(base, {
             modules: true,
             visualSourceLocation: "../src/visual",
             pluginLocation: pluginLocation,
-            packageOutPath: path.join(__dirname, "dist"),
+            packageOutPath: path.join(__dirname, isDev ? "dist/dev" : "dist"),
             dropPath: path.join(__dirname, "/.tmp", "drop")
         })
     ]

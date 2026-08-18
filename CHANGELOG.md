@@ -8,6 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.2.0] - 2026-08-18
+
+### Performance
+
+Opening a report containing the visual in the Power BI Service took roughly two minutes, and the report page stayed unresponsive afterwards. The cause was the size of the shipped bundle, not the rendering itself: the package was **10.4 MB compressed, expanding to ~40 MB of JavaScript** that the browser had to download, parse and evaluate on every report load. It is now **1.7 MB / ~5.9 MB**.
+
+- **Production build.** The packaging configuration was building in webpack's development mode with `devtool: 'inline-source-map'`, which embedded a 24 MB source map as base64 *inside* `visual.js` and shipped it to every report viewer. It also left `NODE_ENV` unset, so React, micromark and mdast used their development builds — larger and measurably slower at runtime. The package build now runs in production mode without source maps; `npm run start` and the new `npm run package:dev` still produce a fully debuggable build (with a separate `.map` file, never `eval`).
+- **Syntax highlighting trimmed to the languages that are actually used.** The Markdown preview pulled in Prism's complete language set (~290 definitions) through its default entry point. Highlighting is now built from a hand-picked list — HTML/XML, CSS, JavaScript, TypeScript, JSX/TSX, JSON, YAML, Markdown, Python, SQL, Bash, PowerShell, C#, **DAX** and **Power Query (M)**. Fences tagged with any other language render unhighlighted instead of failing.
+- **Legacy font formats no longer inlined.** KaTeX ships each of its ~20 fonts as woff2, woff and ttf, and all three were being base64-inlined into the bundle. Only woff2 is ever requested by a browser Power BI supports; the fallbacks are no longer embedded.
+- **Bundle size is now enforced at build time** via webpack's performance budget, so a regression of this kind surfaces during the build rather than in the service.
+
+### Changed
+- **Resizing is no longer treated as a data change.** Every frame of a resize drag previously deep-cloned the entire DataView, re-extracted all Markdown sections and rebuilt one selection ID per row. Resize updates now only update the viewport, and are coalesced while the handle is being dragged.
+- **Rendered diagrams are cached in memory.** Diagrams are re-mounted whenever the section list changes or content scrolls; identical diagram code with identical settings is no longer laid out from scratch each time. The cache holds the sanitized SVG, so the DOMPurify pass cannot be bypassed by a cache hit, and it is memory-only — nothing is persisted.
+- Mermaid's global configuration is only re-applied when it has actually changed.
+
+### Notes
+- No change to the visual's privileges: `capabilities.json` still declares an empty `privileges` array — no web access, no local storage.
+
+---
+
 ## [1.3.1.1] - 2026-07-07
 
 ### Added
