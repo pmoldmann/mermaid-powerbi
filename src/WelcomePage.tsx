@@ -15,7 +15,6 @@ export const LIBRARY_VERSIONS = {
     react: '19.2.6',
     'react-md-editor': '4.1.1 (Markdown rendering)',
     katex: '0.16.x (LaTeX math rendering)',
-    handlebars: '4.7.9',
     dompurify: '3.4.7',
 };
 
