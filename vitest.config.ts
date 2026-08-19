@@ -49,7 +49,7 @@ export default defineConfig({
             // the entry file directly keeps them inside Vite's resolver, which
             // does try extensions.
             'powerbi-visuals-utils-typeutils': path.resolve(__dirname, 'node_modules/powerbi-visuals-utils-typeutils/lib/index.js'),
-            'powerbi-visuals-utils-formattingutils': path.resolve(__dirname, 'node_modules/powerbi-visuals-utils-formattingutils/lib/src/index.js'),
+            'powerbi-visuals-utils-formattingutils': path.resolve(__dirname, 'node_modules/powerbi-visuals-utils-formattingutils/lib/index.js'),
             'powerbi-visuals-utils-dataviewutils': path.resolve(__dirname, 'node_modules/powerbi-visuals-utils-dataviewutils/lib/index.js'),
         },
     },
@@ -72,7 +72,8 @@ export default defineConfig({
         },
         deps: {
             optimizer: {
-                web: {
+                // Vitest 4 renamed the `web` environment key to `client`.
+                client: {
                     enabled: true,
                     include: [
                         'powerbi-visuals-utils-formattingutils',

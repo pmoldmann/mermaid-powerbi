@@ -1,6 +1,6 @@
 # Markdown / Mermaid Renderer for Power BI
 
-![Version](https://img.shields.io/badge/version-1.3.1.1-blue)
+![Version](https://img.shields.io/badge/version-1.3.2.0-blue)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Custom%20Visual-yellow)
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 

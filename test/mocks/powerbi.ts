@@ -1,18 +1,25 @@
 import { vi } from 'vitest';
+import type { Mock } from 'vitest';
 import type powerbiVisualsApi from 'powerbi-visuals-api';
 
 type IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 type ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 type ISelectionId = powerbiVisualsApi.visuals.ISelectionId;
 
-export interface MockSelectionManager extends ISelectionManager {
-    select: ReturnType<typeof vi.fn>;
-    clear: ReturnType<typeof vi.fn>;
-    showContextMenu: ReturnType<typeof vi.fn>;
-    getSelectionIds: ReturnType<typeof vi.fn>;
-    registerOnSelectCallback: ReturnType<typeof vi.fn>;
-    hasSelection: ReturnType<typeof vi.fn>;
-}
+/**
+ * Keeps the real member signature and adds vi.fn()'s assertion helpers.
+ *
+ * Since vitest 4 `vi.fn()` is typed as `Mock<Procedure | Constructable>`, which
+ * no longer satisfies a specific (let alone overloaded) API signature. Declaring
+ * the mocks as an intersection instead of re-declaring them in an `extends`
+ * clause keeps them assignable to the Power BI interfaces.
+ */
+type Mocked<T> = T & Mock;
+type MockedMembers<T> = { [K in keyof T]: Mocked<T[K]> };
+
+export type MockSelectionManager = ISelectionManager &
+    MockedMembers<Pick<ISelectionManager,
+        'select' | 'clear' | 'showContextMenu' | 'getSelectionIds' | 'registerOnSelectCallback' | 'hasSelection'>>;
 
 export function createMockSelectionManager(): MockSelectionManager {
     return {
@@ -51,20 +58,11 @@ function createSelectionIdBuilder() {
     return builder;
 }
 
-export interface MockHost extends IVisualHost {
-    launchUrl: ReturnType<typeof vi.fn>;
-    tooltipService: {
-        enabled: ReturnType<typeof vi.fn>;
-        show: ReturnType<typeof vi.fn>;
-        move: ReturnType<typeof vi.fn>;
-        hide: ReturnType<typeof vi.fn>;
-    };
-    eventService: {
-        renderingStarted: ReturnType<typeof vi.fn>;
-        renderingFinished: ReturnType<typeof vi.fn>;
-        renderingFailed: ReturnType<typeof vi.fn>;
-    };
-}
+export type MockHost = IVisualHost & {
+    launchUrl: Mocked<IVisualHost['launchUrl']>;
+    tooltipService: MockedMembers<IVisualHost['tooltipService']>;
+    eventService: MockedMembers<IVisualHost['eventService']>;
+};
 
 export interface MockHostOptions {
     isHighContrast?: boolean;
