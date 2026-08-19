@@ -16,8 +16,8 @@
     build produced with -NoTest is flagged loudly in the output.
 
 .EXAMPLE
-    npm run package                # full gated build
-    npm run package:notest         # skip the tests (emergency only)
+    yarn package                   # full gated build
+    yarn package:notest            # skip the tests (emergency only)
     ./build.ps1 -Dev -SkipLint     # fast unminified build while developing
 #>
 [CmdletBinding()]
@@ -46,6 +46,22 @@ function Write-Skipped {
     $script:stepNumber++
     Write-Host ''
     Write-Host "[$script:stepNumber] $Title - skipped ($Switch)" -ForegroundColor DarkYellow
+}
+
+# Resolve a tool from node_modules/.bin instead of going through npx.
+#
+# Yarn 1 exports legacy npm_config_* variables (argv, version-git-tag, ...) into
+# every script it runs. Modern npm no longer knows them, so each npx call inside
+# this script printed five "npm warn Unknown env config" lines. Calling the local
+# binary directly avoids that noise - and one npm process start per step.
+function Resolve-LocalBin {
+    param([string]$Name)
+    $bin = Join-Path $root "node_modules/.bin/$Name"
+    $cmd = "$bin.cmd"
+    if (Test-Path $cmd) { return $cmd }
+    if (Test-Path $bin) { return $bin }
+    Write-Host "BUILD ABORTED: '$Name' not found in node_modules/.bin. Run 'yarn install' first." -ForegroundColor Red
+    exit 1
 }
 
 function Invoke-Step {
@@ -99,7 +115,7 @@ if ($SkipLint) {
     Write-Skipped 'ESLint' '-SkipLint'
 } else {
     Write-Step 'ESLint'
-    Invoke-Step 'npx' @('eslint', '.', '--ext', '.js,.jsx,.ts,.tsx')
+    Invoke-Step (Resolve-LocalBin 'eslint') @('.')
 }
 
 # ---------------------------------------------------------------------------
@@ -109,7 +125,7 @@ if ($SkipLint) {
 # tsconfig.test.json covers all of src/ plus the tests.
 # ---------------------------------------------------------------------------
 Write-Step 'TypeScript type check'
-Invoke-Step 'npx' @('tsc', '--noEmit', '-p', 'tsconfig.test.json')
+Invoke-Step (Resolve-LocalBin 'tsc') @('--noEmit', '-p', 'tsconfig.test.json')
 
 # ---------------------------------------------------------------------------
 # 4. Tests - the actual gate
@@ -118,7 +134,7 @@ if ($NoTest) {
     Write-Skipped 'Tests' '-NoTest'
 } else {
     Write-Step 'Tests'
-    Invoke-Step 'npx' @('vitest', 'run')
+    Invoke-Step (Resolve-LocalBin 'vitest') @('run')
 }
 
 # ---------------------------------------------------------------------------
@@ -133,7 +149,7 @@ if (Test-Path $distPath) {
     $before = Get-ChildItem $distPath -Filter '*.pbiviz' | Select-Object -ExpandProperty FullName
 }
 
-Invoke-Step 'npx' @('webpack', '--config', $webpackConfig)
+Invoke-Step (Resolve-LocalBin 'webpack') @('--config', $webpackConfig)
 
 # ---------------------------------------------------------------------------
 # Summary
@@ -158,7 +174,7 @@ if ($NoTest) {
     Write-Host ''
     Write-Host '*******************************************************************' -ForegroundColor Yellow
     Write-Host '  WARNING: built with -NoTest. This package is UNVERIFIED.' -ForegroundColor Yellow
-    Write-Host '  Do not publish it to AppSource without a full "npm run package".' -ForegroundColor Yellow
+    Write-Host '  Do not publish it to AppSource without a full "yarn package".' -ForegroundColor Yellow
     Write-Host '*******************************************************************' -ForegroundColor Yellow
 }
 

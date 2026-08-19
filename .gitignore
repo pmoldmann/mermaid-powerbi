@@ -15,3 +15,7 @@ licenseGenerator.exe
 .specstory/
 coverage/
 
+# yarn.lock is the lockfile of record - a second one from npm makes yarn warn
+# about mixed package managers and lets the two drift apart.
+package-lock.json
+

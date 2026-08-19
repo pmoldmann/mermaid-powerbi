@@ -53,15 +53,6 @@ const moduleRules = {
             }
         },
         {
-            test: /\.pegjs$/,
-            loader: require.resolve('pegjs-loader'),
-            options: {
-              allowedStartRules: ["start", "start_text"],
-              cache: true,
-              optimize: "size"
-            }
-        },
-        {
             test: /\.tmplt$/,
             type: 'asset/source',
         },
