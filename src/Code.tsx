@@ -839,7 +839,6 @@ export const Code = (props: CodeProps) => {
         }
         return (
             <ErrorBoundary>
-                {/* eslint-disable-next-line powerbi-visuals/no-inner-outer-html */}
                 <span className="katex-display-wrapper" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
             </ErrorBoundary>
         );
@@ -859,7 +858,6 @@ export const Code = (props: CodeProps) => {
         }
         return (
             <ErrorBoundary>
-                {/* eslint-disable-next-line powerbi-visuals/no-inner-outer-html */}
                 <span className="katex-inline-wrapper" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
             </ErrorBoundary>
         );

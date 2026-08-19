@@ -13,7 +13,8 @@ module.exports = [
             'lib/**',
             '.tmp/**',
             'coverage/**',
-            '**/*webpack.config.js',
+            // covers base-/view-webpack.config.js and view-webpack.dev.config.js
+            '**/*webpack*.config.js',
             'vitest.config.ts',
             'eslint.config.js',
             'assetProcessor.*',
@@ -63,9 +64,10 @@ module.exports = [
             'powerbi-visuals/no-http-string': 'off',
         },
     },
-    // dax-language.ts uses require() intentionally (ESM-only refractor module)
+    // syntaxHighlight.ts uses require() intentionally (ESM-only refractor and
+    // rehype-prism-plus modules — see the file header)
     {
-        files: ['src/dax-language.ts'],
+        files: ['src/syntaxHighlight.ts'],
         rules: {
             '@typescript-eslint/no-var-requires': 'off',
         },

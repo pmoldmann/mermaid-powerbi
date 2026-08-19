@@ -15,9 +15,9 @@
     "sass": "npx rebuild node-sass",
     "start": "webpack-dev-server --config view-webpack.dev.config.js",
     "audit": "npm audit",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "eslint": "npx eslint . --ext .js,.jsx,.ts,.tsx",
-    "lintfix": "eslint . --ext .js,.jsx,.ts,.tsx --fix"
+    "lint": "eslint .",
+    "eslint": "npx eslint .",
+    "lintfix": "eslint . --fix"
   },
   "dependencies": {
     "@mermaid-js/layout-elk": "^0.2.1",
