@@ -7,7 +7,7 @@ import semadocLogoLight from 'assets/logo_semadoc_light.svg';
 import semadocLogoHero from 'assets/logo_semadoc_hero.svg';
 
 // Visual version - update this for App Store releases
-export const VISUAL_VERSION = '1.3.1.1';
+export const VISUAL_VERSION = '1.3.2.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {

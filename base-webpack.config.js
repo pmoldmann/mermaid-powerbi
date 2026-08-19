@@ -126,7 +126,14 @@ const moduleRules = {
             ],
         },
         {
+            // 'javascript/auto' is required: without it webpack ignores what
+            // base64-inline-loader returns and falls back to asset/resource, which emits
+            // the file next to the bundle and rewrites the reference to
+            // publicPath + hash. A .pbiviz ships exactly one JS file and nothing else, so
+            // those emitted files never reach the browser and the reference 404s. That is
+            // what silently broke KaTeX's math fonts.
             test: /\.(ico|woff2|jpg|jpeg|png|webp|svg)$/i,
+            type: 'javascript/auto',
             use: [
                 {
                     loader: 'base64-inline-loader'
@@ -134,10 +141,10 @@ const moduleRules = {
             ]
         },
         {
-            // Legacy font formats are referenced by KaTeX's @font-face rules only as
-            // fallbacks *after* woff2. Every browser Power BI supports picks the woff2,
-            // so inlining these as base64 would add ~2 MB to the bundle for nothing.
-            // Resolve the URL but do not emit or inline the bytes.
+            // KaTeX declares each font as woff2, then woff, then ttf. Every browser Power
+            // BI supports takes the woff2 above, so embedding the two fallbacks as well
+            // would triple the font payload for nothing. Resolve the URL so css-loader is
+            // satisfied, but emit no bytes.
             test: /\.(woff|ttf|eot)$/i,
             type: 'asset/resource',
             generator: {

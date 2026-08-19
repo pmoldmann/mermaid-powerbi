@@ -1,0 +1,22 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "noEmit": true,
+        "module": "esnext",
+        "resolveJsonModule": true,
+        "types": ["vitest/globals", "@testing-library/jest-dom", "node"],
+        "lib": ["es2018", "dom"],
+        "paths": {
+            "visual/*": ["src/*"],
+            "assets/*": ["assets/*"]
+        }
+    },
+    "files": [],
+    "include": [
+        "src/**/*.ts",
+        "src/**/*.tsx",
+        "test/**/*.ts",
+        "test/**/*.tsx",
+        "vitest.config.ts"
+    ]
+}

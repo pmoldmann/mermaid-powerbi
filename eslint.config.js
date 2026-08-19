@@ -13,8 +13,8 @@ module.exports = [
             'lib/**',
             '.tmp/**',
             'coverage/**',
-            'test/**',
             '**/*webpack.config.js',
+            'vitest.config.ts',
             'eslint.config.js',
             'assetProcessor.*',
             'traceOptions.ts',
@@ -48,6 +48,19 @@ module.exports = [
             '@typescript-eslint/no-var-requires': 'warn',
             // Empty interface is intentional for extensible React prop types
             '@typescript-eslint/no-empty-object-type': ['warn', { allowInterfaces: 'always' }],
+        },
+    },
+    // Test code: the powerbi-visuals certification rules target shipped visual
+    // code (no innerHTML, no eval, …). Tests deliberately build fake DOM and
+    // DataView structures, so those rules do not apply here.
+    {
+        files: ['test/**/*.ts', 'test/**/*.tsx'],
+        rules: {
+            'powerbi-visuals/no-inner-outer-html': 'off',
+            '@typescript-eslint/no-explicit-any': 'off',
+            // SafeLink.test.tsx asserts that http: URLs are handled — the fixture
+            // strings are test data, not links the visual ships.
+            'powerbi-visuals/no-http-string': 'off',
         },
     },
     // dax-language.ts uses require() intentionally (ESM-only refractor module)
