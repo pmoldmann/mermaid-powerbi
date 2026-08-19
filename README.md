@@ -369,10 +369,12 @@ Uh - And now guess only once how this file has been generated...
 
 | Library | Version |
 |---------|---------|
-| Mermaid | 11.15.0 |
-| React | 19.2.6 |
-| react-md-editor | 4.1.1 (Markdown rendering) || KaTeX | 0.16.x (LaTeX math rendering) || Handlebars | 4.7.9 |
-| DOMPurify | 3.4.7 |
+| Mermaid | 11.17.0 |
+| layout-elk | 0.2.3 (ELK diagram layout) |
+| React | 19.2.8 |
+| react-md-editor | 4.1.1 (Markdown rendering) |
+| KaTeX | 0.16.47 (LaTeX math rendering) |
+| DOMPurify | 3.4.14 |
 
 ---
 
