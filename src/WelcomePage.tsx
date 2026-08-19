@@ -7,16 +7,16 @@ import semadocLogoLight from 'assets/logo_semadoc_light.svg';
 import semadocLogoHero from 'assets/logo_semadoc_hero.svg';
 
 // Visual version - update this for App Store releases
-export const VISUAL_VERSION = '1.3.1.1';
+export const VISUAL_VERSION = '1.3.2.0';
 
 // Library versions used in this visual
 export const LIBRARY_VERSIONS = {
-    mermaid: '11.15.0',
-    react: '19.2.6',
+    mermaid: '11.17.0',
+    'layout-elk': '0.2.3 (ELK diagram layout)',
+    react: '19.2.8',
     'react-md-editor': '4.1.1 (Markdown rendering)',
-    katex: '0.16.x (LaTeX math rendering)',
-    handlebars: '4.7.9',
-    dompurify: '3.4.7',
+    katex: '0.16.47 (LaTeX math rendering)',
+    dompurify: '3.4.14',
 };
 
 /**

@@ -1,6 +1,6 @@
 # Markdown / Mermaid Renderer for Power BI
 
-![Version](https://img.shields.io/badge/version-1.3.1.1-blue)
+![Version](https://img.shields.io/badge/version-1.3.2.0-blue)
 ![Power BI](https://img.shields.io/badge/Power%20BI-Custom%20Visual-yellow)
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue)
 
@@ -369,10 +369,12 @@ Uh - And now guess only once how this file has been generated...
 
 | Library | Version |
 |---------|---------|
-| Mermaid | 11.15.0 |
-| React | 19.2.6 |
-| react-md-editor | 4.1.1 (Markdown rendering) || KaTeX | 0.16.x (LaTeX math rendering) || Handlebars | 4.7.9 |
-| DOMPurify | 3.4.7 |
+| Mermaid | 11.17.0 |
+| layout-elk | 0.2.3 (ELK diagram layout) |
+| React | 19.2.8 |
+| react-md-editor | 4.1.1 (Markdown rendering) |
+| KaTeX | 0.16.47 (LaTeX math rendering) |
+| DOMPurify | 3.4.14 |
 
 ---
 
@@ -816,7 +818,6 @@ src/
 ├── Error.tsx              # Error boundary component
 ├── settings.ts            # Visual settings definitions
 ├── utils.ts               # Markdown extraction, sanitization
-├── helpers.ts             # Utility functions
 └── redux/
     ├── store.ts           # Redux store configuration
     ├── slice.ts           # State slice with actions/reducers
@@ -918,13 +919,42 @@ yarn install
 # Start development server (hot reload)
 yarn start
 
-# Build production package
+# Build production package (gated: version check → lint → typecheck → tests)
 yarn package
 
 # Run linting
 yarn lint
 yarn lintfix
 ```
+
+### Automated Tests
+
+The visual is covered by a [Vitest](https://vitest.dev) suite (unit tests for the
+pure logic, component tests for the React rendering against a mocked Power BI
+host). Mermaid itself is mocked — it cannot lay out a diagram in jsdom — so the
+diagram tests assert the *contract*: which config Mermaid is initialised with and
+which preprocessed source it receives.
+
+```bash
+yarn test            # run the whole suite once (~10s)
+yarn test:watch      # re-run on change while developing
+yarn test:coverage   # with a coverage report
+yarn typecheck       # tsc over all of src/ plus the tests
+```
+
+**The build is gated on the tests.** `yarn package` runs `build.ps1`, which stops
+before Webpack if anything fails, so a broken build never produces a `.pbiviz`:
+
+| Switch | Effect |
+| --- | --- |
+| `-NoTest` | skip the test run (the resulting package is flagged as unverified) |
+| `-SkipLint` | skip ESLint |
+| `-NoVersionCheck` | skip the version consistency check |
+| `-Dev` | build with `view-webpack.dev.config.js` (unminified, source maps) |
+
+The version check compares `package.json`, `pbiviz.json` and `VISUAL_VERSION` in
+`src/WelcomePage.tsx` — all three are hand-maintained and must match.
+`yarn package:raw` bypasses `build.ps1` entirely and calls Webpack directly.
 
 ### Testing Locally
 

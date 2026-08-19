@@ -13,8 +13,9 @@ module.exports = [
             'lib/**',
             '.tmp/**',
             'coverage/**',
-            'test/**',
-            '**/*webpack.config.js',
+            // covers base-/view-webpack.config.js and view-webpack.dev.config.js
+            '**/*webpack*.config.js',
+            'vitest.config.ts',
             'eslint.config.js',
             'assetProcessor.*',
             'traceOptions.ts',
@@ -50,9 +51,23 @@ module.exports = [
             '@typescript-eslint/no-empty-object-type': ['warn', { allowInterfaces: 'always' }],
         },
     },
-    // dax-language.ts uses require() intentionally (ESM-only refractor module)
+    // Test code: the powerbi-visuals certification rules target shipped visual
+    // code (no innerHTML, no eval, …). Tests deliberately build fake DOM and
+    // DataView structures, so those rules do not apply here.
     {
-        files: ['src/dax-language.ts'],
+        files: ['test/**/*.ts', 'test/**/*.tsx'],
+        rules: {
+            'powerbi-visuals/no-inner-outer-html': 'off',
+            '@typescript-eslint/no-explicit-any': 'off',
+            // SafeLink.test.tsx asserts that http: URLs are handled — the fixture
+            // strings are test data, not links the visual ships.
+            'powerbi-visuals/no-http-string': 'off',
+        },
+    },
+    // syntaxHighlight.ts uses require() intentionally (ESM-only refractor and
+    // rehype-prism-plus modules — see the file header)
+    {
+        files: ['src/syntaxHighlight.ts'],
         rules: {
             '@typescript-eslint/no-var-requires': 'off',
         },

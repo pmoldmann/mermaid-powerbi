@@ -14,6 +14,39 @@ import { useLocalize } from './useLocalize';
 // Register ELK layout engine (must happen before any mermaid.render() call)
 mermaid.registerLayoutLoaders(elkLayouts);
 
+// Mermaid holds its configuration in module-global state. Tracking the last applied
+// config lets us skip mermaid.initialize() when nothing changed.
+let lastMermaidConfigKey: string | null = null;
+
+// Parsing and laying out a diagram is by far the most expensive thing this visual does,
+// and diagrams are re-mounted whenever the section list changes or the user scrolls.
+// Cached values are the *sanitized* SVG, so the DOMPurify pass is part of what is cached
+// and cannot be bypassed by a cache hit.
+// In-memory only — persisting it would require the LocalStorage privilege, which this
+// visual deliberately does not declare.
+const SVG_CACHE_LIMIT = 50;
+const svgCache = new Map<string, string>();
+
+const getCachedSvg = (key: string): string | undefined => {
+    const svg = svgCache.get(key);
+    if (svg !== undefined) {
+        // Re-insert to mark as most recently used.
+        svgCache.delete(key);
+        svgCache.set(key, svg);
+    }
+    return svg;
+};
+
+const setCachedSvg = (key: string, svg: string): void => {
+    svgCache.delete(key);
+    svgCache.set(key, svg);
+    while (svgCache.size > SVG_CACHE_LIMIT) {
+        const oldest = svgCache.keys().next();
+        if (oldest.done) break;
+        svgCache.delete(oldest.value);
+    }
+};
+
 // eslint-disable-next-line powerbi-visuals/insecure-random
 const randomid = () => parseInt(String(Math.random() * 1e15), 10).toString(36);
 
@@ -369,8 +402,13 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
     const wrapperRef = React.useRef<HTMLDivElement>(null);
     const previousCodeRef = React.useRef<string | null>(null);
 
-    // Create a settings key to detect settings changes
-    const settingsKey = JSON.stringify(mermaidSettings) + JSON.stringify(mermaidDebugSettings) + JSON.stringify(fontSettings) + colorMode + JSON.stringify(mermaidThemeVars);
+    // Create a settings key to detect settings changes. Memoised because this runs on
+    // every render of every diagram on the page, and each diagram serialises the full
+    // settings objects.
+    const settingsKey = React.useMemo(
+        () => JSON.stringify(mermaidSettings) + JSON.stringify(mermaidDebugSettings) + JSON.stringify(fontSettings) + colorMode + JSON.stringify(mermaidThemeVars),
+        [mermaidSettings, mermaidDebugSettings, fontSettings, colorMode, mermaidThemeVars]
+    );
     const previousSettingsRef = React.useRef<string | null>(null);
 
     React.useEffect(() => {
@@ -466,8 +504,70 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                 }
             }
 
-            mermaid.initialize(mermaidConfig as Parameters<typeof mermaid.initialize>[0]);
-            
+            // Injects an already-sanitized SVG and applies the post-render styling and
+            // interactivity. Shared by the cache-hit path and the fresh-render path so
+            // both produce identical DOM.
+            const applySvg = (sanitizedSvg: string) => {
+                // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
+                container.innerHTML = sanitizedSvg;
+
+                // Ensure SVG has max-width constraint for responsiveness
+                const svgElement = container.querySelector('svg');
+                if (svgElement) {
+                    svgElement.style.maxWidth = '100%';
+                    svgElement.style.height = 'auto';
+
+                    // Add class for CSS line break preservation if enabled
+                    if (mermaidDebugSettings.preserveLineBreaksCSS !== false) {
+                        svgElement.classList.add('mermaid-preserve-linebreaks');
+                    } else {
+                        svgElement.classList.remove('mermaid-preserve-linebreaks');
+                    }
+
+                    // Canvas background: Mermaid's 'background' themeVariable only hints at
+                    // the background for color derivations — it does not paint the SVG canvas.
+                    // Apply it explicitly as CSS. Fall back to Mermaid's dark theme default
+                    // (#1f2020) when the dark theme is active, so diagrams look correct in
+                    // dark mode even without a user-set color.
+                    let canvasBg = '';
+                    if (mermaidThemeVars.enableThemeColors) {
+                        const rawBg = mermaidThemeVars.background as unknown;
+                        const userBg = typeof rawBg === 'string'
+                            ? rawBg
+                            : (rawBg as { solid?: { color?: string } })?.solid?.color;
+                        if (userBg && userBg.trim() !== '') {
+                            canvasBg = userBg;
+                        }
+                    }
+                    if (!canvasBg && mermaidConfig.theme === 'dark') {
+                        canvasBg = '#1f2020';
+                    }
+                    svgElement.style.backgroundColor = canvasBg;
+                }
+
+                // Process tooltips and link interception instead of calling
+                // bindFunctions() directly. This prevents Mermaid from setting up
+                // direct navigation handlers that trap the user inside the visual.
+                // Links are instead routed through host.launchUrl() which shows a
+                // confirmation dialog before opening in an external browser.
+                processMermaidInteractivity(container, code, host);
+            };
+
+            const cacheKey = `${settingsKey}\u0000${code}`;
+            const cachedSvg = getCachedSvg(cacheKey);
+            if (cachedSvg !== undefined) {
+                applySvg(cachedSvg);
+                return;
+            }
+
+            // Mermaid keeps its configuration in module-global state, so this has to run
+            // before render — but only when it actually differs from what is already set.
+            const configKey = JSON.stringify(mermaidConfig);
+            if (configKey !== lastMermaidConfigKey) {
+                mermaid.initialize(mermaidConfig as Parameters<typeof mermaid.initialize>[0]);
+                lastMermaidConfigKey = configKey;
+            }
+
             // Set noop transiently for Mermaid's `call noop()` click directives
             (window as WindowWithNoop).noop = () => { /* intentional no-op */ };
             mermaid
@@ -479,52 +579,12 @@ const MermaidDiagram: React.FC<{ code: string; className: string }> = ({ code, c
                     // DEFAULT_FORBID_CONTENTS), so htmlLabels must be false to avoid empty
                     // node boxes. With htmlLabels: false, Mermaid uses SVG <text> elements
                     // which are preserved by the SVG profile.
-                    // eslint-disable-next-line powerbi-visuals/no-inner-outer-html
-                    container.innerHTML = DOMPurify.sanitize(svg, {
+                    const sanitizedSvg = DOMPurify.sanitize(svg, {
                         USE_PROFILES: { svg: true, svgFilters: true },
                         ADD_TAGS: ['use'],
                     });
-                    
-                    // Ensure SVG has max-width constraint for responsiveness
-                    const svgElement = container.querySelector('svg');
-                    if (svgElement) {
-                        svgElement.style.maxWidth = '100%';
-                        svgElement.style.height = 'auto';
-                        
-                        // Add class for CSS line break preservation if enabled
-                        if (mermaidDebugSettings.preserveLineBreaksCSS !== false) {
-                            svgElement.classList.add('mermaid-preserve-linebreaks');
-                        } else {
-                            svgElement.classList.remove('mermaid-preserve-linebreaks');
-                        }
-
-                        // Canvas background: Mermaid's 'background' themeVariable only hints at
-                        // the background for color derivations — it does not paint the SVG canvas.
-                        // Apply it explicitly as CSS. Fall back to Mermaid's dark theme default
-                        // (#1f2020) when the dark theme is active, so diagrams look correct in
-                        // dark mode even without a user-set color.
-                        let canvasBg = '';
-                        if (mermaidThemeVars.enableThemeColors) {
-                            const rawBg = mermaidThemeVars.background as unknown;
-                            const userBg = typeof rawBg === 'string'
-                                ? rawBg
-                                : (rawBg as { solid?: { color?: string } })?.solid?.color;
-                            if (userBg && userBg.trim() !== '') {
-                                canvasBg = userBg;
-                            }
-                        }
-                        if (!canvasBg && mermaidConfig.theme === 'dark') {
-                            canvasBg = '#1f2020';
-                        }
-                        svgElement.style.backgroundColor = canvasBg;
-                    }
-                    
-                    // Process tooltips and link interception instead of calling
-                    // bindFunctions() directly. This prevents Mermaid from setting up
-                    // direct navigation handlers that trap the user inside the visual.
-                    // Links are instead routed through host.launchUrl() which shows a
-                    // confirmation dialog before opening in an external browser.
-                    processMermaidInteractivity(container, code, host);
+                    setCachedSvg(cacheKey, sanitizedSvg);
+                    applySvg(sanitizedSvg);
                 })
                 .catch((error) => {
                     delete (window as WindowWithNoop).noop;
@@ -779,7 +839,6 @@ export const Code = (props: CodeProps) => {
         }
         return (
             <ErrorBoundary>
-                {/* eslint-disable-next-line powerbi-visuals/no-inner-outer-html */}
                 <span className="katex-display-wrapper" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
             </ErrorBoundary>
         );
@@ -799,7 +858,6 @@ export const Code = (props: CodeProps) => {
         }
         return (
             <ErrorBoundary>
-                {/* eslint-disable-next-line powerbi-visuals/no-inner-outer-html */}
                 <span className="katex-inline-wrapper" dangerouslySetInnerHTML={{ __html: renderedHtml }} />
             </ErrorBoundary>
         );

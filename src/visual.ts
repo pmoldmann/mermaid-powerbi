@@ -17,6 +17,7 @@ import IVisualHost = powerbiVisualsApi.extensibility.visual.IVisualHost;
 import ISelectionManager = powerbiVisualsApi.extensibility.ISelectionManager;
 import IVisualEventService = powerbiVisualsApi.extensibility.IVisualEventService;
 import ILocalizationManager = powerbiVisualsApi.extensibility.ILocalizationManager;
+import VisualUpdateType = powerbiVisualsApi.VisualUpdateType;
 
 import { MermaidThemeVariablesSettings, VisualSettings } from "./settings";
 import { buildFormattingModel } from "./FormattingModel";
@@ -35,6 +36,10 @@ export class Visual implements IVisual {
     private events: IVisualEventService;
     private localizationManager: ILocalizationManager;
     private root: Root;
+    // Last DataView Power BI handed us. Used to skip the expensive clone + section
+    // extraction when an update carries the same data (resizes, viewport changes).
+    private lastDataView: DataView | null = null;
+    private viewportTimeout: number | null = null;
 
     constructor(options: VisualConstructorOptions) {
         this.target = options.element;
@@ -85,10 +90,43 @@ export class Visual implements IVisual {
         }
     }
 
+    /**
+     * Pushes the viewport into the store. While the user drags a resize handle Power BI
+     * fires an update per frame; coalescing them keeps the React tree from re-rendering
+     * dozens of times per second. ResizeEnd and all non-resize updates dispatch at once.
+     */
+    private dispatchViewport(options: VisualUpdateOptions, debounce: boolean) {
+        if (this.viewportTimeout !== null) {
+            window.clearTimeout(this.viewportTimeout);
+            this.viewportTimeout = null;
+        }
+        const viewport = deepClone(options.viewport);
+        if (!debounce) {
+            store.dispatch(setViewport(viewport));
+            return;
+        }
+        this.viewportTimeout = window.setTimeout(() => {
+            this.viewportTimeout = null;
+            store.dispatch(setViewport(viewport));
+        }, 100);
+    }
+
     public update(options: VisualUpdateOptions) {
         this.events.renderingStarted(options);
         try {
         const dataView = options && options.dataViews && options.dataViews[0];
+
+        // A pure resize carries unchanged data. Re-cloning the whole DataView,
+        // re-extracting sections and rebuilding one selectionId per row on every
+        // intermediate frame of a drag is what makes the report page feel stuck.
+        const isResize = options.type === VisualUpdateType.Resize
+            || options.type === VisualUpdateType.ResizeEnd
+            || options.type === (VisualUpdateType.Resize | VisualUpdateType.ResizeEnd);
+        if (isResize && this.lastDataView !== null) {
+            this.dispatchViewport(options, options.type === VisualUpdateType.Resize);
+            this.events.renderingFinished(options);
+            return;
+        }
         // supportsEmptyDataView ensures Power BI always provides a dataView
         // (with metadata.objects) even when no data roles are filled.
         if (dataView) {
@@ -98,7 +136,8 @@ export class Visual implements IVisual {
         store.dispatch(setHighContrast((this.host.colorPalette as { isHighContrast?: boolean })?.isHighContrast ?? false));
         // Always dispatch dataView - null/undefined will clear the content and show welcome page
         store.dispatch(setDataView(dataView ? deepClone(dataView) : null));
-        store.dispatch(setViewport(deepClone(options.viewport)));
+        this.dispatchViewport(options, false);
+        this.lastDataView = dataView ?? null;
 
         // Build selectionIds and row data for interactivity
         if (dataView?.table?.rows) {
@@ -129,6 +168,14 @@ export class Visual implements IVisual {
         } catch (error) {
             this.events.renderingFailed(options, String(error));
         }
+    }
+
+    public destroy(): void {
+        if (this.viewportTimeout !== null) {
+            window.clearTimeout(this.viewportTimeout);
+            this.viewportTimeout = null;
+        }
+        this.root?.unmount();
     }
 
     private static parseSettings(dataView: DataView): VisualSettings {

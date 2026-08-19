@@ -1,6 +1,8 @@
 import React from 'react';
-import MDEditor from '@uiw/react-md-editor';
+import MDEditor from '@uiw/react-md-editor/nohighlight';
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+import { rehypePrism } from './syntaxHighlight';
+import type { PluggableList } from 'unified';
 import remarkDefinitionList from 'remark-definition-list';
 import { Code, MermaidSettingsContext, MermaidDebugSettingsContext, ColorModeContext } from './Code';
 import { ErrorBoundary } from './Error';
@@ -49,6 +51,11 @@ const sanitizeSchema = {
         code: [...(defaultSchema.attributes?.code || []), 'className', 'class'],
     },
 };
+
+// Constant across renders — rehypePrism runs after rehypeSanitize and only
+// re-tokenises already-sanitised text.
+const rehypePlugins: PluggableList = [[rehypeSanitize, sanitizeSchema], rehypePrism];
+const remarkPlugins: PluggableList = [remarkDefinitionList, remarkMark];
 
 // Default Mermaid settings for demo
 const defaultMermaidSettings = {
@@ -166,8 +173,8 @@ export const DemoSection: React.FC = () => {
                                         <MermaidDebugSettingsContext.Provider value={defaultMermaidDebugSettings}>
                                         <MDEditor.Markdown
                                             source={DEMO_RENDER_SOURCE}
-                                            rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
-                                            remarkPlugins={[remarkDefinitionList, remarkMark]}
+                                            rehypePlugins={rehypePlugins}
+                                            remarkPlugins={remarkPlugins}
                                             components={{
                                                 code: Code,
                                                 a: SafeLink,

@@ -8,6 +8,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.2.0] - 2026-08-19
+
+### Performance
+
+Opening a report containing the visual in the Power BI Service took roughly two minutes, and the report page stayed unresponsive afterwards. The cause was the size of the shipped bundle, not the rendering itself: the package was **10.4 MB compressed, expanding to ~40 MB of JavaScript** that the browser had to download, parse and evaluate on every report load. It is now **1.7 MB / ~5.9 MB**.
+
+- **Production build.** The packaging configuration was building in webpack's development mode with `devtool: 'inline-source-map'`, which embedded a 24 MB source map as base64 *inside* `visual.js` and shipped it to every report viewer. It also left `NODE_ENV` unset, so React, micromark and mdast used their development builds — larger and measurably slower at runtime. The package build now runs in production mode without source maps; `npm run start` and the new `npm run package:dev` still produce a fully debuggable build (with a separate `.map` file, never `eval`).
+- **Syntax highlighting trimmed to the languages that are actually used.** The Markdown preview pulled in Prism's complete language set (~290 definitions) through its default entry point. Highlighting is now built from a hand-picked list — HTML/XML, CSS, JavaScript, TypeScript, JSX/TSX, JSON, YAML, Markdown, Python, SQL, Bash, PowerShell, C#, **DAX** and **Power Query (M)**. Fences tagged with any other language render unhighlighted instead of failing.
+- **Only the woff2 font format is embedded.** KaTeX declares each of its ~20 fonts as woff2, woff and ttf. Every browser Power BI supports takes the woff2, so the two fallback formats are no longer carried in the bundle.
+- **Bundle size is now enforced at build time** via webpack's performance budget, so a regression of this kind surfaces during the build rather than in the service.
+
+### Changed
+- **Resizing is no longer treated as a data change.** Every frame of a resize drag previously deep-cloned the entire DataView, re-extracted all Markdown sections and rebuilt one selection ID per row. Resize updates now only update the viewport, and are coalesced while the handle is being dragged.
+- **Rendered diagrams are cached in memory.** Diagrams are re-mounted whenever the section list changes or content scrolls; identical diagram code with identical settings is no longer laid out from scratch each time. The cache holds the sanitized SVG, so the DOMPurify pass cannot be bypassed by a cache hit, and it is memory-only — nothing is persisted.
+- Mermaid's global configuration is only re-applied when it has actually changed.
+- **Dependency update.** Mermaid 11.15.0 → **11.17.0** and `@mermaid-js/layout-elk` 0.2.1 → **0.2.3**. The layout engines themselves come in transitively and are pinned by those two: `dagre-d3-es` stays at 7.0.14 (mermaid pins it exactly, and it is the current release) and `elkjs` stays on 0.9.x because `@mermaid-js/layout-elk` declares `elkjs: ^0.9.3`.
+- KaTeX 0.16.45 → **0.16.47**, deliberately staying on the 0.16 line: mermaid requires `katex ^0.16.47` and `rehype-katex` requires `^0.16`, so a jump to 0.18 would ship a second KaTeX copy. A `resolutions`/`overrides` entry now pins the single version, replacing the duplicate that `rehype-katex` had pulled in.
+- Further runtime updates: DOMPurify 3.4.7 → 3.4.14, React / React DOM 19.2.6 → 19.2.8, `@uiw/react-md-editor` 4.1.0 → 4.1.1.
+- Power BI: `powerbi-visuals-api` 5.11.0 → **5.11.1** (`pbiviz.json` `apiVersion` raised in lockstep — the webpack plugin feeds it from the installed package), `powerbi-visuals-webpack-plugin` 5.0.3, and `powerbi-visuals-utils-dataviewutils` / `-formattingutils` 6.x → **7.0.0**. In v7 `formattingutils` moved its entry point from `lib/src/index.js` to `lib/index.js`, which the test alias in `vitest.config.ts` follows.
+- Toolchain: ESLint 10.8.1, typescript-eslint 8.67.0, webpack 5.109.2, webpack-cli 7.2.2, webpack-dev-server 5 → **6**, sass 1.102.0, sass-loader 16 → **17**, ts-loader 9.6.2, vitest and `@vitest/coverage-v8` 3 → **4**.
+- `rehype-rewrite` is now a declared dependency — `Code.tsx` imports `getCodeString` from it directly, but it had only been reaching the build transitively via `@uiw/react-md-editor`.
+- Dropped the dead `@types/dompurify` (DOMPurify 3 ships its own types) and `@types/react-inspector` (the package is not used).
+
+### Fixed
+- **KaTeX math fonts were missing from the package.** A loader rule was misconfigured (`type: 'javascript/auto'` was absent), so webpack ignored the base64 inlining, wrote the font files next to the bundle and rewrote the `@font-face` rules to point at `publicPath + hash`. A `.pbiviz` contains exactly one JavaScript file and nothing else, so those references resolved to nothing and formulas rendered in fallback system fonts instead of KaTeX's own. The fonts are now embedded in the bundle and math renders with correct typography. This affected all previous releases that shipped math support.
+
+### Notes
+- No change to the visual's privileges: `capabilities.json` still declares an empty `privileges` array — no web access, no local storage.
+- Vite is pinned to `^7.3.0` in `resolutions`. Vitest 4 otherwise pulls Vite 8, whose Rolldown bindings are published as per-platform optional dependencies that Yarn 1 tries — and fails — to resolve for every platform. Vitest 4 supports Vite 6, 7 and 8, so this is a lockfile constraint only.
+- TypeScript stays on 6.0.3: typescript-eslint 8.67 declares `typescript >=4.8.4 <6.1.0`, so TypeScript 7 would break linting. Babel remains on 7 and `jsdom` on 29 (jsdom 30 requires Node ≥ 24.15).
+- No behavioural change intended. The test suite mocks mermaid, so diagram rendering was verified manually in the developer visual.
+---
+
 ## [1.3.1.1] - 2026-07-07
 
 ### Added
