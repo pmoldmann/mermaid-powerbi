@@ -16,8 +16,8 @@
     build produced with -NoTest is flagged loudly in the output.
 
 .EXAMPLE
-    yarn package                   # full gated build
-    yarn package:notest            # skip the tests (emergency only)
+    npm run package                # full gated build
+    npm run package:notest         # skip the tests (emergency only)
     ./build.ps1 -Dev -SkipLint     # fast unminified build while developing
 #>
 [CmdletBinding()]
@@ -50,17 +50,16 @@ function Write-Skipped {
 
 # Resolve a tool from node_modules/.bin instead of going through npx.
 #
-# Yarn 1 exports legacy npm_config_* variables (argv, version-git-tag, ...) into
-# every script it runs. Modern npm no longer knows them, so each npx call inside
-# this script printed five "npm warn Unknown env config" lines. Calling the local
-# binary directly avoids that noise - and one npm process start per step.
+# Calling the local binary directly instead of going through npx saves one npm
+# process start per step and keeps the build independent of whatever npx would
+# resolve from the registry.
 function Resolve-LocalBin {
     param([string]$Name)
     $bin = Join-Path $root "node_modules/.bin/$Name"
     $cmd = "$bin.cmd"
     if (Test-Path $cmd) { return $cmd }
     if (Test-Path $bin) { return $bin }
-    Write-Host "BUILD ABORTED: '$Name' not found in node_modules/.bin. Run 'yarn install' first." -ForegroundColor Red
+    Write-Host "BUILD ABORTED: '$Name' not found in node_modules/.bin. Run 'npm install' first." -ForegroundColor Red
     exit 1
 }
 
@@ -174,7 +173,7 @@ if ($NoTest) {
     Write-Host ''
     Write-Host '*******************************************************************' -ForegroundColor Yellow
     Write-Host '  WARNING: built with -NoTest. This package is UNVERIFIED.' -ForegroundColor Yellow
-    Write-Host '  Do not publish it to AppSource without a full "yarn package".' -ForegroundColor Yellow
+    Write-Host '  Do not publish it to AppSource without a full "npm run package".' -ForegroundColor Yellow
     Write-Host '*******************************************************************' -ForegroundColor Yellow
 }
 

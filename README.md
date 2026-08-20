@@ -907,24 +907,24 @@ stateDiagram-v2
 ### Prerequisites
 
 - Node.js 18+
-- Yarn package manager
+- npm (ships with Node.js)
 - Power BI Desktop with Developer Mode enabled
 
 ### Setup
 
 ```bash
 # Install dependencies
-yarn install
+npm install
 
 # Start development server (hot reload)
-yarn start
+npm start
 
 # Build production package (gated: version check → lint → typecheck → tests)
-yarn package
+npm run package
 
 # Run linting
-yarn lint
-yarn lintfix
+npm run lint
+npm run lintfix
 ```
 
 ### Automated Tests
@@ -936,13 +936,13 @@ diagram tests assert the *contract*: which config Mermaid is initialised with an
 which preprocessed source it receives.
 
 ```bash
-yarn test            # run the whole suite once (~10s)
-yarn test:watch      # re-run on change while developing
-yarn test:coverage   # with a coverage report
-yarn typecheck       # tsc over all of src/ plus the tests
+npm test                # run the whole suite once (~10s)
+npm run test:watch      # re-run on change while developing
+npm run test:coverage   # with a coverage report
+npm run typecheck       # tsc over all of src/ plus the tests
 ```
 
-**The build is gated on the tests.** `yarn package` runs `build.ps1`, which stops
+**The build is gated on the tests.** `npm run package` runs `build.ps1`, which stops
 before Webpack if anything fails, so a broken build never produces a `.pbiviz`:
 
 | Switch | Effect |
@@ -954,11 +954,11 @@ before Webpack if anything fails, so a broken build never produces a `.pbiviz`:
 
 The version check compares `package.json`, `pbiviz.json` and `VISUAL_VERSION` in
 `src/WelcomePage.tsx` — all three are hand-maintained and must match.
-`yarn package:raw` bypasses `build.ps1` entirely and calls Webpack directly.
+`npm run package:raw` bypasses `build.ps1` entirely and calls Webpack directly.
 
 ### Testing Locally
 
-1. Run `yarn start` to start the dev server
+1. Run `npm start` to start the dev server
 2. Enable Developer Mode in Power BI Desktop
 3. Add "Developer Visual" to your report
 4. Add a column or measure with Markdown text
