@@ -62,6 +62,14 @@ export default defineConfig({
         setupFiles: ['./test/setup.ts'],
         include: ['test/**/*.test.{ts,tsx}'],
         css: false,
+        // The component suites call vi.resetModules() in beforeEach and then
+        // re-import mermaid, which is a large ESM graph. On a warm Vite cache
+        // that hook takes well under a second, but the first run after a fresh
+        // install has to transform the whole graph and blew past the 10s
+        // default. A build from a clean checkout - which is how AppSource
+        // certification builds the visual - always hits that cold path.
+        hookTimeout: 60000,
+        testTimeout: 30000,
         server: {
             deps: {
                 // powerbi-visuals-utils-* ship ESM with extensionless relative
